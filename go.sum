@@ -23,6 +23,7 @@ github.com/oleiade/lane v1.0.0 h1:kVSB6GwtxDriIu9yQFaEipAPMGV+nEpM60Pu02Fabyo=
 github.com/oleiade/lane v1.0.0/go.mod h1:ym0w0flrmBtGvApLDgFLa0sfGJkWxDQqnm0/0ok5w3Y=
 github.com/omnis-org/omnis-client v0.0.0-20201123110418-cf5337bdca3e h1:0HxLjtfVZ8djbD3RD4czbPZS1F8IwciB5hDE2giGbOA=
 github.com/omnis-org/omnis-client v0.0.0-20201123110418-cf5337bdca3e/go.mod h1:sNRZhiwHhB/caLViIaT+g7BA0Mmb+luO8csxXbEZYoY=
+github.com/omnis-org/omnis-rest-api v0.0.0-20201107102732-c8cacaa7bf37 h1:O8hu06XaDehYQt3EB+UlFJO9z3QqH6hP4zi/KXspJLk=
 github.com/omnis-org/omnis-rest-api v0.0.0-20201123104840-95be4ac3fbda h1:+5qex+GT08UWvFcAJO7o1duZAFLyylXp56umdNotWMY=
 github.com/omnis-org/omnis-rest-api v0.0.0-20201123104840-95be4ac3fbda/go.mod h1:oZkOudgFmHQiIIYxd9LNJJ4z+bVau40kyqDQBT40mWY=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=

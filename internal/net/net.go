@@ -167,9 +167,9 @@ func GetOperatingSystemsByName(name string) (model.OperatingSystems, error) {
 	return operatingSystems, nil
 }
 
-func GetNetworksByName(name string) (model.Networks, error) {
+func GetNetworksByIp(ip string) (model.Networks, error) {
 	networks := model.Networks{}
-	err := getObjects("/api/networks/name", name, &networks)
+	err := getObjects("/api/networks/ip", ip, &networks)
 	if err != nil {
 		return nil, fmt.Errorf("getObjects failed <- %v", err)
 	}

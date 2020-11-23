@@ -60,7 +60,7 @@ func doNetwork(ip string, mask int, perimeterId int32) (int32, error) {
 	var networkId int32 = 0
 	networkPart := utils.GetNetworkPart(ip, mask)
 
-	networks, err := net.GetNetworksByName(networkPart)
+	networks, err := net.GetNetworksByIp(networkPart)
 	if err != nil {
 		return 0, fmt.Errorf("net.GetNetworksByName failed <- %v", err)
 	}
