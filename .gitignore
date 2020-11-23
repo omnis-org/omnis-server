@@ -13,3 +13,8 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+.vscode
+build/omnis-server
+build/omnis-server.exe
+__debug_bin
