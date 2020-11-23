@@ -83,9 +83,10 @@ func doNetwork(ip string, mask int, perimeterId int32) (int32, error) {
 	return networkId, nil
 }
 
-func newGateway(ip string, maskI int) (int32, error) {
+func newGateway(ip string, maskI int, interfaceId int32) (int32, error) {
 	var ipv4 model.NullString
 	var mask model.NullInt32
+	var interfaceO model.NullInt32
 
 	err := ipv4.Scan(ip)
 	if err != nil {
@@ -95,9 +96,14 @@ func newGateway(ip string, maskI int) (int32, error) {
 	if err != nil {
 		return 0, fmt.Errorf("mask.Scan failed <- %v", err)
 	}
+	err = interfaceO.Scan(interfaceId)
+	if err != nil {
+		return 0, fmt.Errorf("interfaceO.Scan failed <- %v", err)
+	}
 
 	gateway := model.Gateway{Ipv4: ipv4,
-		Mask: mask}
+		Mask:        mask,
+		InterfaceId: interfaceO}
 
 	gatewayId, err := net.InsertGateway(&gateway)
 	if err != nil {
@@ -106,44 +112,11 @@ func newGateway(ip string, maskI int) (int32, error) {
 	return gatewayId, nil
 }
 
-func newInterfaceGateway(interfaceId int32, gatewayId int32) (int32, error) {
-	var interfaceO model.NullInt32
-	var gateway model.NullInt32
-
-	err := interfaceO.Scan(interfaceId)
-	if err != nil {
-		return 0, fmt.Errorf("interfaceO.Scan failed <- %v", err)
-	}
-	err = gateway.Scan(gatewayId)
-	if err != nil {
-		return 0, fmt.Errorf("gateway.Scan failed <- %v", err)
-	}
-
-	interfaceGateway := model.InterfaceGateway{InterfaceId: interfaceO,
-		GatewayId: gateway}
-
-	interfaceGatewayId, err := net.InsertInterfaceGateway(&interfaceGateway)
-	if err != nil {
-		return 0, fmt.Errorf("net.InsertInterfaceGateway failed <- %v", err)
-	}
-	return interfaceGatewayId, nil
-}
-
 func doGateways(interfaceId int32, gateways []string, mask int) error {
 
-	oldGtwInterfaces, err := net.GetInterfaceGatewaysByInterfaceId(interfaceId)
+	oldGateways, err := net.GetGatewaysByInterfaceId(interfaceId)
 	if err != nil {
-		return fmt.Errorf("net.GetInterfaceGatewaysByInterfaceId failed <- %v", err)
-	}
-
-	var oldGateways []*model.Gateway
-
-	for _, oldGtwItf := range oldGtwInterfaces {
-		gtw, err := net.GetGatewayById(oldGtwItf.GatewayId.Int32)
-		if err != nil {
-			return fmt.Errorf("net.GetGatewayById failed <- %v", err)
-		}
-		oldGateways = append(oldGateways, gtw)
+		return fmt.Errorf("newGateway failed <- %v", err)
 	}
 
 	for _, gtw := range gateways {
@@ -156,17 +129,12 @@ func doGateways(interfaceId int32, gateways []string, mask int) error {
 		}
 
 		if gatewayId == 0 {
-			gatewayId, err = newGateway(gtw, mask)
+			gatewayId, err = newGateway(gtw, mask, interfaceId)
 			if err != nil {
 				return fmt.Errorf("newGateway failed <- %v", err)
 			}
 		}
 
-		// link
-		_, err = newInterfaceGateway(interfaceId, gatewayId)
-		if err != nil {
-			return fmt.Errorf("newInterfaceGateway failed <- %v", err)
-		}
 	}
 
 	return nil

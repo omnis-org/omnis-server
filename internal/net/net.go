@@ -145,10 +145,6 @@ func InsertGateway(gateway *model.Gateway) (int32, error) {
 	return insertObject(gateway, "api/gateway")
 }
 
-func InsertInterfaceGateway(interfaceGateway *model.InterfaceGateway) (int32, error) {
-	return insertObject(interfaceGateway, "api/interfaceGateway")
-}
-
 func GetInterfacesByMachineId(machineId int32) (model.InterfaceOs, error) {
 	itfs := model.InterfaceOs{}
 	err := getObjects("/api/interfaces/machineId", machineId, &itfs)
@@ -176,14 +172,13 @@ func GetNetworksByIp(ip string) (model.Networks, error) {
 	return networks, nil
 }
 
-func GetInterfaceGatewaysByInterfaceId(interfaceId int32) (model.InterfaceGateways, error) {
-	interfaceGateways := model.InterfaceGateways{}
-
-	err := getObjects("/api/interfacesGateway/interfaceId/", interfaceId, &interfaceGateways)
+func GetGatewaysByInterfaceId(interfaceId int32) (model.Gateways, error) {
+	gateways := model.Gateways{}
+	err := getObjects("/api/gateways/interfaceId", interfaceId, &gateways)
 	if err != nil {
 		return nil, fmt.Errorf("getObjects failed <- %v", err)
 	}
-	return interfaceGateways, nil
+	return gateways, nil
 }
 
 func GetPerimeterByName(name string) (*model.Perimeter, error) {
