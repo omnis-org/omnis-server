@@ -71,6 +71,7 @@ func (api *Api) informations(w http.ResponseWriter, r *http.Request) {
 
 ///// Router
 
+// TODO : Refactor name
 func (api *Api) home(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Welcome in OmnIS Server API\n")
@@ -95,8 +96,8 @@ func Run() error {
 	url := fmt.Sprintf("%s:%d", config.GetConfig().Server.Ip, config.GetConfig().Server.Port)
 
 	log.Info("ListenAndServer : ", url)
-	err := http.ListenAndServe(url, api.router)
 
+	err := http.ListenAndServe(url, api.router)
 	if err != nil {
 		log.Error("ListenAndServe failed : ", err)
 	}

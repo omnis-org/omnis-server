@@ -47,8 +47,8 @@ func newNetwork(networkPart string, mask int, perimeterId int32) (int32, error) 
 	networkO := model.Network{Name: name,
 		Ipv4:        ipv4,
 		Ipv4Mask:    ipv4Mask,
-		PerimeterId: perimeter}
-
+		PerimeterId: perimeter,
+	}
 	networkId, err := net.InsertNetwork(&networkO)
 	if err != nil {
 		return 0, fmt.Errorf("net.InsertNetwork failed <- %v", err)
@@ -116,7 +116,7 @@ func doGateways(interfaceId int32, gateways []string, mask int) error {
 
 	oldGateways, err := net.GetGatewaysByInterfaceId(interfaceId)
 	if err != nil {
-		return fmt.Errorf("newGateway failed <- %v", err)
+		return fmt.Errorf("net.GetGatewaysByInterfaceId failed <- %v", err)
 	}
 
 	for _, gtw := range gateways {

@@ -51,7 +51,7 @@ func newOperatingSystem(osInfos *client_informations.OperatingSystemInformations
 }
 
 func doOperatingSystem(osInfos *client_informations.OperatingSystemInformations) (int32, error) {
-	var operatingSystemId int32 = 0
+	var operatingSystemID int32 = 0
 	var err error
 
 	if osInfos.OS != "" {
@@ -65,14 +65,14 @@ func doOperatingSystem(osInfos *client_informations.OperatingSystemInformations)
 				os.PlatformFamily.String == osInfos.PlatformFamily &&
 				os.PlatformVersion.String == osInfos.PlatformVersion &&
 				os.KernelVersion.String == osInfos.KernelVersion {
-				operatingSystemId = os.Id.Int32
+				operatingSystemID = os.Id.Int32
 			}
 		}
 	}
 
-	if operatingSystemId == 0 {
+	if operatingSystemID == 0 {
 		// new
-		operatingSystemId, err = newOperatingSystem(osInfos)
+		operatingSystemID, err = newOperatingSystem(osInfos)
 		if err != nil {
 			return 0, fmt.Errorf("newOperatingSystem failed <- %v", err)
 		}
@@ -81,10 +81,10 @@ func doOperatingSystem(osInfos *client_informations.OperatingSystemInformations)
 		return 0, fmt.Errorf("Update not implemented <- %v", err) // TODO
 	}
 
-	return operatingSystemId, nil
+	return operatingSystemID, nil
 }
 
-func newMachine(systemInformations *client_informations.SystemInformations, locationId int32, perimeterId int32, osId int32) (int32, error) {
+func newMachine(systemInformations *client_informations.SystemInformations, locationID int32, perimeterID int32, osID int32) (int32, error) {
 	var hostname model.NullString
 	var label model.NullString
 	var isVirtualized model.NullBool
@@ -112,15 +112,15 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 	if err != nil {
 		return 0, fmt.Errorf("serialNumber.Scan failed <- %v", err)
 	}
-	err = perimeter.Scan(perimeterId)
+	err = perimeter.Scan(perimeterID)
 	if err != nil {
 		return 0, fmt.Errorf("perimeter.Scan failed <- %v", err)
 	}
-	err = location.Scan(locationId)
+	err = location.Scan(locationID)
 	if err != nil {
 		return 0, fmt.Errorf("location.Scan failed <- %v", err)
 	}
-	err = operatingSystem.Scan(osId)
+	err = operatingSystem.Scan(osID)
 	if err != nil {
 		return 0, fmt.Errorf("operatingSystem.Scan failed <- %v", err)
 	}
@@ -139,29 +139,29 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 		OperatingSystemId: operatingSystem,
 		OmnisVersion:      omnisVersion}
 
-	machineId, err := net.InsertMachine(&machine)
+	machineID, err := net.InsertMachine(&machine)
 	if err != nil {
 		return 0, fmt.Errorf("net.InsertMachine failed <- %v", err)
 	}
 
-	return machineId, nil
+	return machineID, nil
 }
 
-func doSystemInformations(systemInformations *client_informations.SystemInformations, machineId int32, locationId int32, perimeterId int32) (int32, error) {
-	osId, err := doOperatingSystem(systemInformations.OperatingSystem)
+func doSystemInformations(systemInformations *client_informations.SystemInformations, machineID int32, locationID int32, perimeterID int32) (int32, error) {
+	osID, err := doOperatingSystem(systemInformations.OperatingSystem)
 
 	if err != nil {
 		return 0, err
 	}
 
-	if machineId == 0 {
-		machineId, err = newMachine(systemInformations, locationId, perimeterId, osId)
+	if machineID == 0 {
+		machineID, err = newMachine(systemInformations, locationID, perimeterID, osID)
 		if err != nil {
 			return 0, fmt.Errorf("newMachine failed <- %v", err)
 		}
 	} else {
-		return 0, fmt.Errorf("Update not implemented <- %v", err) // TODO
+		return 0, fmt.Errorf("Update not implemented <- %v", err) // TODO - Update
 	}
 
-	return machineId, nil
+	return machineID, nil
 }

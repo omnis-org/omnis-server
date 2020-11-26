@@ -21,6 +21,7 @@ func getProtocol() string {
 
 func get(path string, i interface{}) ([]byte, error) {
 	var url string
+	// Generic way of get protocol with API OmnIS
 	switch v := i.(type) {
 	case int32:
 		url = fmt.Sprintf("%s://%s:%d/%s/%d", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, path, v)
@@ -49,7 +50,7 @@ func get(path string, i interface{}) ([]byte, error) {
 	return body, nil
 }
 
-func postB(path string, jsonB []byte) ([]byte, error) {
+func postBytes(path string, jsonB []byte) ([]byte, error) {
 	url := fmt.Sprintf("%s://%s:%d/%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, path)
 	res, err := http.Post(url, "application/json", bytes.NewBuffer(jsonB))
 	if err != nil {
@@ -71,14 +72,14 @@ func postB(path string, jsonB []byte) ([]byte, error) {
 }
 
 func insertObject(o model.Object, apiPath string) (int32, error) {
-	jsonB, err := json.Marshal(o)
+	jsonBytes, err := json.Marshal(o)
 	if err != nil {
 		return 0, fmt.Errorf("json.Marshal failed <- %v", err)
 	}
 
-	body, err := postB(apiPath, jsonB)
+	body, err := postBytes(apiPath, jsonBytes)
 	if err != nil {
-		return 0, fmt.Errorf("postB failed <- %v", err)
+		return 0, fmt.Errorf("postBytes failed <- %v", err)
 	}
 
 	var jsonID model.IdJSON
