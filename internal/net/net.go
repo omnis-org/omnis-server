@@ -2,6 +2,7 @@ package net
 
 import (
 	"bytes"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -9,7 +10,15 @@ import (
 
 	"github.com/omnis-org/omnis-rest-api/pkg/model"
 	"github.com/omnis-org/omnis-server/config"
+	log "github.com/sirupsen/logrus"
 )
+
+func InitDefaultTransport() {
+	if config.GetConfig().RestApi.InsecureSkipVerify {
+		log.Warning("http : insecure skip verify")
+		http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	}
+}
 
 func getProtocol() string {
 	protocol := "http"

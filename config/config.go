@@ -17,16 +17,24 @@ type WorkerConfig struct {
 }
 
 type RestApiConfig struct {
-	Ip       string `json:"ip"`
-	Port     int64  `json:"port"`
-	RootPath string `json:"root_path"`
-	TLS      bool   `json:"tls"`
+	Ip                 string `json:"ip"`
+	Port               int64  `json:"port"`
+	RootPath           string `json:"root_path"`
+	TLS                bool   `json:"tls"`
+	InsecureSkipVerify bool   `json:"insecure_skip_verify"`
+}
+
+type TlsConfig struct {
+	Activated bool   `json:"activated"`
+	KeyFile   string `json:"key_file"`
+	CrtFile   string `json:"crt_file"`
 }
 
 type Config struct {
 	Server  *ServerConfig  `json:"server"`
 	Worker  *WorkerConfig  `json:"worker"`
 	RestApi *RestApiConfig `json:"rest_api"`
+	TLS     *TlsConfig     `json:"tls"`
 }
 
 var lockConfig = &sync.Mutex{}
@@ -52,8 +60,9 @@ func LoadConfig(configFile *string) error {
 func defaultConfig() *Config {
 	sc := ServerConfig{"127.0.0.1", 4320}
 	wc := WorkerConfig{60}
-	rc := RestApiConfig{"127.0.0.1", 4320, "/api/auto", false}
-	return &Config{&sc, &wc, &rc}
+	rc := RestApiConfig{"127.0.0.1", 4320, "/api/auto", false, false}
+	tc := TlsConfig{Activated: false}
+	return &Config{&sc, &wc, &rc, &tc}
 }
 
 func GetConfig() *Config {

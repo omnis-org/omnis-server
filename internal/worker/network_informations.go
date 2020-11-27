@@ -147,7 +147,7 @@ func newInterfaces(networkInformation []client_informations.InterfaceInformation
 		var ipv4 model.NullString
 		var ipv4Mask model.NullInt32
 		var mac model.NullString
-		var interfaceType model.NullInt32
+		var interfaceType model.NullString
 		var machine model.NullInt32
 		var network model.NullInt32
 
@@ -168,7 +168,7 @@ func newInterfaces(networkInformation []client_informations.InterfaceInformation
 			return fmt.Errorf("mac.Scan failed <- %v", err)
 		}
 		// interface type
-		err = interfaceType.Scan(1) // TODO
+		err = interfaceType.Scan("eth") // TODO
 		if err != nil {
 			return fmt.Errorf("interfaceType.Scan failed <- %v", err)
 		}
@@ -188,12 +188,12 @@ func newInterfaces(networkInformation []client_informations.InterfaceInformation
 		}
 
 		itfO := model.InterfaceO{Name: name,
-			Ipv4:            ipv4,
-			Ipv4Mask:        ipv4Mask,
-			MAC:             mac,
-			InterfaceTypeId: interfaceType,
-			MachineId:       machine,
-			NetworkId:       network}
+			Ipv4:          ipv4,
+			Ipv4Mask:      ipv4Mask,
+			MAC:           mac,
+			InterfaceType: interfaceType,
+			MachineId:     machine,
+			NetworkId:     network}
 
 		interfaceId, err := net.InsertInterface(&itfO)
 		if err != nil {

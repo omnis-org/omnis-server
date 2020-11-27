@@ -11,7 +11,7 @@
         "port" : 4321,
         "root_path" : "/api/auto",
         "tls": true,
-        "insecure_skip_verify": false
+        "insecure_skip_verify": true
     },
     "tls": {
         "activated" : true,

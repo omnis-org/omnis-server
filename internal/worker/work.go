@@ -27,7 +27,7 @@ func LaunchWorker() {
 			work = workQueue.Dequeue().(*Work)
 			work.Job(work.Handle)
 		}
-		log.Info("Wait for job ... (", config.GetConfig().Worker.WaitWorkTime, ")")
+		log.Debug("Wait for job ... (", config.GetConfig().Worker.WaitWorkTime, ")")
 		time.Sleep(time.Duration(config.GetConfig().Worker.WaitWorkTime) * time.Second)
 	}
 }

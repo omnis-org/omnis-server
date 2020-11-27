@@ -92,7 +92,7 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 	var perimeter model.NullInt32
 	var location model.NullInt32
 	var operatingSystem model.NullInt32
-	//var machineType model.NullInt32
+	var machineType model.NullString
 	var omnisVersion model.NullString
 
 	err := hostname.Scan(systemInformations.Hostname)
@@ -125,6 +125,11 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 		return 0, fmt.Errorf("operatingSystem.Scan failed <- %v", err)
 	}
 	// TODO : MACHINE TYPE
+	err = machineType.Scan("client")
+	if err != nil {
+		return 0, fmt.Errorf("machineType.Scan failed <- %v", err)
+	}
+
 	err = omnisVersion.Scan(systemInformations.OmnisVersion)
 	if err != nil {
 		return 0, fmt.Errorf("omnisVersion.Scan failed <- %v", err)
@@ -137,6 +142,7 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 		PerimeterId:       perimeter,
 		LocationId:        location,
 		OperatingSystemId: operatingSystem,
+		MachineType:       machineType,
 		OmnisVersion:      omnisVersion}
 
 	machineID, err := net.InsertMachine(&machine)
