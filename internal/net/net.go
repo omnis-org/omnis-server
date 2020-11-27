@@ -22,13 +22,14 @@ func getProtocol() string {
 func get(path string, i interface{}) ([]byte, error) {
 	var url string
 	// Generic way of get protocol with API OmnIS
+	url = fmt.Sprintf("%s://%s:%d%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, config.GetConfig().RestApi.RootPath)
 	switch v := i.(type) {
 	case int32:
-		url = fmt.Sprintf("%s://%s:%d/%s/%d", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, path, v)
+		url = fmt.Sprintf("%s/%s/%d", url, path, v)
 	case string:
-		url = fmt.Sprintf("%s://%s:%d/%s/%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, path, v)
+		url = fmt.Sprintf("%s/%s/%s", url, path, v)
 	default:
-		url = fmt.Sprintf("%s://%s:%d/%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, path)
+		url = fmt.Sprintf("%s/%s", url, path)
 	}
 
 	res, err := http.Get(url)
@@ -51,7 +52,7 @@ func get(path string, i interface{}) ([]byte, error) {
 }
 
 func postBytes(path string, jsonB []byte) ([]byte, error) {
-	url := fmt.Sprintf("%s://%s:%d/%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, path)
+	url := fmt.Sprintf("%s://%s:%d%s/%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, config.GetConfig().RestApi.RootPath, path)
 	res, err := http.Post(url, "application/json", bytes.NewBuffer(jsonB))
 	if err != nil {
 		return nil, fmt.Errorf("http.Post failed <- %v", err)
@@ -119,36 +120,36 @@ func getObject(apiPath string, i interface{}, object model.Object) error {
 }
 
 func InsertPerimeter(perimeter *model.Perimeter) (int32, error) {
-	return insertObject(perimeter, "api/perimeter")
+	return insertObject(perimeter, "perimeter")
 }
 
 func InsertLocation(location *model.Location) (int32, error) {
-	return insertObject(location, "api/location")
+	return insertObject(location, "location")
 }
 
 func InsertMachine(machine *model.Machine) (int32, error) {
-	return insertObject(machine, "api/machine")
+	return insertObject(machine, "machine")
 }
 
 func InsertInterface(itf *model.InterfaceO) (int32, error) {
-	return insertObject(itf, "api/interface")
+	return insertObject(itf, "interface")
 }
 
 func InsertOperatingSystem(os *model.OperatingSystem) (int32, error) {
-	return insertObject(os, "api/operatingSystem")
+	return insertObject(os, "operatingSystem")
 }
 
 func InsertNetwork(network *model.Network) (int32, error) {
-	return insertObject(network, "api/network")
+	return insertObject(network, "network")
 }
 
 func InsertGateway(gateway *model.Gateway) (int32, error) {
-	return insertObject(gateway, "api/gateway")
+	return insertObject(gateway, "gateway")
 }
 
 func GetInterfacesByMachineId(machineId int32) (model.InterfaceOs, error) {
 	itfs := model.InterfaceOs{}
-	err := getObjects("/api/interfaces/machineId", machineId, &itfs)
+	err := getObjects("interfaces/machineId", machineId, &itfs)
 	if err != nil {
 		return nil, fmt.Errorf("getObjects failed <- %v", err)
 	}
@@ -157,7 +158,7 @@ func GetInterfacesByMachineId(machineId int32) (model.InterfaceOs, error) {
 
 func GetOperatingSystemsByName(name string) (model.OperatingSystems, error) {
 	operatingSystems := model.OperatingSystems{}
-	err := getObjects("/api/operatingSystems/name", name, &operatingSystems)
+	err := getObjects("operatingSystems/name", name, &operatingSystems)
 	if err != nil {
 		return nil, fmt.Errorf("getObjects failed <- %v", err)
 	}
@@ -166,7 +167,7 @@ func GetOperatingSystemsByName(name string) (model.OperatingSystems, error) {
 
 func GetNetworksByIp(ip string) (model.Networks, error) {
 	networks := model.Networks{}
-	err := getObjects("/api/networks/ip", ip, &networks)
+	err := getObjects("networks/ip", ip, &networks)
 	if err != nil {
 		return nil, fmt.Errorf("getObjects failed <- %v", err)
 	}
@@ -175,7 +176,7 @@ func GetNetworksByIp(ip string) (model.Networks, error) {
 
 func GetGatewaysByInterfaceId(interfaceId int32) (model.Gateways, error) {
 	gateways := model.Gateways{}
-	err := getObjects("/api/gateways/interfaceId", interfaceId, &gateways)
+	err := getObjects("gateways/interfaceId", interfaceId, &gateways)
 	if err != nil {
 		return nil, fmt.Errorf("getObjects failed <- %v", err)
 	}
@@ -185,7 +186,7 @@ func GetGatewaysByInterfaceId(interfaceId int32) (model.Gateways, error) {
 func GetPerimeterByName(name string) (*model.Perimeter, error) {
 	perimeter := model.Perimeter{}
 
-	err := getObject("/api/perimeter/name", name, &perimeter)
+	err := getObject("perimeter/name", name, &perimeter)
 	if err != nil {
 		return nil, fmt.Errorf("getObject failed <- %v", err)
 	}
@@ -195,7 +196,7 @@ func GetPerimeterByName(name string) (*model.Perimeter, error) {
 func GetLocationByName(name string) (*model.Location, error) {
 	location := model.Location{}
 
-	err := getObject("/api/location/name", name, &location)
+	err := getObject("location/name", name, &location)
 	if err != nil {
 		return nil, fmt.Errorf("getObject failed <- %v", err)
 	}
@@ -205,7 +206,7 @@ func GetLocationByName(name string) (*model.Location, error) {
 func GetInterfaceByMac(mac string) (*model.InterfaceO, error) {
 	itf := model.InterfaceO{}
 
-	err := getObject("/api/interface/mac", mac, &itf)
+	err := getObject("interface/mac", mac, &itf)
 	if err != nil {
 		return nil, fmt.Errorf("getObject failed <- %v", err)
 	}
@@ -215,7 +216,7 @@ func GetInterfaceByMac(mac string) (*model.InterfaceO, error) {
 func GetMachineById(id int32) (*model.Machine, error) {
 	machine := model.Machine{}
 
-	err := getObject("/api/machine", id, &machine)
+	err := getObject("machine", id, &machine)
 	if err != nil {
 		return nil, fmt.Errorf("getObject failed <- %v", err)
 	}
@@ -225,7 +226,7 @@ func GetMachineById(id int32) (*model.Machine, error) {
 func GetGatewayById(id int32) (*model.Gateway, error) {
 	gateway := model.Gateway{}
 
-	err := getObject("/api/gateway", id, &gateway)
+	err := getObject("gateway", id, &gateway)
 	if err != nil {
 		return nil, fmt.Errorf("getObject failed <- %v", err)
 	}

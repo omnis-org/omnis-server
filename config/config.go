@@ -17,9 +17,10 @@ type WorkerConfig struct {
 }
 
 type RestApiConfig struct {
-	Ip   string `json:"ip"`
-	Port int64  `json:"port"`
-	TLS  bool   `json:"tls"`
+	Ip       string `json:"ip"`
+	Port     int64  `json:"port"`
+	RootPath string `json:"root_path"`
+	TLS      bool   `json:"tls"`
 }
 
 type Config struct {
@@ -51,7 +52,7 @@ func LoadConfig(configFile *string) error {
 func defaultConfig() *Config {
 	sc := ServerConfig{"127.0.0.1", 4320}
 	wc := WorkerConfig{60}
-	rc := RestApiConfig{"127.0.0.1", 4320, false}
+	rc := RestApiConfig{"127.0.0.1", 4320, "/api/auto", false}
 	return &Config{&sc, &wc, &rc}
 }
 

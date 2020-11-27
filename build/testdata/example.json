@@ -9,6 +9,7 @@
     "rest_api" : {
         "ip" : "127.0.0.1",
         "port" : 4321,
+        "root_path" : "/api/auto",
         "tls": false
     }
 }

@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/oleiade/lane v1.0.0
 	github.com/omnis-org/omnis-client v0.0.0-20201123110418-cf5337bdca3e
-	github.com/omnis-org/omnis-rest-api v0.0.0-20201123153132-5f17d7011ecb
+	github.com/omnis-org/omnis-rest-api v0.0.0-20201127135151-3de6ea70aed6
 	github.com/sirupsen/logrus v1.7.0
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
 )
