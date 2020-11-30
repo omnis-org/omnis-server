@@ -72,14 +72,14 @@ func (api *Api) informations(w http.ResponseWriter, r *http.Request) {
 
 ///// Router
 
-// TODO : Refactor name
-func (api *Api) home(w http.ResponseWriter, r *http.Request) {
+func (api *Api) root(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Welcome in OmnIS Server API\n")
 }
 
 func (api *Api) setupRouter() {
-	api.router.Methods("GET").Path("/api").HandlerFunc(api.home)
+	api.router.Methods("GET").Path("/").HandlerFunc(api.root)
+	api.router.Methods("GET").Path("/api").HandlerFunc(api.root)
 	api.router.Methods("POST").Path("/api/informations").HandlerFunc(api.informations)
 }
 
