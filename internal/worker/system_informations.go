@@ -2,6 +2,7 @@ package worker
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/omnis-org/omnis-rest-api/pkg/model"
 
@@ -124,8 +125,14 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 	if err != nil {
 		return 0, fmt.Errorf("operatingSystem.Scan failed <- %v", err)
 	}
-	// TODO : MACHINE TYPE
-	err = machineType.Scan("client")
+
+	if strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformVersion), "server") ||
+		strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformFamily), "server") { // TO DO : check work on all server type
+		err = machineType.Scan("server")
+	} else {
+		err = machineType.Scan("client")
+	}
+
 	if err != nil {
 		return 0, fmt.Errorf("machineType.Scan failed <- %v", err)
 	}
