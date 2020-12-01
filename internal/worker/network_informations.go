@@ -22,7 +22,7 @@ func getOneMacInterfaces(infos *client_informations.Informations) (string, error
 	return "", fmt.Errorf("Not found interfaces for  %s %s machine", infos.SystemInformations.Hostname, infos.SystemInformations.SerialNumber)
 }
 
-func newNetwork(networkPart string, mask int, perimeterId int32) (int32, error) {
+func newNetwork(networkPart string, mask int, perimeterID int32) (int32, error) {
 	var name model.NullString
 	var ipv4 model.NullString
 	var ipv4Mask model.NullInt32
@@ -40,7 +40,7 @@ func newNetwork(networkPart string, mask int, perimeterId int32) (int32, error) 
 	if err != nil {
 		return 0, fmt.Errorf("ipv4Mask.Scan failed <- %v", err)
 	}
-	err = perimeter.Scan(perimeterId)
+	err = perimeter.Scan(perimeterID)
 	if err != nil {
 		return 0, fmt.Errorf("perimeter.Scan failed <- %v", err)
 	}
@@ -49,15 +49,15 @@ func newNetwork(networkPart string, mask int, perimeterId int32) (int32, error) 
 		Ipv4Mask:    ipv4Mask,
 		PerimeterId: perimeter,
 	}
-	networkId, err := net.InsertNetwork(&networkO)
+	networkID, err := net.InsertNetwork(&networkO)
 	if err != nil {
 		return 0, fmt.Errorf("net.InsertNetwork failed <- %v", err)
 	}
-	return networkId, nil
+	return networkID, nil
 }
 
-func doNetwork(ip string, mask int, perimeterId int32) (int32, error) {
-	var networkId int32 = 0
+func doNetwork(ip string, mask int, perimeterID int32) (int32, error) {
+	var networkID int32 = 0
 	networkPart := utils.GetNetworkPart(ip, mask)
 
 	networks, err := net.GetNetworksByIp(networkPart)
@@ -68,22 +68,22 @@ func doNetwork(ip string, mask int, perimeterId int32) (int32, error) {
 	for _, network := range networks {
 		if network.Ipv4.String == networkPart &&
 			network.Ipv4Mask.Int32 == int32(mask) &&
-			network.PerimeterId.Int32 == perimeterId {
-			networkId = network.Id.Int32
+			network.PerimeterId.Int32 == perimeterID {
+			networkID = network.Id.Int32
 		}
 	}
 
-	if networkId == 0 {
-		networkId, err = newNetwork(networkPart, mask, perimeterId)
+	if networkID == 0 {
+		networkID, err = newNetwork(networkPart, mask, perimeterID)
 		if err != nil {
 			return 0, fmt.Errorf("newNetwork failed <- %v", err)
 		}
 	}
 
-	return networkId, nil
+	return networkID, nil
 }
 
-func newGateway(ip string, maskI int, interfaceId int32) (int32, error) {
+func newGateway(ip string, maskI int, interfaceID int32) (int32, error) {
 	var ipv4 model.NullString
 	var mask model.NullInt32
 	var interfaceO model.NullInt32
@@ -96,7 +96,7 @@ func newGateway(ip string, maskI int, interfaceId int32) (int32, error) {
 	if err != nil {
 		return 0, fmt.Errorf("mask.Scan failed <- %v", err)
 	}
-	err = interfaceO.Scan(interfaceId)
+	err = interfaceO.Scan(interfaceID)
 	if err != nil {
 		return 0, fmt.Errorf("interfaceO.Scan failed <- %v", err)
 	}
@@ -105,130 +105,188 @@ func newGateway(ip string, maskI int, interfaceId int32) (int32, error) {
 		Mask:        mask,
 		InterfaceId: interfaceO}
 
-	gatewayId, err := net.InsertGateway(&gateway)
+	gatewayID, err := net.InsertGateway(&gateway)
 	if err != nil {
 		return 0, fmt.Errorf("net.InsertGateway failed <- %v", err)
 	}
-	return gatewayId, nil
+	return gatewayID, nil
 }
 
-func doGateways(interfaceId int32, gateways []string, mask int) error {
-
-	oldGateways, err := net.GetGatewaysByInterfaceId(interfaceId)
+func doGateways(interfaceID int32, gateways []string, mask int) error {
+	oldGateways, err := net.GetGatewaysByInterfaceId(interfaceID)
 	if err != nil {
 		return fmt.Errorf("net.GetGatewaysByInterfaceId failed <- %v", err)
 	}
 
 	for _, gtw := range gateways {
-		var gatewayId int32 = 0
+		var gatewayID int32 = 0
 		for _, oldGtw := range oldGateways {
-			if oldGtw.Ipv4.String == gtw &&
-				oldGtw.Mask.Int32 == int32(mask) {
-				gatewayId = oldGtw.Id.Int32
+			if oldGtw.Ipv4.String == gtw && oldGtw.Mask.Int32 == int32(mask) {
+				gatewayID = oldGtw.Id.Int32
+				break
 			}
 		}
-
-		if gatewayId == 0 {
-			gatewayId, err = newGateway(gtw, mask, interfaceId)
+		if gatewayID == 0 {
+			_, err = newGateway(gtw, mask, interfaceID)
 			if err != nil {
 				return fmt.Errorf("newGateway failed <- %v", err)
 			}
 		}
-
 	}
 
-	return nil
-
-}
-
-func newInterfaces(networkInformation []client_informations.InterfaceInformations, machineId int32, perimeterId int32) error {
-	for _, itf := range networkInformation {
-		var name model.NullString
-		var ipv4 model.NullString
-		var ipv4Mask model.NullInt32
-		var mac model.NullString
-		var interfaceType model.NullString
-		var machine model.NullInt32
-		var network model.NullInt32
-
-		err := name.Scan(itf.Name)
-		if err != nil {
-			return fmt.Errorf("name.Scan failed <- %v", err)
-		}
-		err = ipv4.Scan(itf.Ipv4)
-		if err != nil {
-			return fmt.Errorf("ipv4.Scan failed <- %v", err)
-		}
-		err = ipv4Mask.Scan(itf.Ipv4Mask)
-		if err != nil {
-			return fmt.Errorf("ipv4Mask.Scan failed <- %v", err)
-		}
-		err = mac.Scan(itf.MAC)
-		if err != nil {
-			return fmt.Errorf("mac.Scan failed <- %v", err)
-		}
-		// interface type
-		err = interfaceType.Scan("eth") // TODO
-		if err != nil {
-			return fmt.Errorf("interfaceType.Scan failed <- %v", err)
-		}
-		err = machine.Scan(machineId)
-		if err != nil {
-			return fmt.Errorf("machine.Scan failed <- %v", err)
-		}
-
-		networkId, err := doNetwork(itf.Ipv4, itf.Ipv4Mask, perimeterId)
-		if err != nil {
-			return fmt.Errorf("doNetwork failed <- %v", err)
-		}
-
-		err = network.Scan(networkId)
-		if err != nil {
-			return fmt.Errorf("network.Scan failed <- %v", err)
-		}
-
-		itfO := model.InterfaceO{Name: name,
-			Ipv4:          ipv4,
-			Ipv4Mask:      ipv4Mask,
-			MAC:           mac,
-			InterfaceType: interfaceType,
-			MachineId:     machine,
-			NetworkId:     network}
-
-		interfaceId, err := net.InsertInterface(&itfO)
-		if err != nil {
-			return fmt.Errorf("InsertInterfnetworkace failed <- %v", err)
-		}
-
-		log.Debug(fmt.Sprintf("Create new interface %s %s : %d", itf.Name, itf.Ipv4, interfaceId))
-
-		if len(itf.Gateways) != 0 {
-			err = doGateways(interfaceId, itf.Gateways, itf.Ipv4Mask)
-			if err != nil {
-				return fmt.Errorf("doGateways failed <- %v", err)
+	for _, oldGtw := range oldGateways {
+		var found bool = false
+		for _, gtw := range gateways {
+			if oldGtw.Ipv4.String == gtw && oldGtw.Mask.Int32 == int32(mask) {
+				found = true
+				break
 			}
 		}
 
+		if !found {
+			err = net.DeleteGateway(oldGtw.Id.Int32)
+			if err != nil {
+				return fmt.Errorf("net.DeleteGateway failed <- %v", err)
+			}
+
+			log.Debug(fmt.Sprintf("delete gateway : %d", oldGtw.Id.Int32))
+		}
+
 	}
+
 	return nil
 }
 
-func doNetworkInformations(networkInformation *client_informations.NetworkInformations, machineId int32, perimeterId int32) error {
-	itfsDb, err := net.GetInterfacesByMachineId(machineId)
+func doInterface(itf *client_informations.InterfaceInformations, machineID int32, perimeterID int32, updateInterfaceID int32) error {
+	var name model.NullString
+	var ipv4 model.NullString
+	var ipv4Mask model.NullInt32
+	var mac model.NullString
+	var interfaceType model.NullString
+	var machine model.NullInt32
+	var network model.NullInt32
+
+	err := name.Scan(itf.Name)
+	if err != nil {
+		return fmt.Errorf("name.Scan failed <- %v", err)
+	}
+	err = ipv4.Scan(itf.Ipv4)
+	if err != nil {
+		return fmt.Errorf("ipv4.Scan failed <- %v", err)
+	}
+	err = ipv4Mask.Scan(itf.Ipv4Mask)
+	if err != nil {
+		return fmt.Errorf("ipv4Mask.Scan failed <- %v", err)
+	}
+	err = mac.Scan(itf.MAC)
+	if err != nil {
+		return fmt.Errorf("mac.Scan failed <- %v", err)
+	}
+	// interface type
+	err = interfaceType.Scan("eth") // TODO
+	if err != nil {
+		return fmt.Errorf("interfaceType.Scan failed <- %v", err)
+	}
+	err = machine.Scan(machineID)
+	if err != nil {
+		return fmt.Errorf("machine.Scan failed <- %v", err)
+	}
+
+	networkID, err := doNetwork(itf.Ipv4, itf.Ipv4Mask, perimeterID)
+	if err != nil {
+		return fmt.Errorf("doNetwork failed <- %v", err)
+	}
+
+	err = network.Scan(networkID)
+	if err != nil {
+		return fmt.Errorf("network.Scan failed <- %v", err)
+	}
+
+	itfO := model.InterfaceO{Name: name,
+		Ipv4:          ipv4,
+		Ipv4Mask:      ipv4Mask,
+		MAC:           mac,
+		InterfaceType: interfaceType,
+		MachineId:     machine,
+		NetworkId:     network}
+
+	var itfID int32 = 0
+
+	if updateInterfaceID == 0 {
+		itfID, err = net.InsertInterface(&itfO)
+		if err != nil {
+			return fmt.Errorf("net.InsertInterface failed <- %v", err)
+		}
+		log.Debug(fmt.Sprintf("new interface %s %s : %d", itf.Name, itf.Ipv4, itfID))
+	} else {
+		itfID = updateInterfaceID
+		err = net.UpdateInterface(updateInterfaceID, &itfO)
+		if err != nil {
+			return fmt.Errorf("net.UpdateInterface failed <- %v", err)
+		}
+		log.Debug(fmt.Sprintf("update interface %s %s : %d", itf.Name, itf.Ipv4, itfID))
+	}
+
+	if len(itf.Gateways) != 0 {
+		err = doGateways(itfID, itf.Gateways, itf.Ipv4Mask)
+		if err != nil {
+			return fmt.Errorf("doGateways failed <- %v", err)
+		}
+	}
+
+	return nil
+}
+
+func doInterfaces(interfaces []client_informations.InterfaceInformations, machineID int32, perimeterID int32) error {
+	oldInterfaces, err := net.GetInterfacesByMachineId(machineID)
 
 	if err != nil {
 		return fmt.Errorf("net.GetInterfacesByMachineId failed <- %v", err)
 	}
 
-	if len(itfsDb) == 0 {
-		err = newInterfaces(networkInformation.Interfaces, machineId, perimeterId)
-		if err != nil {
-			return fmt.Errorf("newInterfaces failed <- %v", err)
+	for _, itf := range interfaces {
+
+		var updateInterface model.InterfaceO
+
+		for _, oldInterface := range oldInterfaces {
+			if oldInterface.MAC.String == itf.MAC {
+				updateInterface = oldInterface
+				break
+			}
 		}
-	} else {
-		return fmt.Errorf("Update not implemented <- %v", err) // TODO
+
+		err = doInterface(&itf, machineID, perimeterID, updateInterface.Id.Int32)
+		if err != nil {
+			return fmt.Errorf("doInterface failed <- %v", err)
+		}
 	}
 
-	return nil
+	for _, oldInterface := range oldInterfaces {
+		var found bool = false
+		for _, itf := range interfaces {
 
+			if oldInterface.MAC.String == itf.MAC {
+				found = true
+				break
+			}
+		}
+
+		if !found {
+			err = net.DeleteInterface(oldInterface.Id.Int32)
+			if err != nil {
+				return fmt.Errorf("net.DeleteInterface failed <- %v", err)
+			}
+
+			log.Debug(fmt.Sprintf("delete interface : %d", oldInterface.Id.Int32))
+		}
+	}
+	return nil
+}
+
+func doNetworkInformations(networkInformation *client_informations.NetworkInformations, machineID int32, perimeterID int32) error {
+	err := doInterfaces(networkInformation.Interfaces, machineID, perimeterID)
+	if err != nil {
+		return fmt.Errorf("doInterfaces failed <- %v", err)
+	}
+	return nil
 }

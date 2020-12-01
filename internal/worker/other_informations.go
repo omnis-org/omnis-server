@@ -17,15 +17,14 @@ func doLocation(locationName string) (int32, error) {
 
 	var idLocation int32
 	if !location.Id.Valid {
-		log.Info("Create new location : ", locationName)
 		var name model.NullString
 		name.Scan(locationName)
-
 		idLocation, err = net.InsertLocation(&model.Location{Name: name})
-
 		if err != nil {
 			return 0, fmt.Errorf("net.InsertLocation failed <- %v", err)
 		}
+
+		log.Debug(fmt.Sprintf("new location : %s", locationName))
 
 	} else {
 		idLocation = location.Id.Int32
@@ -43,16 +42,15 @@ func doPerimeter(perimeterName string) (int32, error) {
 
 	var idPerimeter int32
 	if !perimeter.Id.Valid {
-		log.Info("Create new perimeter : ", perimeterName)
 		var name model.NullString
 		name.Scan(perimeterName)
 
 		idPerimeter, err = net.InsertPerimeter(&model.Perimeter{Name: name})
-
 		if err != nil {
 			return 0, fmt.Errorf("net.InsertLocation failed <- %v", err)
 		}
 
+		log.Debug(fmt.Sprintf("new perimeter : %s", perimeterName))
 	} else {
 		idPerimeter = perimeter.Id.Int32
 	}
