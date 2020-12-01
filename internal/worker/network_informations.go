@@ -12,16 +12,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func getOneMacInterfaces(infos *client_informations.Informations) (string, error) {
-	for _, itf := range infos.NetworkInformations.Interfaces {
-		if itf.MAC != "" {
-			return itf.MAC, nil
-		}
-	}
-
-	return "", fmt.Errorf("Not found interfaces for  %s %s machine", infos.SystemInformations.Hostname, infos.SystemInformations.SerialNumber)
-}
-
 func newNetwork(networkPart string, mask int, perimeterID int32) (int32, error) {
 	var name model.NullString
 	var ipv4 model.NullString

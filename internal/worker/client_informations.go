@@ -38,23 +38,29 @@ func AnalyzeClientInformations(i interface{}) {
 
 	log.Info(fmt.Sprintf("get new informations from : %s", infos.SystemInformations.Hostname))
 
-	mac, err := getOneMacInterfaces(infos)
-	if err != nil {
-		log.Error(err)
-		return
+	var machineID int32 = 0
+	for _, itf := range infos.NetworkInformations.Interfaces {
+		if itf.MAC == "" {
+			continue
+		}
+
+		log.Debug(fmt.Sprintf("machine as interface with mac : %s", itf.MAC))
+
+		itf2, err := net.GetInterfaceByMac(itf.MAC)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+
+		if itf2.Id.Valid {
+			machineID = itf2.MachineId.Int32
+			break
+		}
 	}
 
-	log.Debug(fmt.Sprintf("machine as interface with mac : %s", mac))
+	log.Debug(fmt.Sprintf("machine id : %d", machineID))
 
-	itf, err := net.GetInterfaceByMac(mac)
-	if err != nil {
-		log.Error(err)
-		return
-	}
-
-	log.Debug(fmt.Sprintf("interface id : %d", itf.Id.Int32))
-
-	err = doClientInformations(infos, itf.MachineId.Int32)
+	err := doClientInformations(infos, machineID)
 	if err != nil {
 		log.Error(err)
 		return
