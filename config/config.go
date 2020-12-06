@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"net/url"
 	"sync"
 )
 
@@ -16,25 +17,34 @@ type WorkerConfig struct {
 	WaitWorkTime int64 `json:"wait_work_time"`
 }
 
+type AdministrationConfig struct {
+	ExpirationTokenTime int64  `json:"expiration_token_time"`
+	AuthKeyFile         string `json:"auth_key_file"`
+	AuthPubFile         string `json:"auth_pub_file"`
+	AuthSimpleKey       []byte `json:"AuthSimpleKey"`
+}
+
 type RestApiConfig struct {
 	Ip                 string `json:"ip"`
 	Port               int64  `json:"port"`
-	RootPath           string `json:"root_path"`
+	AdminPath          string `json:"admin_path"`
+	OmnisPath          string `json:"omnis_path"`
 	TLS                bool   `json:"tls"`
 	InsecureSkipVerify bool   `json:"insecure_skip_verify"`
 }
 
 type TlsConfig struct {
-	Activated bool   `json:"activated"`
-	KeyFile   string `json:"key_file"`
-	CrtFile   string `json:"crt_file"`
+	Activated     bool   `json:"activated"`
+	ServerKeyFile string `json:"server_key_file"`
+	ServerCrtFile string `json:"server_crt_file"`
 }
 
 type Config struct {
-	Server  *ServerConfig  `json:"server"`
-	Worker  *WorkerConfig  `json:"worker"`
-	RestApi *RestApiConfig `json:"rest_api"`
-	TLS     *TlsConfig     `json:"tls"`
+	Server  *ServerConfig         `json:"server"`
+	Worker  *WorkerConfig         `json:"worker"`
+	Admin   *AdministrationConfig `json:"admin"`
+	RestApi *RestApiConfig        `json:"rest_api"`
+	TLS     *TlsConfig            `json:"tls"`
 }
 
 var lockConfig = &sync.Mutex{}
@@ -60,9 +70,10 @@ func LoadConfig(configFile *string) error {
 func defaultConfig() *Config {
 	sc := ServerConfig{"127.0.0.1", 4320}
 	wc := WorkerConfig{60}
-	rc := RestApiConfig{"127.0.0.1", 4320, "/api/auto", false, false}
+	ac := AdministrationConfig{5, "", "", []byte("SECRET_KEY")}
+	rc := RestApiConfig{"127.0.0.1", 4320, "/api/auto", "/admin", false, false}
 	tc := TlsConfig{Activated: false}
-	return &Config{&sc, &wc, &rc, &tc}
+	return &Config{&sc, &wc, &ac, &rc, &tc}
 }
 
 func GetConfig() *Config {
@@ -72,4 +83,20 @@ func GetConfig() *Config {
 		return defaultConfig()
 	}
 	return loadedConfig
+}
+
+func GetRestApiScheme() string {
+	protocol := "http://"
+	if GetConfig().RestApi.TLS {
+		protocol = "https://"
+	}
+	return protocol
+}
+
+func GetRestApiStringUrl() string {
+	return fmt.Sprintf("%s:%d", GetConfig().RestApi.Ip, GetConfig().RestApi.Port)
+}
+
+func GetRestApiUrl() (*url.URL, error) {
+	return url.Parse(fmt.Sprintf("%s%s", GetRestApiScheme(), GetRestApiStringUrl()))
 }

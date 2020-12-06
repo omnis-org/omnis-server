@@ -6,16 +6,22 @@
     "worker" : {
         "wait_work_time" : 10
     },
+    "admin":{
+        "expiration_token_time" : 10,
+        "auth_key_file" : "../keys/auth.key",
+        "auth_pub_file" : "../keys/auth.pub"
+    },
     "rest_api" : {
         "ip" : "127.0.0.1",
         "port" : 4321,
-        "root_path" : "/api/auto",
+        "admin_path" : "/admin",
+        "omnis_path" : "/api",
         "tls": true,
         "insecure_skip_verify": true
     },
     "tls": {
         "activated" : true,
-        "key_file": "../keys/server.key",
-        "crt_file" : "../keys/server.crt"
+        "server_key_file": "../keys/server.key",
+        "server_crt_file" : "../keys/server.crt"
     }
 }
