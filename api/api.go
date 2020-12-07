@@ -12,6 +12,7 @@ import (
 
 	"github.com/omnis-org/omnis-server/config"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 )
@@ -71,18 +72,19 @@ func (api *Api) informations(w http.ResponseWriter, r *http.Request) {
 
 ///// Router
 
-// TODO : Refactor name
-func (api *Api) home(w http.ResponseWriter, r *http.Request) {
+func (api *Api) root(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	fmt.Fprintf(w, "Welcome in OmnIS Server API\n")
 }
 
 func (api *Api) setupRouter() {
-	api.router.Methods("GET").Path("/api").HandlerFunc(api.home)
+	api.router.Methods("GET").Path("/").HandlerFunc(api.root)
+	api.router.Methods("GET").Path("/api").HandlerFunc(api.root)
 	api.router.Methods("POST").Path("/api/informations").HandlerFunc(api.informations)
 }
 
 func Run() error {
+	var err error
 	// Init router
 	router := mux.NewRouter().StrictSlash(true)
 
@@ -95,9 +97,18 @@ func Run() error {
 	// Init Serve
 	url := fmt.Sprintf("%s:%d", config.GetConfig().Server.Ip, config.GetConfig().Server.Port)
 
-	log.Info("ListenAndServer : ", url)
+	handler := handlers.CORS(
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
+		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin"}),
+		handlers.AllowedOrigins([]string{"*"}),
+	)
 
-	err := http.ListenAndServe(url, api.router)
+	if config.GetConfig().TLS.Activated {
+		err = http.ListenAndServeTLS(url, config.GetConfig().TLS.CrtFile, config.GetConfig().TLS.KeyFile, handler(api.router))
+	} else {
+		err = http.ListenAndServe(url, handler(api.router))
+	}
+
 	if err != nil {
 		log.Error("ListenAndServe failed : ", err)
 	}

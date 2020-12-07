@@ -1,6 +1,7 @@
 package worker
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/oleiade/lane"
@@ -27,7 +28,7 @@ func LaunchWorker() {
 			work = workQueue.Dequeue().(*Work)
 			work.Job(work.Handle)
 		}
-		log.Info("Wait for job ... (", config.GetConfig().Worker.WaitWorkTime, ")")
+		log.Debug(fmt.Sprintf("Wait for job ... (%d)", config.GetConfig().Worker.WaitWorkTime))
 		time.Sleep(time.Duration(config.GetConfig().Worker.WaitWorkTime) * time.Second)
 	}
 }

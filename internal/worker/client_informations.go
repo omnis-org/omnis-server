@@ -9,45 +9,23 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// new informations
-func new(infos *client_informations.Informations) error {
-	locationId, perimeterId, err := doOtherInformations(infos.OtherInformations)
-
+func doClientInformations(infos *client_informations.Informations, updateMachineID int32) error {
+	locationID, perimeterID, err := doOtherInformations(infos.OtherInformations)
 	if err != nil {
 		return fmt.Errorf("doOtherInformations failed <- %v", err)
 	}
 
-	machineId, err := doSystemInformations(infos.SystemInformations, 0, locationId, perimeterId)
+	log.Debug(fmt.Sprintf("location id : %d", locationID))
+	log.Debug(fmt.Sprintf("perimeter id : %d", perimeterID))
 
+	machineID, err := doSystemInformations(infos.SystemInformations, locationID, perimeterID, updateMachineID)
 	if err != nil {
 		return fmt.Errorf("doSystemInformations failed <- %v", err)
 	}
 
-	err = doNetworkInformations(infos.NetworkInformations, machineId, perimeterId)
+	log.Debug(fmt.Sprintf("machine id : %d", machineID))
 
-	if err != nil {
-		return fmt.Errorf("doNetworkInformations failed <- %v", err)
-	}
-
-	return nil
-}
-
-// update informations
-func update(machineId int32, infos *client_informations.Informations) error {
-
-	locationId, perimeterId, err := doOtherInformations(infos.OtherInformations)
-
-	if err != nil {
-		return fmt.Errorf("doNetworkInformations failed <- %v", err)
-	}
-
-	machineId, err = doSystemInformations(infos.SystemInformations, machineId, locationId, perimeterId)
-	if err != nil {
-		return fmt.Errorf("doSystemInformations failed <- %v", err)
-	}
-
-	err = doNetworkInformations(infos.NetworkInformations, machineId, perimeterId)
-
+	err = doNetworkInformations(infos.NetworkInformations, machineID, perimeterID)
 	if err != nil {
 		return fmt.Errorf("doNetworkInformations failed <- %v", err)
 	}
@@ -58,27 +36,31 @@ func update(machineId int32, infos *client_informations.Informations) error {
 func AnalyzeClientInformations(i interface{}) {
 	infos := i.(*client_informations.Informations)
 
-	mac, err := getOneMacInterfaces(infos)
-	if err != nil {
-		log.Error(err)
-		return
-	}
+	log.Info(fmt.Sprintf("get new informations from : %s", infos.SystemInformations.Hostname))
 
-	itf, err := net.GetInterfaceByMac(mac)
-	if err != nil {
-		log.Error(err)
-		return
-	}
+	var machineID int32 = 0
+	for _, itf := range infos.NetworkInformations.Interfaces {
+		if itf.MAC == "" {
+			continue
+		}
 
-	if !itf.Id.Valid {
-		err = new(infos)
+		log.Debug(fmt.Sprintf("machine as interface with mac : %s", itf.MAC))
+
+		itf2, err := net.GetInterfaceByMac(itf.MAC)
 		if err != nil {
 			log.Error(err)
+			return
 		}
-		return
+
+		if itf2.Id.Valid {
+			machineID = itf2.MachineId.Int32
+			break
+		}
 	}
 
-	err = update(itf.MachineId.Int32, infos)
+	log.Debug(fmt.Sprintf("machine id : %d", machineID))
+
+	err := doClientInformations(infos, machineID)
 	if err != nil {
 		log.Error(err)
 		return

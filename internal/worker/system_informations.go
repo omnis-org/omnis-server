@@ -2,8 +2,10 @@ package worker
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/omnis-org/omnis-rest-api/pkg/model"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/omnis-org/omnis-client/pkg/client_informations"
 	"github.com/omnis-org/omnis-server/internal/net"
@@ -54,45 +56,40 @@ func doOperatingSystem(osInfos *client_informations.OperatingSystemInformations)
 	var operatingSystemID int32 = 0
 	var err error
 
-	if osInfos.OS != "" {
-		operatingSystems, err := net.GetOperatingSystemsByName(osInfos.OS)
-		if err != nil {
-			return 0, fmt.Errorf("net.GetOperatingSystemsByName <- %v", err)
-		}
+	operatingSystems, err := net.GetOperatingSystemsByName(osInfos.OS)
+	if err != nil {
+		return 0, fmt.Errorf("net.GetOperatingSystemsByName <- %v", err)
+	}
 
-		for _, os := range operatingSystems {
-			if os.Platform.String == osInfos.Platform &&
-				os.PlatformFamily.String == osInfos.PlatformFamily &&
-				os.PlatformVersion.String == osInfos.PlatformVersion &&
-				os.KernelVersion.String == osInfos.KernelVersion {
-				operatingSystemID = os.Id.Int32
-			}
+	for _, os := range operatingSystems {
+		if os.Platform.String == osInfos.Platform &&
+			os.PlatformFamily.String == osInfos.PlatformFamily &&
+			os.PlatformVersion.String == osInfos.PlatformVersion &&
+			os.KernelVersion.String == osInfos.KernelVersion {
+			operatingSystemID = os.Id.Int32
 		}
 	}
 
 	if operatingSystemID == 0 {
-		// new
 		operatingSystemID, err = newOperatingSystem(osInfos)
 		if err != nil {
 			return 0, fmt.Errorf("newOperatingSystem failed <- %v", err)
 		}
-	} else {
-		// update
-		return 0, fmt.Errorf("Update not implemented <- %v", err) // TODO
-	}
 
+		log.Debug(fmt.Sprintf("new os : %s %s %s %s", osInfos.Platform, osInfos.PlatformFamily, osInfos.PlatformVersion, osInfos.KernelVersion))
+	}
 	return operatingSystemID, nil
 }
 
-func newMachine(systemInformations *client_informations.SystemInformations, locationID int32, perimeterID int32, osID int32) (int32, error) {
+func doMachine(systemInformations *client_informations.SystemInformations, locationID int32, perimeterID int32, osID int32, updateMachineID int32) (int32, error) {
 	var hostname model.NullString
 	var label model.NullString
-	var isVirtualized model.NullBool
+	var virtualizationSystem model.NullString
 	var serialNumber model.NullString
 	var perimeter model.NullInt32
 	var location model.NullInt32
 	var operatingSystem model.NullInt32
-	//var machineType model.NullInt32
+	var machineType model.NullString
 	var omnisVersion model.NullString
 
 	err := hostname.Scan(systemInformations.Hostname)
@@ -103,11 +100,14 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 	if err != nil {
 		return 0, fmt.Errorf("label.Scan failed <- %v", err)
 	}
-	err = isVirtualized.Scan(systemInformations.VirtualizationInformations.IsVirtualized)
-	if err != nil {
-		return 0, fmt.Errorf("isVirtualized.Scan failed <- %v", err)
+
+	if !systemInformations.VirtualizationInformations.IsVirtualized {
+		err = virtualizationSystem.Scan(systemInformations.VirtualizationInformations.VirtualizationSystem)
+		if err != nil {
+			return 0, fmt.Errorf("virtualizationSystem.Scan failed <- %v", err)
+		}
 	}
-	// TODO : Add virtualization system
+
 	err = serialNumber.Scan(systemInformations.SerialNumber)
 	if err != nil {
 		return 0, fmt.Errorf("serialNumber.Scan failed <- %v", err)
@@ -124,43 +124,68 @@ func newMachine(systemInformations *client_informations.SystemInformations, loca
 	if err != nil {
 		return 0, fmt.Errorf("operatingSystem.Scan failed <- %v", err)
 	}
-	// TODO : MACHINE TYPE
+
+	if strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformVersion), "server") ||
+		strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformFamily), "server") { // TO DO : check work on all server type
+		err = machineType.Scan("server")
+	} else {
+		err = machineType.Scan("client")
+	}
+
+	if err != nil {
+		return 0, fmt.Errorf("machineType.Scan failed <- %v", err)
+	}
+
 	err = omnisVersion.Scan(systemInformations.OmnisVersion)
 	if err != nil {
 		return 0, fmt.Errorf("omnisVersion.Scan failed <- %v", err)
 	}
 
 	machine := model.Machine{Hostname: hostname,
-		Label:             label,
-		IsVirtualized:     isVirtualized,
-		SerialNumber:      serialNumber,
-		PerimeterId:       perimeter,
-		LocationId:        location,
-		OperatingSystemId: operatingSystem,
-		OmnisVersion:      omnisVersion}
+		Label:                label,
+		VirtualizationSystem: virtualizationSystem,
+		SerialNumber:         serialNumber,
+		PerimeterId:          perimeter,
+		LocationId:           location,
+		OperatingSystemId:    operatingSystem,
+		MachineType:          machineType,
+		OmnisVersion:         omnisVersion}
 
-	machineID, err := net.InsertMachine(&machine)
-	if err != nil {
-		return 0, fmt.Errorf("net.InsertMachine failed <- %v", err)
+	var machineID int32 = 0
+	if updateMachineID == 0 { // new
+		machineID, err = net.InsertMachine(&machine)
+		if err != nil {
+			return 0, fmt.Errorf("net.InsertMachine failed <- %v", err)
+		}
+
+		log.Debug(fmt.Sprintf("new machine : %s", systemInformations.Hostname))
+
+	} else { // update
+		machineID = updateMachineID
+		err = net.UpdateMachine(machineID, &machine)
+		if err != nil {
+			return 0, fmt.Errorf("net.UpdateMachine failed <- %v", err)
+		}
+
+		log.Debug(fmt.Sprintf("update machine : %s", systemInformations.Hostname))
 	}
 
 	return machineID, nil
 }
 
-func doSystemInformations(systemInformations *client_informations.SystemInformations, machineID int32, locationID int32, perimeterID int32) (int32, error) {
-	osID, err := doOperatingSystem(systemInformations.OperatingSystem)
+func doSystemInformations(systemInformations *client_informations.SystemInformations, locationID int32, perimeterID int32, updateMachineID int32) (int32, error) {
+	var machineID int32 = 0
 
+	osID, err := doOperatingSystem(systemInformations.OperatingSystem)
 	if err != nil {
-		return 0, err
+		return 0, fmt.Errorf("doOperatingSystem failed <- %v", err)
 	}
 
-	if machineID == 0 {
-		machineID, err = newMachine(systemInformations, locationID, perimeterID, osID)
-		if err != nil {
-			return 0, fmt.Errorf("newMachine failed <- %v", err)
-		}
-	} else {
-		return 0, fmt.Errorf("Update not implemented <- %v", err) // TODO - Update
+	log.Debug(fmt.Sprintf("os id : %d", osID))
+
+	machineID, err = doMachine(systemInformations, locationID, perimeterID, osID, updateMachineID)
+	if err != nil {
+		return 0, fmt.Errorf("doMachine failed <- %v", err)
 	}
 
 	return machineID, nil
