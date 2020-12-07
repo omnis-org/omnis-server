@@ -23,8 +23,8 @@ github.com/gorilla/handlers v1.5.1 h1:9lRY6j8DEeeBT10CvO9hGW0gmky0BprnvDI5vfhUHH
 github.com/gorilla/handlers v1.5.1/go.mod h1:t8XrUpc4KVXb7HGyJ4/cEnwQiaxrX/hz1Zv/4g96P1Q=
 github.com/gorilla/mux v1.8.0 h1:i40aqfkR1h2SlN9hojwV5ZA91wcXFOvkdNIeFDP5koI=
 github.com/gorilla/mux v1.8.0/go.mod h1:DVbg23sWSpFRCP0SfiEN6jmj59UnW/n46BH5rLB71So=
-github.com/oleiade/lane v1.0.0 h1:kVSB6GwtxDriIu9yQFaEipAPMGV+nEpM60Pu02Fabyo=
-github.com/oleiade/lane v1.0.0/go.mod h1:ym0w0flrmBtGvApLDgFLa0sfGJkWxDQqnm0/0ok5w3Y=
+github.com/oleiade/lane v1.0.1 h1:hXofkn7GEOubzTwNpeL9MaNy8WxolCYb9cInAIeqShU=
+github.com/oleiade/lane v1.0.1/go.mod h1:IyTkraa4maLfjq/GmHR+Dxb4kCMtEGeb+qmhlrQ5Mk4=
 github.com/omnis-org/omnis-client v0.0.0-20201123110418-cf5337bdca3e h1:0HxLjtfVZ8djbD3RD4czbPZS1F8IwciB5hDE2giGbOA=
 github.com/omnis-org/omnis-client v0.0.0-20201123110418-cf5337bdca3e/go.mod h1:sNRZhiwHhB/caLViIaT+g7BA0Mmb+luO8csxXbEZYoY=
 github.com/omnis-org/omnis-rest-api v0.0.0-20201130091147-d3019306b900 h1:yINPEO3ul0xmo5ZbbYOj4DC+LfH1vKoW+CoYG7DZqQY=
