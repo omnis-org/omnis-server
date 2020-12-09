@@ -13,21 +13,19 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-type Credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 type JWTClaims struct {
 	Username string
 	jwt.StandardClaims
 }
 
 type UserToken struct {
-	Id       int32      `json:"id"`
-	Username string     `json:"username"`
-	Token    string     `json:"token"`
-	ExpireAt *time.Time `json:"exprireAt"`
+	Id        int32      `json:"id"`
+	Username  string     `json:"username"`
+	FirstName string     `json:"firstName"`
+	LastName  string     `json:"lastName"`
+	Admin     bool       `json:"admin"`
+	Token     string     `json:"token"`
+	ExpireAt  *time.Time `json:"exprireAt"`
 }
 
 var InvalidTokenError error = errors.New("Invalid Token")
@@ -53,7 +51,7 @@ func getPrivKey(jwtClaims *JWTClaims, token **jwt.Token) (interface{}, error) {
 	return key, nil
 }
 
-func createToken(id int32, username string) (*UserToken, error) {
+func createToken(id int32, username string, firstName string, lastName string, admin bool) (*UserToken, error) {
 	var err error
 	var token *jwt.Token
 	adminConf := config.GetConfig().Admin
@@ -76,58 +74,53 @@ func createToken(id int32, username string) (*UserToken, error) {
 		return nil, fmt.Errorf("token.SignedString failed <- %v", err)
 	}
 
-	return &UserToken{Id: id, Username: username, Token: tokenSignedString, ExpireAt: &expirationTokenTime}, nil
+	return &UserToken{Id: id, Username: username, FirstName: firstName,
+		LastName: lastName, Admin: admin, Token: tokenSignedString, ExpireAt: &expirationTokenTime}, nil
 
 }
 
-func Login(credentials *Credentials) (*UserToken, error) {
-	user, err := net.GetUserByUsername(credentials.Username)
+func Login(user *model.User) (*UserToken, error) {
+	userDB, err := net.GetUserByUsername(user.Username.String)
 	if err != nil {
 		return nil, fmt.Errorf("net.GetUserByUsername failed <- %v", err)
 	}
 
-	if !user.Valid() {
+	if !userDB.Valid() {
 		return nil, InvalidCredentialError
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(user.Password.String), []byte(credentials.Password))
+	err = bcrypt.CompareHashAndPassword([]byte(userDB.Password.String), []byte(user.Password.String))
 	if err != nil {
 		return nil, InvalidCredentialError
 	}
 	// auth ok
-	return createToken(user.Id.Int32, user.Username.String)
+	return createToken(user.Id.Int32, user.Username.String, user.FirstName.String,
+		user.LastName.String, user.Admin.Bool)
 }
 
-func Register(credentials *Credentials) error {
+func Register(user *model.User) error {
 
-	user, err := net.GetUserByUsername(credentials.Username)
+	userDB, err := net.GetUserByUsername(user.Username.String)
 	if err != nil {
 		return fmt.Errorf("net.GetUserByUsername failed <- %v", err)
 	}
 
-	if user.Valid() {
+	if userDB.Valid() {
 		return AlreadyExistError
 	}
 
-	enc, err := bcrypt.GenerateFromPassword([]byte(credentials.Password), bcrypt.DefaultCost)
+	enc, err := bcrypt.GenerateFromPassword([]byte(user.Password.String), bcrypt.DefaultCost)
 	if err != nil {
 		return fmt.Errorf("bcrypt.GenerateFromPassword failed <- %v", err)
 	}
 
-	var username model.NullString
-	var password model.NullString
-
-	err = username.Scan(credentials.Username)
+	err = user.Password.Scan(enc)
 	if err != nil {
-		return fmt.Errorf("username.Scan failed <- %v", err)
+		return fmt.Errorf("user.Password.Scan failed <- %v", err)
 	}
 
-	err = password.Scan(enc)
-	if err != nil {
-		return fmt.Errorf("password.Scan failed <- %v", err)
-	}
+	_, err = net.InsertUser(user)
 
-	_, err = net.InsertUser(&model.User{Username: username, Password: password})
 	if err != nil {
 		return fmt.Errorf("net.InsertUser failed <- %v", err)
 	}
@@ -184,6 +177,6 @@ func RefreshToken(token string) (*UserToken, error) {
 		return userToken, nil
 	}
 
-	return createToken(userToken.Id, userToken.Username)
+	return createToken(userToken.Id, userToken.Username, userToken.FirstName, userToken.LastName, userToken.Admin)
 
 }

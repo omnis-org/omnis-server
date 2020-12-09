@@ -24,23 +24,15 @@ func redirectRestApi(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *Api) reverseProxy(w http.ResponseWriter, r *http.Request) {
-	tokenCookie, err := r.Cookie("token")
+	tokenValue, err := getToken(r)
 	if err != nil {
-		if err == http.ErrNoCookie {
-			api.unauthorizedError(w, err)
-		} else {
-			api.internalError(w, err)
-		}
+		api.unauthorizedError(w, err)
 		return
 	}
 
-	_, err = auth.CheckToken(tokenCookie.Value)
+	_, err = auth.CheckToken(tokenValue)
 	if err != nil {
-		if err == auth.InvalidTokenError {
-			api.unauthorizedError(w, err)
-		} else {
-			api.internalError(w, err)
-		}
+		api.unauthorizedError(w, err)
 		return
 	}
 

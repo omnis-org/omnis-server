@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/omnis-org/omnis-rest-api/pkg/model"
 	"github.com/omnis-org/omnis-server/internal/auth"
 	"github.com/omnis-org/omnis-server/internal/net"
 )
@@ -37,14 +38,14 @@ func (api *Api) validToken(w http.ResponseWriter, r *http.Request) error {
 }
 
 func (api *Api) login(w http.ResponseWriter, r *http.Request) {
-	var credentials auth.Credentials
-	err := json.NewDecoder(r.Body).Decode(&credentials)
+	var user model.User
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		api.internalError(w, err)
 		return
 	}
 
-	token, err := auth.Login(&credentials)
+	token, err := auth.Login(&user)
 
 	if err != nil {
 		api.unauthorizedError(w, err)
@@ -91,14 +92,14 @@ func (api *Api) register(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var credentials auth.Credentials
-	err = json.NewDecoder(r.Body).Decode(&credentials)
+	var user model.User
+	err = json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		api.internalError(w, fmt.Errorf("json.NewDecoder(r.Body).Decode failed <- %v", err))
 		return
 	}
 
-	err = auth.Register(&credentials)
+	err = auth.Register(&user)
 	if err != nil {
 		if err == auth.AlreadyExistError {
 			api.badRequestError(w, err)
@@ -108,7 +109,13 @@ func (api *Api) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	api.success(w)
+	user.Password.String = ""
+	jsonUser, err := json.Marshal(user)
+	if err != nil {
+		api.internalError(w, err)
+	}
+
+	api.sendJSON(w, jsonUser)
 }
 
 func (api *Api) admin(w http.ResponseWriter, r *http.Request) {

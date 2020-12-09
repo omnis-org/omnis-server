@@ -10,7 +10,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/oleiade/lane v1.0.0
 	github.com/omnis-org/omnis-client v0.0.0-20201123110418-cf5337bdca3e
-	github.com/omnis-org/omnis-rest-api v0.0.0-20201205210556-13718b3739be
+	github.com/omnis-org/omnis-rest-api v0.0.0-20201209220803-c738212127d9
 	github.com/sirupsen/logrus v1.7.0
 	golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c
 	gopkg.in/alecthomas/kingpin.v2 v2.2.6
