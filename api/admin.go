@@ -22,7 +22,7 @@ func getToken(r *http.Request) (string, error) {
 	return tokenBearerArray[1], nil
 }
 
-func (api *Api) validToken(w http.ResponseWriter, r *http.Request) error {
+func (api *Api) validateToken(w http.ResponseWriter, r *http.Request) error {
 	tokenValue, err := getToken(r)
 	if err != nil {
 		api.unauthorizedError(w, err)
@@ -86,7 +86,7 @@ func (api *Api) refresh(w http.ResponseWriter, r *http.Request) {
 func (api *Api) register(w http.ResponseWriter, r *http.Request) {
 	users, err := net.GetUsers()
 	if len(users) != 0 {
-		err := api.validToken(w, r)
+		err := api.validateToken(w, r)
 		if err != nil {
 			return
 		}
@@ -119,7 +119,7 @@ func (api *Api) register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *Api) admin(w http.ResponseWriter, r *http.Request) {
-	err := api.validToken(w, r)
+	err := api.validateToken(w, r)
 	if err != nil {
 		return
 	}
