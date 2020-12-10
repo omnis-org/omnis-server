@@ -1,14 +1,8 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-
-	"github.com/omnis-org/omnis-server/internal/worker"
-
-	"github.com/omnis-org/omnis-client/pkg/client_informations"
 
 	"github.com/omnis-org/omnis-server/config"
 
@@ -21,55 +15,6 @@ type Api struct {
 	router *mux.Router
 }
 
-//////////////////			ERROR			//////////////////
-
-func (api *Api) badRequestError(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(400), 400)
-}
-
-func (api *Api) notFoundError(w http.ResponseWriter) {
-	http.Error(w, http.StatusText(404), 404)
-}
-
-func (api *Api) internalError(w http.ResponseWriter, err error) {
-	log.Error(err)
-	http.Error(w, http.StatusText(500), 500)
-}
-
-//////////////////			SUCCESS			//////////////////
-
-func (api *Api) success(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Success\n")
-}
-
-func (api *Api) sendJSON(w http.ResponseWriter, json []byte) {
-	w.Header().Set("Content-Type", "application/json")
-	w.Write(json)
-}
-
-//////////////////			FUNCTIONS			//////////////////
-
-func (api *Api) informations(w http.ResponseWriter, r *http.Request) {
-	body, err := ioutil.ReadAll(r.Body)
-	if err != nil {
-		api.internalError(w, err)
-		return
-	}
-
-	infos := client_informations.Informations{}
-
-	err = json.Unmarshal(body, &infos)
-	if err != nil {
-		api.internalError(w, err)
-		return
-	}
-
-	worker.AddWork(&worker.Work{worker.AnalyzeClientInformations, &infos})
-
-	api.success(w)
-}
-
 ///// Router
 
 func (api *Api) root(w http.ResponseWriter, r *http.Request) {
@@ -79,8 +24,9 @@ func (api *Api) root(w http.ResponseWriter, r *http.Request) {
 
 func (api *Api) setupRouter() {
 	api.router.Methods("GET").Path("/").HandlerFunc(api.root)
-	api.router.Methods("GET").Path("/api").HandlerFunc(api.root)
-	api.router.Methods("POST").Path("/api/informations").HandlerFunc(api.informations)
+	api.setupClient()
+	api.setupAdmin()
+	api.setupProxy()
 }
 
 func Run() error {
@@ -104,7 +50,7 @@ func Run() error {
 	)
 
 	if config.GetConfig().TLS.Activated {
-		err = http.ListenAndServeTLS(url, config.GetConfig().TLS.CrtFile, config.GetConfig().TLS.KeyFile, handler(api.router))
+		err = http.ListenAndServeTLS(url, config.GetConfig().TLS.ServerCrtFile, config.GetConfig().TLS.ServerKeyFile, handler(api.router))
 	} else {
 		err = http.ListenAndServe(url, handler(api.router))
 	}

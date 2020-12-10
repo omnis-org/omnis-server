@@ -8,6 +8,7 @@ import (
 	"io"
 	"io/ioutil"
 	"net/http"
+	"path"
 
 	"github.com/omnis-org/omnis-rest-api/pkg/model"
 	"github.com/omnis-org/omnis-server/config"
@@ -21,28 +22,20 @@ func InitDefaultTransport() {
 	}
 }
 
-func getProtocol() string {
-	protocol := "http"
-	if config.GetConfig().RestApi.TLS {
-		protocol = "https"
-	}
-	return protocol
-}
-
-func get(path string, i interface{}) ([]byte, error) {
+func get(rootPath string, pathS string, i interface{}) ([]byte, error) {
 	var url string
 	// Generic way of get protocol with API OmnIS
-	url = fmt.Sprintf("%s://%s:%d%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, config.GetConfig().RestApi.RootPath)
+	url = fmt.Sprintf("%s/%s", config.GetRestApiStringUrl(), rootPath)
 	switch v := i.(type) {
 	case int32:
-		url = fmt.Sprintf("%s/%s/%d", url, path, v)
+		url = fmt.Sprintf("%s/%s/%d", url, pathS, v)
 	case string:
-		url = fmt.Sprintf("%s/%s/%s", url, path, v)
+		url = fmt.Sprintf("%s/%s/%s", url, pathS, v)
 	default:
-		url = fmt.Sprintf("%s/%s", url, path)
+		url = fmt.Sprintf("%s/%s", url, pathS)
 	}
 
-	res, err := http.Get(url)
+	res, err := http.Get(config.GetRestApiScheme() + path.Clean(url))
 
 	if err != nil {
 		return nil, fmt.Errorf("Get failed <- %v", err)
@@ -61,9 +54,9 @@ func get(path string, i interface{}) ([]byte, error) {
 	return body, nil
 }
 
-func postBytes(path string, jsonB []byte) ([]byte, error) {
-	url := fmt.Sprintf("%s://%s:%d%s/%s", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, config.GetConfig().RestApi.RootPath, path)
-	res, err := http.Post(url, "application/json", bytes.NewBuffer(jsonB))
+func postBytes(rootPath string, pathS string, jsonB []byte) ([]byte, error) {
+	url := fmt.Sprintf("%s/%s/%s", config.GetRestApiStringUrl(), rootPath, pathS)
+	res, err := http.Post(config.GetRestApiScheme()+path.Clean(url), "application/json", bytes.NewBuffer(jsonB))
 	if err != nil {
 		return nil, fmt.Errorf("http.Post failed <- %v", err)
 	}
@@ -102,9 +95,9 @@ func delete(url, contentType string, body io.Reader) (resp *http.Response, err e
 	return http.DefaultClient.Do(req)
 }
 
-func putBytes(path string, id int32, jsonB []byte) error {
-	url := fmt.Sprintf("%s://%s:%d%s/%s/%d", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, config.GetConfig().RestApi.RootPath, path, id)
-	res, err := put(url, "application/json", bytes.NewBuffer(jsonB))
+func putBytes(rootPath string, pathS string, id int32, jsonB []byte) error {
+	url := fmt.Sprintf("%s/%s/%s/%d", config.GetRestApiStringUrl(), rootPath, pathS, id)
+	res, err := put(config.GetRestApiScheme()+path.Clean(url), "application/json", bytes.NewBuffer(jsonB))
 	if err != nil {
 		return fmt.Errorf("put failed <- %v", err)
 	}
@@ -118,9 +111,9 @@ func putBytes(path string, id int32, jsonB []byte) error {
 	return nil
 }
 
-func deleteID(path string, id int32) error {
-	url := fmt.Sprintf("%s://%s:%d%s/%s/%d", getProtocol(), config.GetConfig().RestApi.Ip, config.GetConfig().RestApi.Port, config.GetConfig().RestApi.RootPath, path, id)
-	res, err := delete(url, "application/json", nil)
+func deleteID(rootPath string, pathS string, id int32) error {
+	url := fmt.Sprintf("%s/%s/%s/%d", config.GetRestApiStringUrl(), rootPath, pathS, id)
+	res, err := delete(config.GetRestApiScheme()+path.Clean(url), "application/json", nil)
 	if err != nil {
 		return fmt.Errorf("delete failed <- %v", err)
 	}
@@ -134,13 +127,13 @@ func deleteID(path string, id int32) error {
 	return nil
 }
 
-func insertObject(o model.Object, apiPath string) (int32, error) {
+func insertObject(rootPath string, o model.Object, apiPath string) (int32, error) {
 	jsonBytes, err := json.Marshal(o)
 	if err != nil {
 		return 0, fmt.Errorf("json.Marshal failed <- %v", err)
 	}
 
-	body, err := postBytes(apiPath, jsonBytes)
+	body, err := postBytes(rootPath, apiPath, jsonBytes)
 	if err != nil {
 		return 0, fmt.Errorf("postBytes failed <- %v", err)
 	}
@@ -155,13 +148,13 @@ func insertObject(o model.Object, apiPath string) (int32, error) {
 	return id32, nil
 }
 
-func updateObject(o model.Object, apiPath string, id int32) error {
+func updateObject(rootPath string, o model.Object, apiPath string, id int32) error {
 	jsonBytes, err := json.Marshal(o)
 	if err != nil {
 		return fmt.Errorf("json.Marshal failed <- %v", err)
 	}
 
-	err = putBytes(apiPath, id, jsonBytes)
+	err = putBytes(rootPath, apiPath, id, jsonBytes)
 	if err != nil {
 		return fmt.Errorf("putBytes failed <- %v", err)
 	}
@@ -169,8 +162,8 @@ func updateObject(o model.Object, apiPath string, id int32) error {
 	return nil
 }
 
-func getObjects(apiPath string, i interface{}, objects model.Objects) error {
-	data, err := get(apiPath, i)
+func getObjects(rootPath string, apiPath string, i interface{}, objects model.Objects) error {
+	data, err := get(rootPath, apiPath, i)
 	if err != nil {
 		return fmt.Errorf("get failed <- %v", err)
 	}
@@ -182,8 +175,8 @@ func getObjects(apiPath string, i interface{}, objects model.Objects) error {
 	return nil
 }
 
-func getObject(apiPath string, i interface{}, object model.Object) error {
-	data, err := get(apiPath, i)
+func getObject(rootPath string, apiPath string, i interface{}, object model.Object) error {
+	data, err := get(rootPath, apiPath, i)
 	if err != nil {
 		return fmt.Errorf("get failed <- %v", err)
 	}
@@ -195,141 +188,11 @@ func getObject(apiPath string, i interface{}, object model.Object) error {
 	return nil
 }
 
-func deleteObject(apiPath string, id int32) error {
-	err := deleteID(apiPath, id)
+func deleteObject(rootPath string, apiPath string, id int32) error {
+	err := deleteID(rootPath, apiPath, id)
 	if err != nil {
 		return fmt.Errorf("deleteID failed <- %v", err)
 	}
 
 	return nil
-}
-
-func InsertPerimeter(perimeter *model.Perimeter) (int32, error) {
-	return insertObject(perimeter, "perimeter")
-}
-
-func InsertLocation(location *model.Location) (int32, error) {
-	return insertObject(location, "location")
-}
-
-func InsertMachine(machine *model.Machine) (int32, error) {
-	return insertObject(machine, "machine")
-}
-
-func InsertInterface(itf *model.InterfaceO) (int32, error) {
-	return insertObject(itf, "interface")
-}
-
-func InsertOperatingSystem(os *model.OperatingSystem) (int32, error) {
-	return insertObject(os, "operatingSystem")
-}
-
-func InsertNetwork(network *model.Network) (int32, error) {
-	return insertObject(network, "network")
-}
-
-func InsertGateway(gateway *model.Gateway) (int32, error) {
-	return insertObject(gateway, "gateway")
-}
-
-func UpdateMachine(id int32, machine *model.Machine) error {
-	return updateObject(machine, "machine", id)
-}
-
-func UpdateInterface(id int32, itf *model.InterfaceO) error {
-	return updateObject(itf, "interface", id)
-}
-
-func DeleteGateway(id int32) error {
-	return deleteObject("gateway", id)
-}
-
-func DeleteInterface(id int32) error {
-	return deleteObject("interface", id)
-}
-
-func GetInterfacesByMachineId(machineId int32) (model.InterfaceOs, error) {
-	itfs := model.InterfaceOs{}
-	err := getObjects("interfaces/machineId", machineId, &itfs)
-	if err != nil {
-		return nil, fmt.Errorf("getObjects failed <- %v", err)
-	}
-	return itfs, nil
-}
-
-func GetOperatingSystemsByName(name string) (model.OperatingSystems, error) {
-	operatingSystems := model.OperatingSystems{}
-	err := getObjects("operatingSystems/name", name, &operatingSystems)
-	if err != nil {
-		return nil, fmt.Errorf("getObjects failed <- %v", err)
-	}
-	return operatingSystems, nil
-}
-
-func GetNetworksByIp(ip string) (model.Networks, error) {
-	networks := model.Networks{}
-	err := getObjects("networks/ip", ip, &networks)
-	if err != nil {
-		return nil, fmt.Errorf("getObjects failed <- %v", err)
-	}
-	return networks, nil
-}
-
-func GetGatewaysByInterfaceId(interfaceId int32) (model.Gateways, error) {
-	gateways := model.Gateways{}
-	err := getObjects("gateways/interfaceId", interfaceId, &gateways)
-	if err != nil {
-		return nil, fmt.Errorf("getObjects failed <- %v", err)
-	}
-	return gateways, nil
-}
-
-func GetPerimeterByName(name string) (*model.Perimeter, error) {
-	perimeter := model.Perimeter{}
-
-	err := getObject("perimeter/name", name, &perimeter)
-	if err != nil {
-		return nil, fmt.Errorf("getObject failed <- %v", err)
-	}
-	return &perimeter, nil
-}
-
-func GetLocationByName(name string) (*model.Location, error) {
-	location := model.Location{}
-
-	err := getObject("location/name", name, &location)
-	if err != nil {
-		return nil, fmt.Errorf("getObject failed <- %v", err)
-	}
-	return &location, nil
-}
-
-func GetInterfaceByMac(mac string) (*model.InterfaceO, error) {
-	itf := model.InterfaceO{}
-
-	err := getObject("interface/mac", mac, &itf)
-	if err != nil {
-		return nil, fmt.Errorf("getObject failed <- %v", err)
-	}
-	return &itf, nil
-}
-
-func GetMachineById(id int32) (*model.Machine, error) {
-	machine := model.Machine{}
-
-	err := getObject("machine", id, &machine)
-	if err != nil {
-		return nil, fmt.Errorf("getObject failed <- %v", err)
-	}
-	return &machine, nil
-}
-
-func GetGatewayById(id int32) (*model.Gateway, error) {
-	gateway := model.Gateway{}
-
-	err := getObject("gateway", id, &gateway)
-	if err != nil {
-		return nil, fmt.Errorf("getObject failed <- %v", err)
-	}
-	return &gateway, nil
 }
