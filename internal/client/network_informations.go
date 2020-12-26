@@ -1,14 +1,13 @@
-package worker
+package client
 
 import (
 	"fmt"
 
+	"github.com/omnis-org/omnis-server/internal/db"
+	"github.com/omnis-org/omnis-server/internal/model"
 	"github.com/omnis-org/omnis-server/internal/utils"
 
-	"github.com/omnis-org/omnis-rest-api/pkg/model"
-
 	"github.com/omnis-org/omnis-client/pkg/client_informations"
-	"github.com/omnis-org/omnis-server/internal/net"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -39,7 +38,7 @@ func newNetwork(networkPart string, mask int, perimeterID int32) (int32, error) 
 		Ipv4Mask:    ipv4Mask,
 		PerimeterId: perimeter,
 	}
-	networkID, err := net.InsertNetwork(&networkO)
+	networkID, err := db.InsertNetwork(&networkO, true)
 	if err != nil {
 		return 0, fmt.Errorf("net.InsertNetwork failed <- %v", err)
 	}
@@ -50,7 +49,7 @@ func doNetwork(ip string, mask int, perimeterID int32) (int32, error) {
 	var networkID int32 = 0
 	networkPart := utils.GetNetworkPart(ip, mask)
 
-	networks, err := net.GetNetworksByIp(networkPart)
+	networks, err := db.GetNetworksByIp(networkPart, true)
 	if err != nil {
 		return 0, fmt.Errorf("net.GetNetworksByIp failed <- %v", err)
 	}
@@ -95,7 +94,7 @@ func newGateway(ip string, maskI int, interfaceID int32) (int32, error) {
 		Mask:        mask,
 		InterfaceId: interfaceO}
 
-	gatewayID, err := net.InsertGateway(&gateway)
+	gatewayID, err := db.InsertGateway(&gateway, true)
 	if err != nil {
 		return 0, fmt.Errorf("net.InsertGateway failed <- %v", err)
 	}
@@ -103,7 +102,7 @@ func newGateway(ip string, maskI int, interfaceID int32) (int32, error) {
 }
 
 func doGateways(interfaceID int32, gateways []string, mask int) error {
-	oldGateways, err := net.GetGatewaysByInterfaceId(interfaceID)
+	oldGateways, err := db.GetGatewaysByInterfaceId(interfaceID, true)
 	if err != nil {
 		return fmt.Errorf("net.GetGatewaysByInterfaceId failed <- %v", err)
 	}
@@ -134,9 +133,13 @@ func doGateways(interfaceID int32, gateways []string, mask int) error {
 		}
 
 		if !found {
-			err = net.DeleteGateway(oldGtw.Id.Int32)
+			rowsAffected, err := db.DeleteGateway(oldGtw.Id.Int32)
 			if err != nil {
 				return fmt.Errorf("net.DeleteGateway failed <- %v", err)
+			}
+
+			if rowsAffected != 0 {
+				return fmt.Errorf("net.DeleteGateway no rows affected <- %v", err)
 			}
 
 			log.Debug(fmt.Sprintf("delete gateway : %d", oldGtw.Id.Int32))
@@ -203,17 +206,18 @@ func doInterface(itf *client_informations.InterfaceInformations, machineID int32
 	var itfID int32 = 0
 
 	if updateInterfaceID == 0 {
-		itfID, err = net.InsertInterface(&itfO)
+		itfID, err = db.InsertInterface(&itfO, true)
 		if err != nil {
 			return fmt.Errorf("net.InsertInterface failed <- %v", err)
 		}
 		log.Debug(fmt.Sprintf("new interface %s %s : %d", itf.Name, itf.Ipv4, itfID))
 	} else {
 		itfID = updateInterfaceID
-		err = net.UpdateInterface(updateInterfaceID, &itfO)
+		_, err := db.UpdateInterface(updateInterfaceID, &itfO, true)
 		if err != nil {
 			return fmt.Errorf("net.UpdateInterface failed <- %v", err)
 		}
+
 		log.Debug(fmt.Sprintf("update interface %s %s : %d", itf.Name, itf.Ipv4, itfID))
 	}
 
@@ -228,7 +232,7 @@ func doInterface(itf *client_informations.InterfaceInformations, machineID int32
 }
 
 func doInterfaces(interfaces []client_informations.InterfaceInformations, machineID int32, perimeterID int32) error {
-	oldInterfaces, err := net.GetInterfacesByMachineId(machineID)
+	oldInterfaces, err := db.GetInterfacesByMachineId(machineID, true)
 
 	if err != nil {
 		return fmt.Errorf("net.GetInterfacesByMachineId failed <- %v", err)
@@ -262,9 +266,12 @@ func doInterfaces(interfaces []client_informations.InterfaceInformations, machin
 		}
 
 		if !found {
-			err = net.DeleteInterface(oldInterface.Id.Int32)
+			rowsAffected, err := db.DeleteInterface(oldInterface.Id.Int32)
 			if err != nil {
-				return fmt.Errorf("net.DeleteInterface failed <- %v", err)
+				return fmt.Errorf("db.DeleteInterface failed <- %v", err)
+			}
+			if rowsAffected == 0 {
+				return fmt.Errorf("db.DeleteInterface no rows affected <- %v", err)
 			}
 
 			log.Debug(fmt.Sprintf("delete interface : %d", oldInterface.Id.Int32))

@@ -1,0 +1,38 @@
+USE OMNIS;
+CALL insert_perimeter("SI-BUREAUTIQUE","Système d'information dédié à l'utilisation bureautique",1);
+CALL insert_perimeter("SI-BACKUP","Système d'information dédié aux sauvegardes et décorélé des autres SI",1);
+CALL insert_location("Paris", "PCA",1);
+CALL insert_location("Lyon", "Siège",1);
+CALL insert_location("Nomade", "Utilisateur",1);
+CALL insert_operating_system("linux", "ubuntu", "debian", "20.04", "5.4.0-50-generic",1);
+CALL insert_operating_system("windows", "windows", "windows", "10", "unknown",1);
+CALL insert_operating_system("windows", "windows", "server", "2019", "unknown",1);
+CALL insert_machine("AD01","AD01","ActiveDirectory domain controller",1,"012345",1,2,3,"client", "1.0", 1);
+CALL insert_machine("FILE-SHARE01","FILE-SHARE01","File sharing server",1,"012445",1,2,3,"client", "1.0", 1);
+CALL insert_machine("AD01-PCA","AD01-PCA","ActiveDirectory domain controller redondant",1,"012346",1,1,3,"client", "1.0", 1);
+CALL insert_machine("FILE-SHARE01-PCA","FILE-SHARE-PCA01","File sharing server",1,"012347",1,1,3,"client", "1.0", 1);
+CALL insert_machine("BACKUP01-DOMAIN","BACKUP01-DOMAIN","machine de backup décorélée des autres SI",1,"29931",2,2,3,"client",NULL, 1);
+CALL insert_machine("BACKUP01-DOMAIN-PCA","BACKUP02-DOMAIN-PCA","machine de backup dédiée au site de PCA et décorélée des autres SI",1,"29431",2,1,3,"client",NULL, 1);
+CALL insert_machine("user01","user01","Domain user computer",1,"012315",1,3,2,"client", "1.0", 1);
+CALL insert_machine("user02","user02","Domain user computer",1,"012325",1,3,2,"client", "1.0", 1);
+CALL insert_machine("user03","user03","Domain user computer",1,"012335",1,3,2,"client", "1.0", 1);
+CALL insert_machine("user04","user04","Domain user computer",1,"012345",1,3,2,"client", "1.0", 1);
+CALL insert_machine("user05","user05","Domain user computer",1,"012355",1,3,2,"client", "1.0", 1);
+
+CALL insert_network("LAN-DOMAIN-CONTROL", "192.168.10.0", 24, 0, 0, 1, 1);
+CALL insert_network("LAN-DOMAIN-CONTROL-PCA", "172.16.10.0", 24, 0, 0, 1, 1);
+CALL insert_network("LAN-DOMAIN-CONTROL-BACKUP", "192.168.11.0", 24, 0, 0, 2, 1);
+CALL insert_network("LAN-DOMAIN-CONTROL-PCA-BACKUP", "172.16.11.0", 24, 0, 0, 2, 1);
+CALL insert_network("LAN-BUREAUTIQUE", "192.168.20.0", 24, 0, 0, 1, 1);
+CALL insert_interface("eth0", "192.168.10.1", 24, "AB:0D:1F", "eth", 1, 1,1);
+CALL insert_interface("eth0", "192.168.10.2", 24, "AB:1D:1F", "eth", 2, 1,1);
+CALL insert_interface("eth0", "172.16.10.1", 24, "AB:0D:2F", "eth", 3, 2,1);
+CALL insert_interface("eth0", "172.16.10.2", 24, "AB:1D:2F", "eth", 4, 2,1);
+CALL insert_interface("eth0", "192.168.11.1", 24, "AB:0D:3F", "eth", 5, 3,1);
+CALL insert_interface("eth0", "172.16.11.1", 24, "AB:0D:4F", "eth", 6, 4,1);
+CALL insert_interface("eth0", "192.168.20.1", 24, "AB:0D:5F", "eth", 7, 5,1);
+CALL insert_interface("eth0", "192.168.20.2", 24, "AB:0D:6F", "eth", 8, 5,1);
+CALL insert_interface("eth0", "192.168.20.3", 24, "AB:0D:7F", "eth", 9, 5,1);
+CALL insert_interface("eth0", "192.168.20.4", 24, "AB:0D:8F", "eth", 10, 5,1);
+CALL insert_interface("eth0", "192.168.20.5", 24, "AB:0D:9F", "eth", 11, 5,1);
+

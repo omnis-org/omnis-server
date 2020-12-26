@@ -1,14 +1,14 @@
-package worker
+package client
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/omnis-org/omnis-rest-api/pkg/model"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/omnis-org/omnis-client/pkg/client_informations"
-	"github.com/omnis-org/omnis-server/internal/net"
+	"github.com/omnis-org/omnis-server/internal/db"
+	"github.com/omnis-org/omnis-server/internal/model"
 )
 
 func newOperatingSystem(osInfos *client_informations.OperatingSystemInformations) (int32, error) {
@@ -45,7 +45,7 @@ func newOperatingSystem(osInfos *client_informations.OperatingSystemInformations
 		PlatformVersion: platformVersion,
 		KernelVersion:   kernelVersion}
 
-	id, err := net.InsertOperatingSystem(&os)
+	id, err := db.InsertOperatingSystem(&os, true)
 	if err != nil {
 		return 0, fmt.Errorf("net.InsertOperatingSystem failed <- %v", err)
 	}
@@ -56,7 +56,7 @@ func doOperatingSystem(osInfos *client_informations.OperatingSystemInformations)
 	var operatingSystemID int32 = 0
 	var err error
 
-	operatingSystems, err := net.GetOperatingSystemsByName(osInfos.OS)
+	operatingSystems, err := db.GetOperatingSystemsByName(osInfos.OS, true)
 	if err != nil {
 		return 0, fmt.Errorf("net.GetOperatingSystemsByName <- %v", err)
 	}
@@ -153,7 +153,7 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 
 	var machineID int32 = 0
 	if updateMachineID == 0 { // new
-		machineID, err = net.InsertMachine(&machine)
+		machineID, err = db.InsertMachine(&machine, true)
 		if err != nil {
 			return 0, fmt.Errorf("net.InsertMachine failed <- %v", err)
 		}
@@ -162,9 +162,9 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 
 	} else { // update
 		machineID = updateMachineID
-		err = net.UpdateMachine(machineID, &machine)
+		_, err := db.UpdateMachine(machineID, &machine, true)
 		if err != nil {
-			return 0, fmt.Errorf("net.UpdateMachine failed <- %v", err)
+			return 0, fmt.Errorf("db.UpdateMachine failed <- %v", err)
 		}
 
 		log.Debug(fmt.Sprintf("update machine : %s", systemInformations.Hostname))

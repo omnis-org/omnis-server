@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/omnis-org/omnis-client/pkg/client_informations"
-	"github.com/omnis-org/omnis-server/internal/worker"
+	"github.com/omnis-org/omnis-server/internal/client"
 )
 
 //////////////////	FUNCTIONS CLIENT	//////////////////
@@ -18,7 +18,7 @@ func (api *Api) informations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	worker.AddWork(&worker.Work{Job: worker.AnalyzeClientInformations, Handle: &infos})
+	client.AnalyzeClientInformations(&infos)
 
 	api.success(w)
 }

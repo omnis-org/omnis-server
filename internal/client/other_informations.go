@@ -1,16 +1,17 @@
-package worker
+package client
 
 import (
 	"fmt"
 
 	"github.com/omnis-org/omnis-client/pkg/client_informations"
-	"github.com/omnis-org/omnis-rest-api/pkg/model"
-	"github.com/omnis-org/omnis-server/internal/net"
+
+	"github.com/omnis-org/omnis-server/internal/db"
+	"github.com/omnis-org/omnis-server/internal/model"
 	log "github.com/sirupsen/logrus"
 )
 
 func doLocation(locationName string) (int32, error) {
-	location, err := net.GetLocationByName(locationName)
+	location, err := db.GetLocationByName(locationName, true)
 	if err != nil {
 		return 0, fmt.Errorf("GetLocationByName failed <- %v", err)
 	}
@@ -19,7 +20,7 @@ func doLocation(locationName string) (int32, error) {
 	if !location.Id.Valid {
 		var name model.NullString
 		name.Scan(locationName)
-		idLocation, err = net.InsertLocation(&model.Location{Name: name})
+		idLocation, err = db.InsertLocation(&model.Location{Name: name}, true)
 		if err != nil {
 			return 0, fmt.Errorf("net.InsertLocation failed <- %v", err)
 		}
@@ -35,7 +36,7 @@ func doLocation(locationName string) (int32, error) {
 
 func doPerimeter(perimeterName string) (int32, error) {
 	//perimeter
-	perimeter, err := net.GetPerimeterByName(perimeterName)
+	perimeter, err := db.GetPerimeterByName(perimeterName, true)
 	if err != nil {
 		return 0, fmt.Errorf("net.GetPerimeterByName failed <- %v", err)
 	}
@@ -45,7 +46,7 @@ func doPerimeter(perimeterName string) (int32, error) {
 		var name model.NullString
 		name.Scan(perimeterName)
 
-		idPerimeter, err = net.InsertPerimeter(&model.Perimeter{Name: name})
+		idPerimeter, err = db.InsertPerimeter(&model.Perimeter{Name: name}, true)
 		if err != nil {
 			return 0, fmt.Errorf("net.InsertLocation failed <- %v", err)
 		}
