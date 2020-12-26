@@ -1,10 +1,10 @@
-package worker
+package client
 
 import (
 	"fmt"
 
 	"github.com/omnis-org/omnis-client/pkg/client_informations"
-	"github.com/omnis-org/omnis-server/internal/net"
+	"github.com/omnis-org/omnis-server/internal/db"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -46,7 +46,7 @@ func AnalyzeClientInformations(i interface{}) {
 
 		log.Debug(fmt.Sprintf("machine as interface with mac : %s", itf.MAC))
 
-		itf2, err := net.GetInterfaceByMac(itf.MAC)
+		itf2, err := db.GetInterfaceByMac(itf.MAC, true)
 		if err != nil {
 			log.Error(err)
 			return

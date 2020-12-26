@@ -26,6 +26,29 @@ cd keys
 ./generate_rsa_keys.sh
 ```
 
+## Create Database
+
+Omnis rest api needs to store informations in a mariadb database.
+
+You can create table and procedures with the following commands :
+
+```bash
+sudo apt install mariadb-server
+sudo mysql_secure_installation
+
+cd sql/
+
+# If you haven't define root password :
+sudo mysql < create_db.sql
+sudo mysql OMNIS < create_procedure.sql
+
+# Else :
+mysql -u root -p < create_db.sql
+mysql -u root -p OMNIS  < create_procedure.sql
+```
+
+> ⚠️ You should change the password of the default create users in file : sql/create_db.sql
+
 
 ## Create configuration file
 
@@ -35,23 +58,28 @@ You have examples of configuration file in build/testdata/example.json :
 {
     "server" : {
         "ip" : "0.0.0.0",                           # The listening IP address of the server
-        "port" : 4320                               # The port of the omnis server service
-    },
-    "worker" : {
-        "wait_work_time" : 10                       # Time during worker waits if it has no work to do (second)
+        "port" : 4320,                              # The port of the omnis server service
+        "omnis_api" : "/api/omnis",                 # The path of omnis api
+        "admin_api" : "/api/admin"                  # The path of admin api
     },
     "admin":{
         "expiration_token_time" : 10,               # Token validity time (minute)
         "auth_key_file" : "../keys/auth.key",       # RSA private key for authentification
         "auth_pub_file" : "../keys/auth.pub"        # RSA public key for authentification
     },
-    "rest_api" : {
-        "ip" : "127.0.0.1",                         # The IP address of the omnis rest api service
-        "port" : 4321,                              # The port of the omnis rest api service
-        "admin_path" : "/admin",                    # Path of the administration part
-        "omnis_path" : "/api",                      # Path of the omnis data path
-        "tls": true,                                # Is TLS activated ?
-        "insecure_skip_verify": false               # Check if certificate is valid
+    "omnis_db" : {
+        "name" : "OMNIS",                   # Name of database that store clients data
+        "username" : "omnis",               # username of user that can access database (OMNIS)
+        "password" : "PASSWORD",            # password of user that can access database (OMNIS)
+        "host" : "127.0.0.1",               # The IP address of the database (OMNIS)
+        "port" : 3306                       # The port of the database service (OMNIS)
+    },
+    "admin_db" : {
+        "name" : "OMNIS_ADMIN",             # Name of database that store users data
+        "username" : "omnis",               # username of user that can access database (OMNIS_ADMIN)
+        "password" : "PASSWORD",            # password of user that can access database (OMNIS_ADMIN)
+        "host" : "127.0.0.1",               # The IP address of the database (OMNIS_ADMIN)
+        "port" : 3306                       # The port of the database service (OMNIS_ADMIN)
     },
     "tls": {
         "activated" : true,                         # Activate TLS ?

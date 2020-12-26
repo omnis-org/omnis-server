@@ -1,23 +1,28 @@
 {
     "server" : {
         "ip" : "0.0.0.0",
-        "port" : 4320
-    },
-    "worker" : {
-        "wait_work_time" : 10
+        "port" : 4320,
+        "omnis_api" : "/api/omnis",
+        "admin_api" : "/api/admin"
     },
     "admin":{
         "expiration_token_time" : 10,
         "auth_key_file" : "../keys/auth.key",
         "auth_pub_file" : "../keys/auth.pub"
     },
-    "rest_api" : {
-        "ip" : "127.0.0.1",
-        "port" : 4321,
-        "admin_path" : "/admin",
-        "omnis_path" : "/api",
-        "tls": true,
-        "insecure_skip_verify": false
+    "omnis_db" : {
+        "name" : "OMNIS",
+        "username" : "omnis",
+        "password" : "MyBeautifulPassword8273!",
+        "host" : "localhost",
+        "port" : 3306
+    },
+    "admin_db" : {
+        "name" : "OMNIS_ADMIN",
+        "username" : "omnis",
+        "password" : "MyBeautifulPassword8273!",
+        "host" : "localhost",
+        "port" : 3306
     },
     "tls": {
         "activated" : true,

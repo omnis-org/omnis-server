@@ -7,9 +7,7 @@ import (
 	nested "github.com/antonfisher/nested-logrus-formatter"
 	"github.com/omnis-org/omnis-server/api"
 	"github.com/omnis-org/omnis-server/config"
-	"github.com/omnis-org/omnis-server/internal/net"
 	"github.com/omnis-org/omnis-server/internal/version"
-	"github.com/omnis-org/omnis-server/internal/worker"
 	log "github.com/sirupsen/logrus"
 	kingpin "gopkg.in/alecthomas/kingpin.v2"
 )
@@ -46,12 +44,8 @@ func init() {
 	if err != nil {
 		log.Warn("config.LoadConfig failed <- ", err)
 	}
-
-	net.InitDefaultTransport()
 }
 
 func main() {
-	go worker.LaunchWorker()
-
 	api.Run()
 }

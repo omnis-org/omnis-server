@@ -4,33 +4,29 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"sync"
 )
 
 type ServerConfig struct {
-	Ip   string `json:"ip"`
-	Port int64  `json:"port"`
+	Ip       string `json:"ip"`
+	Port     int64  `json:"port"`
+	OmnisApi string `json:"omnis_api"`
+	AdminApi string `json:"admin_api"`
 }
 
-type WorkerConfig struct {
-	WaitWorkTime int64 `json:"wait_work_time"`
+type DbConfig struct {
+	Name     string `json:"name"`
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Host     string `json:"host"`
+	Port     int64  `json:"port"`
 }
 
-type AdministrationConfig struct {
+type AdminConfig struct {
 	ExpirationTokenTime int64  `json:"expiration_token_time"`
 	AuthKeyFile         string `json:"auth_key_file"`
 	AuthPubFile         string `json:"auth_pub_file"`
 	AuthSimpleKey       []byte `json:"AuthSimpleKey"`
-}
-
-type RestApiConfig struct {
-	Ip                 string `json:"ip"`
-	Port               int64  `json:"port"`
-	AdminPath          string `json:"admin_path"`
-	OmnisPath          string `json:"omnis_path"`
-	TLS                bool   `json:"tls"`
-	InsecureSkipVerify bool   `json:"insecure_skip_verify"`
 }
 
 type TlsConfig struct {
@@ -40,11 +36,11 @@ type TlsConfig struct {
 }
 
 type Config struct {
-	Server  *ServerConfig         `json:"server"`
-	Worker  *WorkerConfig         `json:"worker"`
-	Admin   *AdministrationConfig `json:"admin"`
-	RestApi *RestApiConfig        `json:"rest_api"`
-	TLS     *TlsConfig            `json:"tls"`
+	Server  *ServerConfig `json:"server"`
+	Admin   *AdminConfig  `json:"admin"`
+	OmnisDB *DbConfig     `json:"omnis_db"`
+	AdminDB *DbConfig     `json:"admin_db"`
+	TLS     *TlsConfig    `json:"tls"`
 }
 
 var lockConfig = &sync.Mutex{}
@@ -68,12 +64,12 @@ func LoadConfig(configFile *string) error {
 }
 
 func defaultConfig() *Config {
-	sc := ServerConfig{"127.0.0.1", 4320}
-	wc := WorkerConfig{60}
-	ac := AdministrationConfig{5, "", "", []byte("SECRET_KEY")}
-	rc := RestApiConfig{"127.0.0.1", 4320, "/api/auto", "/admin", false, false}
+	sc := ServerConfig{"127.0.0.1", 4320, "/api/omnis", "/api/admin"}
+	ac := AdminConfig{5, "", "", []byte("SECRET_KEY")}
+	omnisDbc := DbConfig{"OMNIS", "omnis", "PASSWORD", "localhost", 3306}
+	adminDbc := DbConfig{"OMNIS_ADMIN", "omnis", "PASSWORD", "localhost", 3306}
 	tc := TlsConfig{Activated: false}
-	return &Config{&sc, &wc, &ac, &rc, &tc}
+	return &Config{&sc, &ac, &omnisDbc, &adminDbc, &tc}
 }
 
 func GetConfig() *Config {
@@ -83,20 +79,4 @@ func GetConfig() *Config {
 		return defaultConfig()
 	}
 	return loadedConfig
-}
-
-func GetRestApiScheme() string {
-	protocol := "http://"
-	if GetConfig().RestApi.TLS {
-		protocol = "https://"
-	}
-	return protocol
-}
-
-func GetRestApiStringUrl() string {
-	return fmt.Sprintf("%s:%d", GetConfig().RestApi.Ip, GetConfig().RestApi.Port)
-}
-
-func GetRestApiUrl() (*url.URL, error) {
-	return url.Parse(fmt.Sprintf("%s%s", GetRestApiScheme(), GetRestApiStringUrl()))
 }
