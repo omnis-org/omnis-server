@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetInstalledSoftwares should have a comment.
 func GetInstalledSoftwares(automatic bool) (model.InstalledSoftwares, error) {
 	log.Debug(fmt.Sprintf("GetInstalledSoftwares(%t)", automatic))
 
@@ -27,7 +28,7 @@ func GetInstalledSoftwares(automatic bool) (model.InstalledSoftwares, error) {
 	for rows.Next() {
 		var installedSoftware model.InstalledSoftware
 
-		err := rows.Scan(&installedSoftware.Id, &installedSoftware.SoftwareId, &installedSoftware.MachineId)
+		err := rows.Scan(&installedSoftware.ID, &installedSoftware.SoftwareID, &installedSoftware.MachineID)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -42,6 +43,7 @@ func GetInstalledSoftwares(automatic bool) (model.InstalledSoftwares, error) {
 	return installedSoftwares, nil
 }
 
+// GetInstalledSoftware should have a comment.
 func GetInstalledSoftware(id int32, automatic bool) (*model.InstalledSoftware, error) {
 	log.Debug(fmt.Sprintf("GetInstalledSoftware(%d,%t)", id, automatic))
 
@@ -51,7 +53,7 @@ func GetInstalledSoftware(id int32, automatic bool) (*model.InstalledSoftware, e
 	}
 
 	var installedSoftware model.InstalledSoftware
-	err = db.QueryRow("CALL get_installed_software_by_id(?,?);", id, automatic).Scan(&installedSoftware.Id, &installedSoftware.SoftwareId, &installedSoftware.MachineId)
+	err = db.QueryRow("CALL get_installed_software_by_id(?,?);", id, automatic).Scan(&installedSoftware.ID, &installedSoftware.SoftwareID, &installedSoftware.MachineID)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -64,6 +66,7 @@ func GetInstalledSoftware(id int32, automatic bool) (*model.InstalledSoftware, e
 	return &installedSoftware, nil
 }
 
+// InsertInstalledSoftware should have a comment.
 func InsertInstalledSoftware(installedSoftware *model.InstalledSoftware, automatic bool) (int32, error) {
 	log.Debug(fmt.Sprintf("InsertInstalledSoftware(%t)", automatic))
 
@@ -75,7 +78,7 @@ func InsertInstalledSoftware(installedSoftware *model.InstalledSoftware, automat
 	var id int32 = 0
 	sqlStr := "CALL insert_installed_software(?,?,?);"
 
-	err = db.QueryRow(sqlStr, installedSoftware.SoftwareId, installedSoftware.MachineId, automatic).Scan(&id)
+	err = db.QueryRow(sqlStr, installedSoftware.SoftwareID, installedSoftware.MachineID, automatic).Scan(&id)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.QueryRow failed <- %v", err)
@@ -84,6 +87,7 @@ func InsertInstalledSoftware(installedSoftware *model.InstalledSoftware, automat
 	return id, nil
 }
 
+// UpdateInstalledSoftware should have a comment.
 func UpdateInstalledSoftware(id int32, installedSoftware *model.InstalledSoftware, automatic bool) (int64, error) {
 	log.Debug(fmt.Sprintf("UpdateInstalledSoftware(%t)", automatic))
 
@@ -94,7 +98,7 @@ func UpdateInstalledSoftware(id int32, installedSoftware *model.InstalledSoftwar
 
 	sqlStr := "CALL update_installed_software(?,?,?,?);"
 
-	res, err := db.Exec(sqlStr, id, installedSoftware.SoftwareId, installedSoftware.MachineId, automatic)
+	res, err := db.Exec(sqlStr, id, installedSoftware.SoftwareID, installedSoftware.MachineID, automatic)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.Exec failed <- %v", err)
@@ -108,6 +112,7 @@ func UpdateInstalledSoftware(id int32, installedSoftware *model.InstalledSoftwar
 	return rowsAffected, nil
 }
 
+// DeleteInstalledSoftware should have a comment.
 func DeleteInstalledSoftware(id int32) (int64, error) {
 	log.Debug(fmt.Sprintf("DeleteInstalledSoftware(%d)", id))
 
@@ -129,19 +134,23 @@ func DeleteInstalledSoftware(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetInstalledSoftwaresO should have a comment.
 func GetInstalledSoftwaresO(automatic bool) (model.Objects, error) {
 	return GetInstalledSoftwares(automatic)
 }
 
+// GetInstalledSoftwareO should have a comment.
 func GetInstalledSoftwareO(id int32, automatic bool) (model.Object, error) {
 	return GetInstalledSoftware(id, automatic)
 }
 
+// InsertInstalledSoftwareO should have a comment.
 func InsertInstalledSoftwareO(object *model.Object, automatic bool) (int32, error) {
 	var installedSoftware *model.InstalledSoftware = (*object).(*model.InstalledSoftware)
 	return InsertInstalledSoftware(installedSoftware, automatic)
 }
 
+// UpdateInstalledSoftwareO should have a comment.
 func UpdateInstalledSoftwareO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var installedSoftware *model.InstalledSoftware = (*object).(*model.InstalledSoftware)
 	return UpdateInstalledSoftware(id, installedSoftware, automatic)

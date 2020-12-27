@@ -17,7 +17,7 @@ func doLocation(locationName string) (int32, error) {
 	}
 
 	var idLocation int32
-	if !location.Id.Valid {
+	if !location.ID.Valid {
 		var name model.NullString
 		name.Scan(locationName)
 		idLocation, err = db.InsertLocation(&model.Location{Name: name}, true)
@@ -28,7 +28,7 @@ func doLocation(locationName string) (int32, error) {
 		log.Debug(fmt.Sprintf("new location : %s", locationName))
 
 	} else {
-		idLocation = location.Id.Int32
+		idLocation = location.ID.Int32
 	}
 
 	return idLocation, nil
@@ -42,7 +42,7 @@ func doPerimeter(perimeterName string) (int32, error) {
 	}
 
 	var idPerimeter int32
-	if !perimeter.Id.Valid {
+	if !perimeter.ID.Valid {
 		var name model.NullString
 		name.Scan(perimeterName)
 
@@ -53,7 +53,7 @@ func doPerimeter(perimeterName string) (int32, error) {
 
 		log.Debug(fmt.Sprintf("new perimeter : %s", perimeterName))
 	} else {
-		idPerimeter = perimeter.Id.Int32
+		idPerimeter = perimeter.ID.Int32
 	}
 
 	return idPerimeter, nil

@@ -20,12 +20,12 @@ func getToken(r *http.Request) (string, error) {
 	tokenBearer := r.Header.Get("Authorization")
 	tokenBearerArray := strings.Split(tokenBearer, "Bearer ")
 	if len(tokenBearerArray) != 2 {
-		return "", auth.InvalidTokenError
+		return "", auth.ErrInvalidToken
 	}
 	return tokenBearerArray[1], nil
 }
 
-func (api *Api) validateToken(w http.ResponseWriter, r *http.Request) error {
+func (api *API) validateToken(w http.ResponseWriter, r *http.Request) error {
 	tokenValue, err := getToken(r)
 	if err != nil {
 		api.unauthorizedError(w, err)
@@ -40,7 +40,7 @@ func (api *Api) validateToken(w http.ResponseWriter, r *http.Request) error {
 	return nil
 }
 
-func (api *Api) login(w http.ResponseWriter, r *http.Request) {
+func (api *API) login(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
@@ -63,7 +63,7 @@ func (api *Api) login(w http.ResponseWriter, r *http.Request) {
 	api.sendJSON(w, jsonToken)
 }
 
-func (api *Api) refresh(w http.ResponseWriter, r *http.Request) {
+func (api *API) refresh(w http.ResponseWriter, r *http.Request) {
 
 	tokenValue, err := getToken(r)
 	if err != nil {
@@ -86,7 +86,7 @@ func (api *Api) refresh(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (api *Api) register(w http.ResponseWriter, r *http.Request) {
+func (api *API) register(w http.ResponseWriter, r *http.Request) {
 	var users model.Users
 	users, err := db.GetUsers()
 	if len(users) != 0 {
@@ -105,7 +105,7 @@ func (api *Api) register(w http.ResponseWriter, r *http.Request) {
 
 	err = auth.Register(&user)
 	if err != nil {
-		if err == auth.AlreadyExistError {
+		if err == auth.ErrAlreadyExist {
 			api.badRequestError(w, err)
 		} else {
 			api.internalError(w, fmt.Errorf("auth.Register failed <- %v", err))
@@ -122,7 +122,7 @@ func (api *Api) register(w http.ResponseWriter, r *http.Request) {
 	api.sendJSON(w, jsonUser)
 }
 
-func (api *Api) update(w http.ResponseWriter, r *http.Request) {
+func (api *API) update(w http.ResponseWriter, r *http.Request) {
 	idS := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idS)
 	if err != nil {
@@ -152,7 +152,7 @@ func (api *Api) update(w http.ResponseWriter, r *http.Request) {
 	api.sendJSON(w, jsonUser)
 }
 
-func (api *Api) admin(w http.ResponseWriter, r *http.Request) {
+func (api *API) admin(w http.ResponseWriter, r *http.Request) {
 	err := api.validateToken(w, r)
 	if err != nil {
 		return
@@ -160,7 +160,7 @@ func (api *Api) admin(w http.ResponseWriter, r *http.Request) {
 	api.sendText(w, fmt.Sprintf("Welcome admin"))
 }
 
-func (api *Api) setupAdmin() {
+func (api *API) setupAdmin() {
 	api.router.Methods("GET").Path("/admin/").HandlerFunc(api.admin)
 	api.router.Methods("POST").Path("/admin/login").HandlerFunc(api.login)
 	api.router.Methods("POST").Path("/admin/register").HandlerFunc(api.register)

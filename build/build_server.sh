@@ -5,8 +5,8 @@ VERSION="0.2"
 TIME=$(date +"%d-%m-%y")
 WINDOWS="windows"
 
-sed -i "/BuildVersion/c\    BuildVersion string = \"$VERSION\"" ../internal/version/version.go
-sed -i "/BuildDate/c\    BuildDate string = \"$TIME\"" ../internal/version/version.go
+sed -i "/BuildVersion string/c\    BuildVersion string = \"$VERSION\"" ../internal/version/version.go
+sed -i "/BuildDate string/c\    BuildDate string = \"$TIME\"" ../internal/version/version.go
 
 
 

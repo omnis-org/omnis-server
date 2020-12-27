@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetTags should have a comment.
 func GetTags(automatic bool) (model.Tags, error) {
 	log.Debug(fmt.Sprintf("GetTags(%t)", automatic))
 
@@ -27,7 +28,7 @@ func GetTags(automatic bool) (model.Tags, error) {
 	for rows.Next() {
 		var tag model.Tag
 
-		err := rows.Scan(&tag.Id, &tag.Name, &tag.Color)
+		err := rows.Scan(&tag.ID, &tag.Name, &tag.Color)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -42,6 +43,7 @@ func GetTags(automatic bool) (model.Tags, error) {
 	return tags, nil
 }
 
+// GetTag should have a comment.
 func GetTag(id int32, automatic bool) (*model.Tag, error) {
 	log.Debug(fmt.Sprintf("GetTag(%d,%t)", id, automatic))
 
@@ -51,7 +53,7 @@ func GetTag(id int32, automatic bool) (*model.Tag, error) {
 	}
 
 	var tag model.Tag
-	err = db.QueryRow("CALL get_tag_by_id(?,?);", id, automatic).Scan(&tag.Id, &tag.Name, &tag.Color)
+	err = db.QueryRow("CALL get_tag_by_id(?,?);", id, automatic).Scan(&tag.ID, &tag.Name, &tag.Color)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -64,6 +66,7 @@ func GetTag(id int32, automatic bool) (*model.Tag, error) {
 	return &tag, nil
 }
 
+// InsertTag should have a comment.
 func InsertTag(tag *model.Tag, automatic bool) (int32, error) {
 	log.Debug(fmt.Sprintf("InsertTag(%t)", automatic))
 
@@ -84,6 +87,7 @@ func InsertTag(tag *model.Tag, automatic bool) (int32, error) {
 	return id, nil
 }
 
+// UpdateTag should have a comment.
 func UpdateTag(id int32, tag *model.Tag, automatic bool) (int64, error) {
 	log.Debug(fmt.Sprintf("UpdateTag(%t)", automatic))
 
@@ -108,6 +112,7 @@ func UpdateTag(id int32, tag *model.Tag, automatic bool) (int64, error) {
 	return rowsAffected, nil
 }
 
+// DeleteTag should have a comment.
 func DeleteTag(id int32) (int64, error) {
 	log.Debug(fmt.Sprintf("DeleteTag(%d)", id))
 
@@ -129,19 +134,23 @@ func DeleteTag(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetTagsO should have a comment.
 func GetTagsO(automatic bool) (model.Objects, error) {
 	return GetTags(automatic)
 }
 
+// GetTagO should have a comment.
 func GetTagO(id int32, automatic bool) (model.Object, error) {
 	return GetTag(id, automatic)
 }
 
+// InsertTagO should have a comment.
 func InsertTagO(object *model.Object, automatic bool) (int32, error) {
 	var tag *model.Tag = (*object).(*model.Tag)
 	return InsertTag(tag, automatic)
 }
 
+// UpdateTagO should have a comment.
 func UpdateTagO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var tag *model.Tag = (*object).(*model.Tag)
 	return UpdateTag(id, tag, automatic)

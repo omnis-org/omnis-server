@@ -5,33 +5,43 @@ import (
 	"fmt"
 )
 
+// Tag should have a comment.
 type Tag struct {
-	Id    NullInt32  `json:"id"`
+	ID    NullInt32  `json:"id"`
 	Name  NullString `json:"name"`
 	Color NullString `json:"color"`
 }
 
+// Tags should have a comment.
 type Tags []Tag
 
+// String should have a comment.
 func (tag *Tag) String() string {
 	return fmt.Sprintf("Tag {%d, %s, %s}",
-		tag.Id.Int32,
+		tag.ID.Int32,
 		tag.Name.String,
 		tag.Color.String)
 }
 
+// New should have a comment.
 func (tag *Tag) New() Object {
 	return new(Tag)
 }
 
+// Valid should have a comment.
 func (tag *Tag) Valid() bool {
+	if tag == nil {
+		return false
+	}
 	return tag.Name.Valid
 }
 
-func (tag *Tag) Json() ([]byte, error) {
+// JSON should have a comment.
+func (tag *Tag) JSON() ([]byte, error) {
 	return json.Marshal(tag)
 }
 
-func (tags Tags) Json() ([]byte, error) {
+// JSON should have a comment.
+func (tags Tags) JSON() ([]byte, error) {
 	return json.Marshal(tags)
 }

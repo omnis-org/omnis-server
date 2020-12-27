@@ -5,49 +5,59 @@ import (
 	"fmt"
 )
 
+// Machine should have a comment.
 type Machine struct {
-	Id                   NullInt32  `json:"id"`
+	ID                   NullInt32  `json:"id"`
 	Hostname             NullString `json:"hostname"`
 	Label                NullString `json:"label"`
 	Description          NullString `json:"description"`
-	VirtualizationSystem NullString `json:"virtualization_system"`
-	SerialNumber         NullString `json:"serial_number"`
-	PerimeterId          NullInt32  `json:"perimeter_id"`
-	LocationId           NullInt32  `json:"location_id"`
-	OperatingSystemId    NullInt32  `json:"operating_system_id"`
-	MachineType          NullString `json:"machine_type"`
-	OmnisVersion         NullString `json:"omnis_version"`
+	VirtualizationSystem NullString `json:"virtualizationSystem"`
+	SerialNumber         NullString `json:"serialNumber"`
+	PerimeterID          NullInt32  `json:"perimeterId"`
+	LocationID           NullInt32  `json:"locationId"`
+	OperatingSystemID    NullInt32  `json:"operatingSystemId"`
+	MachineType          NullString `json:"machineType"`
+	OmnisVersion         NullString `json:"omnisVersion"`
 }
 
+// Machines should have a comment.
 type Machines []Machine
 
+// String should have a comment.
 func (machine *Machine) String() string {
 	return fmt.Sprintf("Machine {%d, %s, %s, %s, %s, %s, %d, %d, %d, %s, %s}",
-		machine.Id.Int32,
+		machine.ID.Int32,
 		machine.Hostname.String,
 		machine.Label.String,
 		machine.Description.String,
 		machine.VirtualizationSystem.String,
 		machine.SerialNumber.String,
-		machine.PerimeterId.Int32,
-		machine.LocationId.Int32,
-		machine.OperatingSystemId.Int32,
+		machine.PerimeterID.Int32,
+		machine.LocationID.Int32,
+		machine.OperatingSystemID.Int32,
 		machine.MachineType.String,
 		machine.OmnisVersion.String)
 }
 
+// New should have a comment.
 func (machine *Machine) New() Object {
 	return new(Machine)
 }
 
+// Valid should have a comment.
 func (machine *Machine) Valid() bool {
-	return machine.Hostname.Valid && machine.Label.Valid && machine.PerimeterId.Valid && machine.LocationId.Valid
+	if machine == nil {
+		return false
+	}
+	return machine.Hostname.Valid && machine.Label.Valid && machine.PerimeterID.Valid && machine.LocationID.Valid
 }
 
-func (machine *Machine) Json() ([]byte, error) {
+// JSON should have a comment.
+func (machine *Machine) JSON() ([]byte, error) {
 	return json.Marshal(machine)
 }
 
-func (machines Machines) Json() ([]byte, error) {
+// JSON should have a comment.
+func (machines Machines) JSON() ([]byte, error) {
 	return json.Marshal(machines)
 }

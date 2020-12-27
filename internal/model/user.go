@@ -5,8 +5,9 @@ import (
 	"fmt"
 )
 
+// User should have a comment.
 type User struct {
-	Id        NullInt32  `json:"id"`
+	ID        NullInt32  `json:"id"`
 	Username  NullString `json:"username"`
 	Password  NullString `json:"password"`
 	FirstName NullString `json:"firstName"`
@@ -14,29 +15,38 @@ type User struct {
 	Admin     NullBool   `json:"admin"`
 }
 
+// Users should have a comment.
 type Users []User
 
+// String should have a comment.
 func (user *User) String() string {
 	return fmt.Sprintf("User {%d, %s, %s, %s, %t}",
-		user.Id.Int32,
+		user.ID.Int32,
 		user.Username.String,
 		user.FirstName.String,
 		user.LastName.String,
 		user.Admin.Bool)
 }
 
+// New should have a comment.
 func (user *User) New() Object {
 	return new(User)
 }
 
+// Valid should have a comment.
 func (user *User) Valid() bool {
+	if user == nil {
+		return false
+	}
 	return user.Username.Valid && user.Password.Valid
 }
 
-func (user *User) Json() ([]byte, error) {
+// JSON should have a comment.
+func (user *User) JSON() ([]byte, error) {
 	return json.Marshal(user)
 }
 
-func (users Users) Json() ([]byte, error) {
+// JSON should have a comment.
+func (users Users) JSON() ([]byte, error) {
 	return json.Marshal(users)
 }

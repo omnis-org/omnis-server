@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetMachines should have a comment.
 func GetMachines(automatic bool) (model.Machines, error) {
 	log.Debug(fmt.Sprintf("GetMachines(%t)", automatic))
 
@@ -27,7 +28,7 @@ func GetMachines(automatic bool) (model.Machines, error) {
 	for rows.Next() {
 		var machine model.Machine
 
-		err := rows.Scan(&machine.Id, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterId, &machine.LocationId, &machine.OperatingSystemId, &machine.MachineType, &machine.OmnisVersion)
+		err := rows.Scan(&machine.ID, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -42,6 +43,7 @@ func GetMachines(automatic bool) (model.Machines, error) {
 	return machines, nil
 }
 
+// GetMachine should have a comment.
 func GetMachine(id int32, automatic bool) (*model.Machine, error) {
 	log.Debug(fmt.Sprintf("GetMachine(%d,%t)", id, automatic))
 
@@ -51,7 +53,7 @@ func GetMachine(id int32, automatic bool) (*model.Machine, error) {
 	}
 
 	var machine model.Machine
-	err = db.QueryRow("CALL get_machine_by_id(?,?);", id, automatic).Scan(&machine.Id, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterId, &machine.LocationId, &machine.OperatingSystemId, &machine.MachineType, &machine.OmnisVersion)
+	err = db.QueryRow("CALL get_machine_by_id(?,?);", id, automatic).Scan(&machine.ID, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -64,6 +66,7 @@ func GetMachine(id int32, automatic bool) (*model.Machine, error) {
 	return &machine, nil
 }
 
+// InsertMachine should have a comment.
 func InsertMachine(machine *model.Machine, automatic bool) (int32, error) {
 	log.Debug(fmt.Sprintf("InsertMachine(%t)", automatic))
 
@@ -75,7 +78,7 @@ func InsertMachine(machine *model.Machine, automatic bool) (int32, error) {
 	var id int32 = 0
 	sqlStr := "CALL insert_machine(?,?,?,?,?,?,?,?,?,?,?);"
 
-	err = db.QueryRow(sqlStr, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterId, machine.LocationId, machine.OperatingSystemId, machine.MachineType, machine.OmnisVersion, automatic).Scan(&id)
+	err = db.QueryRow(sqlStr, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterID, machine.LocationID, machine.OperatingSystemID, machine.MachineType, machine.OmnisVersion, automatic).Scan(&id)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.QueryRow failed <- %v", err)
@@ -84,6 +87,7 @@ func InsertMachine(machine *model.Machine, automatic bool) (int32, error) {
 	return id, nil
 }
 
+// UpdateMachine should have a comment.
 func UpdateMachine(id int32, machine *model.Machine, automatic bool) (int64, error) {
 	log.Debug(fmt.Sprintf("UpdateMachine(%t)", automatic))
 
@@ -94,7 +98,7 @@ func UpdateMachine(id int32, machine *model.Machine, automatic bool) (int64, err
 
 	sqlStr := "CALL update_machine(?,?,?,?,?,?,?,?,?,?,?,?);"
 
-	res, err := db.Exec(sqlStr, id, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterId, machine.LocationId, machine.OperatingSystemId, machine.MachineType, machine.OmnisVersion, automatic)
+	res, err := db.Exec(sqlStr, id, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterID, machine.LocationID, machine.OperatingSystemID, machine.MachineType, machine.OmnisVersion, automatic)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.Exec failed <- %v", err)
@@ -108,6 +112,7 @@ func UpdateMachine(id int32, machine *model.Machine, automatic bool) (int64, err
 	return rowsAffected, nil
 }
 
+// DeleteMachine should have a comment.
 func DeleteMachine(id int32) (int64, error) {
 	log.Debug(fmt.Sprintf("DeleteMachine(%d)", id))
 
@@ -129,19 +134,23 @@ func DeleteMachine(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetMachinesO should have a comment.
 func GetMachinesO(automatic bool) (model.Objects, error) {
 	return GetMachines(automatic)
 }
 
+// GetMachineO should have a comment.
 func GetMachineO(id int32, automatic bool) (model.Object, error) {
 	return GetMachine(id, automatic)
 }
 
+// InsertMachineO should have a comment.
 func InsertMachineO(object *model.Object, automatic bool) (int32, error) {
 	var machine *model.Machine = (*object).(*model.Machine)
 	return InsertMachine(machine, automatic)
 }
 
+// UpdateMachineO should have a comment.
 func UpdateMachineO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var machine *model.Machine = (*object).(*model.Machine)
 	return UpdateMachine(id, machine, automatic)

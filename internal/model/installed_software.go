@@ -5,33 +5,43 @@ import (
 	"fmt"
 )
 
+// InstalledSoftware should have a comment.
 type InstalledSoftware struct {
-	Id         NullInt32 `json:"id"`
-	SoftwareId NullInt32 `json:"software_id"`
-	MachineId  NullInt32 `json:"machine_id"`
+	ID         NullInt32 `json:"id"`
+	SoftwareID NullInt32 `json:"softwareId"`
+	MachineID  NullInt32 `json:"machineId"`
 }
 
+// InstalledSoftwares should have a comment.
 type InstalledSoftwares []InstalledSoftware
 
+// String should have a comment.
 func (installedSoftware *InstalledSoftware) String() string {
 	return fmt.Sprintf("InstalledSoftware {%d, %d, %d}",
-		installedSoftware.Id.Int32,
-		installedSoftware.SoftwareId.Int32,
-		installedSoftware.MachineId.Int32)
+		installedSoftware.ID.Int32,
+		installedSoftware.SoftwareID.Int32,
+		installedSoftware.MachineID.Int32)
 }
 
+// New should have a comment.
 func (installedSoftware *InstalledSoftware) New() Object {
 	return new(InstalledSoftware)
 }
 
+// Valid should have a comment.
 func (installedSoftware *InstalledSoftware) Valid() bool {
-	return installedSoftware.SoftwareId.Valid && installedSoftware.MachineId.Valid
+	if installedSoftware == nil {
+		return false
+	}
+	return installedSoftware.SoftwareID.Valid && installedSoftware.MachineID.Valid
 }
 
-func (installedSoftware *InstalledSoftware) Json() ([]byte, error) {
+// JSON should have a comment.
+func (installedSoftware *InstalledSoftware) JSON() ([]byte, error) {
 	return json.Marshal(installedSoftware)
 }
 
-func (installedSoftwares InstalledSoftwares) Json() ([]byte, error) {
+// JSON should have a comment.
+func (installedSoftwares InstalledSoftwares) JSON() ([]byte, error) {
 	return json.Marshal(installedSoftwares)
 }

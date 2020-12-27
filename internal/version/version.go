@@ -1,6 +1,8 @@
 package version
 
 var (
-	BuildVersion string = "0.3"
-	BuildDate    string = "26-12-20"
+	// BuildVersion should have a comment.
+	BuildVersion string = "0.2"
+	// BuildDate should have a comment.
+	BuildDate string = "27-12-20"
 )

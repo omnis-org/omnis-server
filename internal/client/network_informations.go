@@ -36,7 +36,7 @@ func newNetwork(networkPart string, mask int, perimeterID int32) (int32, error) 
 	networkO := model.Network{Name: name,
 		Ipv4:        ipv4,
 		Ipv4Mask:    ipv4Mask,
-		PerimeterId: perimeter,
+		PerimeterID: perimeter,
 	}
 	networkID, err := db.InsertNetwork(&networkO, true)
 	if err != nil {
@@ -49,7 +49,7 @@ func doNetwork(ip string, mask int, perimeterID int32) (int32, error) {
 	var networkID int32 = 0
 	networkPart := utils.GetNetworkPart(ip, mask)
 
-	networks, err := db.GetNetworksByIp(networkPart, true)
+	networks, err := db.GetNetworksByIP(networkPart, true)
 	if err != nil {
 		return 0, fmt.Errorf("net.GetNetworksByIp failed <- %v", err)
 	}
@@ -57,8 +57,8 @@ func doNetwork(ip string, mask int, perimeterID int32) (int32, error) {
 	for _, network := range networks {
 		if network.Ipv4.String == networkPart &&
 			network.Ipv4Mask.Int32 == int32(mask) &&
-			network.PerimeterId.Int32 == perimeterID {
-			networkID = network.Id.Int32
+			network.PerimeterID.Int32 == perimeterID {
+			networkID = network.ID.Int32
 		}
 	}
 
@@ -92,7 +92,7 @@ func newGateway(ip string, maskI int, interfaceID int32) (int32, error) {
 
 	gateway := model.Gateway{Ipv4: ipv4,
 		Mask:        mask,
-		InterfaceId: interfaceO}
+		InterfaceID: interfaceO}
 
 	gatewayID, err := db.InsertGateway(&gateway, true)
 	if err != nil {
@@ -102,7 +102,7 @@ func newGateway(ip string, maskI int, interfaceID int32) (int32, error) {
 }
 
 func doGateways(interfaceID int32, gateways []string, mask int) error {
-	oldGateways, err := db.GetGatewaysByInterfaceId(interfaceID, true)
+	oldGateways, err := db.GetGatewaysByInterfaceID(interfaceID, true)
 	if err != nil {
 		return fmt.Errorf("net.GetGatewaysByInterfaceId failed <- %v", err)
 	}
@@ -111,7 +111,7 @@ func doGateways(interfaceID int32, gateways []string, mask int) error {
 		var gatewayID int32 = 0
 		for _, oldGtw := range oldGateways {
 			if oldGtw.Ipv4.String == gtw && oldGtw.Mask.Int32 == int32(mask) {
-				gatewayID = oldGtw.Id.Int32
+				gatewayID = oldGtw.ID.Int32
 				break
 			}
 		}
@@ -133,7 +133,7 @@ func doGateways(interfaceID int32, gateways []string, mask int) error {
 		}
 
 		if !found {
-			rowsAffected, err := db.DeleteGateway(oldGtw.Id.Int32)
+			rowsAffected, err := db.DeleteGateway(oldGtw.ID.Int32)
 			if err != nil {
 				return fmt.Errorf("net.DeleteGateway failed <- %v", err)
 			}
@@ -142,7 +142,7 @@ func doGateways(interfaceID int32, gateways []string, mask int) error {
 				return fmt.Errorf("net.DeleteGateway no rows affected <- %v", err)
 			}
 
-			log.Debug(fmt.Sprintf("delete gateway : %d", oldGtw.Id.Int32))
+			log.Debug(fmt.Sprintf("delete gateway : %d", oldGtw.ID.Int32))
 		}
 
 	}
@@ -200,8 +200,8 @@ func doInterface(itf *client_informations.InterfaceInformations, machineID int32
 		Ipv4Mask:      ipv4Mask,
 		MAC:           mac,
 		InterfaceType: interfaceType,
-		MachineId:     machine,
-		NetworkId:     network}
+		MachineID:     machine,
+		NetworkID:     network}
 
 	var itfID int32 = 0
 
@@ -232,7 +232,7 @@ func doInterface(itf *client_informations.InterfaceInformations, machineID int32
 }
 
 func doInterfaces(interfaces []client_informations.InterfaceInformations, machineID int32, perimeterID int32) error {
-	oldInterfaces, err := db.GetInterfacesByMachineId(machineID, true)
+	oldInterfaces, err := db.GetInterfacesByMachineID(machineID, true)
 
 	if err != nil {
 		return fmt.Errorf("net.GetInterfacesByMachineId failed <- %v", err)
@@ -249,7 +249,7 @@ func doInterfaces(interfaces []client_informations.InterfaceInformations, machin
 			}
 		}
 
-		err = doInterface(&itf, machineID, perimeterID, updateInterface.Id.Int32)
+		err = doInterface(&itf, machineID, perimeterID, updateInterface.ID.Int32)
 		if err != nil {
 			return fmt.Errorf("doInterface failed <- %v", err)
 		}
@@ -266,7 +266,7 @@ func doInterfaces(interfaces []client_informations.InterfaceInformations, machin
 		}
 
 		if !found {
-			rowsAffected, err := db.DeleteInterface(oldInterface.Id.Int32)
+			rowsAffected, err := db.DeleteInterface(oldInterface.ID.Int32)
 			if err != nil {
 				return fmt.Errorf("db.DeleteInterface failed <- %v", err)
 			}
@@ -274,7 +274,7 @@ func doInterfaces(interfaces []client_informations.InterfaceInformations, machin
 				return fmt.Errorf("db.DeleteInterface no rows affected <- %v", err)
 			}
 
-			log.Debug(fmt.Sprintf("delete interface : %d", oldInterface.Id.Int32))
+			log.Debug(fmt.Sprintf("delete interface : %d", oldInterface.ID.Int32))
 		}
 	}
 	return nil

@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetUsers should have a comment.
 func GetUsers() (model.Users, error) {
 	log.Debug("GetUsers()")
 
@@ -27,7 +28,7 @@ func GetUsers() (model.Users, error) {
 	for rows.Next() {
 		var user model.User
 
-		err := rows.Scan(&user.Id, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
+		err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -42,6 +43,7 @@ func GetUsers() (model.Users, error) {
 	return users, nil
 }
 
+// GetUser should have a comment.
 func GetUser(id int32) (*model.User, error) {
 	log.Debug(fmt.Sprintf("GetUser(%d)", id))
 
@@ -51,7 +53,7 @@ func GetUser(id int32) (*model.User, error) {
 	}
 
 	var user model.User
-	err = db.QueryRow("SELECT * FROM User WHERE id=?;", id).Scan(&user.Id, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
+	err = db.QueryRow("SELECT * FROM User WHERE id=?;", id).Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -64,6 +66,7 @@ func GetUser(id int32) (*model.User, error) {
 	return &user, nil
 }
 
+// InsertUser should have a comment.
 func InsertUser(user *model.User) (int32, error) {
 	log.Debug("InsertUser()")
 
@@ -89,6 +92,7 @@ func InsertUser(user *model.User) (int32, error) {
 	return int32(id), nil
 }
 
+// UpdateUser should have a comment.
 func UpdateUser(id int32, user *model.User) (int64, error) {
 	log.Debug("UpdateUser()")
 
@@ -114,6 +118,7 @@ func UpdateUser(id int32, user *model.User) (int64, error) {
 	return rowsAffected, nil
 }
 
+// DeleteUser should have a comment.
 func DeleteUser(id int32) (int64, error) {
 	log.Debug(fmt.Sprintf("DeleteUser(%d)", id))
 
@@ -135,6 +140,7 @@ func DeleteUser(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetUserByUsername should have a comment.
 func GetUserByUsername(username string) (*model.User, error) {
 	log.Debug(fmt.Sprintf("GetUserByUsername(%s)", username))
 
@@ -144,7 +150,7 @@ func GetUserByUsername(username string) (*model.User, error) {
 	}
 
 	var user model.User
-	err = db.QueryRow("SELECT * FROM User WHERE username=?;", username).Scan(&user.Id, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
+	err = db.QueryRow("SELECT * FROM User WHERE username=?;", username).Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -157,24 +163,29 @@ func GetUserByUsername(username string) (*model.User, error) {
 	return &user, nil
 }
 
+// GetUsersO should have a comment.
 func GetUsersO(automatic bool) (model.Objects, error) {
 	return GetUsers()
 }
 
+// GetUserO should have a comment.
 func GetUserO(id int32, automatic bool) (model.Object, error) {
 	return GetUser(id)
 }
 
+// InsertUserO should have a comment.
 func InsertUserO(object *model.Object, automatic bool) (int32, error) {
 	var user *model.User = (*object).(*model.User)
 	return InsertUser(user)
 }
 
+// UpdateUserO should have a comment.
 func UpdateUserO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var user *model.User = (*object).(*model.User)
 	return UpdateUser(id, user)
 }
 
+// GetUserByUsernameO should have a comment.
 func GetUserByUsernameO(username string, automatic bool) (model.Object, error) {
 	return GetUserByUsername(username)
 }

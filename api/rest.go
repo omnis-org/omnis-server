@@ -18,7 +18,7 @@ import (
 
 //////////////////		OMNIS	FUNCTIONS			//////////////////
 
-func (api *Api) getObjects(f func(bool) (model.Objects, error), automatic bool) http.HandlerFunc {
+func (api *API) getObjects(f func(bool) (model.Objects, error), automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("getObjects")
 		obj, err := f(automatic)
@@ -27,7 +27,7 @@ func (api *Api) getObjects(f func(bool) (model.Objects, error), automatic bool) 
 			return
 		}
 
-		json, err := obj.Json()
+		json, err := obj.JSON()
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -37,7 +37,7 @@ func (api *Api) getObjects(f func(bool) (model.Objects, error), automatic bool) 
 	}
 }
 
-func (api *Api) getObjectsByInt(f func(int32, bool) (model.Objects, error), s string, automatic bool) http.HandlerFunc {
+func (api *API) getObjectsByInt(f func(int32, bool) (model.Objects, error), s string, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("getObjectsByInt")
 		idS := mux.Vars(r)[s]
@@ -54,7 +54,7 @@ func (api *Api) getObjectsByInt(f func(int32, bool) (model.Objects, error), s st
 			return
 		}
 
-		json, err := obj.Json()
+		json, err := obj.JSON()
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -64,7 +64,7 @@ func (api *Api) getObjectsByInt(f func(int32, bool) (model.Objects, error), s st
 	}
 }
 
-func (api *Api) getObjectsByString(f func(string, bool) (model.Objects, error), s string, automatic bool) http.HandlerFunc {
+func (api *API) getObjectsByString(f func(string, bool) (model.Objects, error), s string, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("getObjectsByString")
 		sv := mux.Vars(r)[s]
@@ -75,7 +75,7 @@ func (api *Api) getObjectsByString(f func(string, bool) (model.Objects, error), 
 			return
 		}
 
-		json, err := obj.Json()
+		json, err := obj.JSON()
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -85,7 +85,7 @@ func (api *Api) getObjectsByString(f func(string, bool) (model.Objects, error), 
 	}
 }
 
-func (api *Api) getObject(f func(int32, bool) (model.Object, error), automatic bool) http.HandlerFunc {
+func (api *API) getObject(f func(int32, bool) (model.Object, error), automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("getObject")
 		idS := mux.Vars(r)["id"]
@@ -107,7 +107,7 @@ func (api *Api) getObject(f func(int32, bool) (model.Object, error), automatic b
 			return
 		}
 
-		json, err := obj.Json()
+		json, err := obj.JSON()
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -117,7 +117,7 @@ func (api *Api) getObject(f func(int32, bool) (model.Object, error), automatic b
 	}
 }
 
-func (api *Api) getObjectByString(f func(string, bool) (model.Object, error), s string, automatic bool) http.HandlerFunc {
+func (api *API) getObjectByString(f func(string, bool) (model.Object, error), s string, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("getObjectByString")
 		sv := mux.Vars(r)[s]
@@ -133,7 +133,7 @@ func (api *Api) getObjectByString(f func(string, bool) (model.Object, error), s 
 			return
 		}
 
-		json, err := obj.Json()
+		json, err := obj.JSON()
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -143,7 +143,7 @@ func (api *Api) getObjectByString(f func(string, bool) (model.Object, error), s 
 	}
 }
 
-func (api *Api) insertObject(f func(*model.Object, bool) (int32, error), o *model.Object, automatic bool) http.HandlerFunc {
+func (api *API) insertObject(f func(*model.Object, bool) (int32, error), o *model.Object, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("insertObject")
 
@@ -171,7 +171,7 @@ func (api *Api) insertObject(f func(*model.Object, bool) (int32, error), o *mode
 			return
 		}
 
-		idJSON, err := json.Marshal(model.IdJSON{Id: id})
+		idJSON, err := json.Marshal(model.IDJSON{ID: id})
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -181,7 +181,7 @@ func (api *Api) insertObject(f func(*model.Object, bool) (int32, error), o *mode
 	}
 }
 
-func (api *Api) updateObject(f func(int32, *model.Object, bool) (int64, error), o *model.Object, automatic bool) http.HandlerFunc {
+func (api *API) updateObject(f func(int32, *model.Object, bool) (int64, error), o *model.Object, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("updateObject")
 
@@ -210,7 +210,7 @@ func (api *Api) updateObject(f func(int32, *model.Object, bool) (int64, error), 
 	}
 }
 
-func (api *Api) deleteObject(f func(int32) (int64, error), automatic bool) http.HandlerFunc {
+func (api *API) deleteObject(f func(int32) (int64, error), automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("deleteObject")
 		idS := mux.Vars(r)["id"]
@@ -237,7 +237,7 @@ func (api *Api) deleteObject(f func(int32) (int64, error), automatic bool) http.
 
 ///// Router
 
-func (api *Api) setupBasicFunctions(apiPath string, getObjs func(bool) (model.Objects, error),
+func (api *API) setupBasicFunctions(apiPath string, getObjs func(bool) (model.Objects, error),
 	getObj func(int32, bool) (model.Object, error),
 	insertObj func(*model.Object, bool) (int32, error),
 	updateObj func(int32, *model.Object, bool) (int64, error),
@@ -275,7 +275,7 @@ func (api *Api) setupBasicFunctions(apiPath string, getObjs func(bool) (model.Ob
 	}
 }
 
-func (api *Api) setupGetObjectsByString(apiPath string, f func(string, bool) (model.Objects, error), objName string, s string) {
+func (api *API) setupGetObjectsByString(apiPath string, f func(string, bool) (model.Objects, error), objName string, s string) {
 	apiPathAuto := fmt.Sprintf("%s/auto", apiPath)
 
 	if f != nil {
@@ -284,7 +284,7 @@ func (api *Api) setupGetObjectsByString(apiPath string, f func(string, bool) (mo
 	}
 }
 
-func (api *Api) setupGetObjectsByInt(apiPath string, f func(int32, bool) (model.Objects, error), objName string, s string) {
+func (api *API) setupGetObjectsByInt(apiPath string, f func(int32, bool) (model.Objects, error), objName string, s string) {
 	apiPathAuto := fmt.Sprintf("%s/auto", apiPath)
 
 	if f != nil {
@@ -293,7 +293,7 @@ func (api *Api) setupGetObjectsByInt(apiPath string, f func(int32, bool) (model.
 	}
 }
 
-func (api *Api) setupGetObjectByString(apiPath string, f func(string, bool) (model.Object, error), objName string, s string) {
+func (api *API) setupGetObjectByString(apiPath string, f func(string, bool) (model.Object, error), objName string, s string) {
 	apiPathAuto := fmt.Sprintf("%s/auto", apiPath)
 
 	if f != nil {
@@ -304,70 +304,70 @@ func (api *Api) setupGetObjectByString(apiPath string, f func(string, bool) (mod
 
 ///// API OMNIS
 
-func (api *Api) setupLocation(apiPath string) {
+func (api *API) setupLocation(apiPath string) {
 	var location model.Object = new(model.Location)
 	api.setupBasicFunctions(apiPath, db.GetLocationsO, db.GetLocationO, db.InsertLocationO, db.UpdateLocationO, db.DeleteLocation, "location", &location)
 	api.setupGetObjectByString(apiPath, db.GetLocationByNameO, "location", "name")
 }
 
-func (api *Api) setupPerimeter(apiPath string) {
+func (api *API) setupPerimeter(apiPath string) {
 	var perimeter model.Object = new(model.Perimeter)
 	api.setupBasicFunctions(apiPath, db.GetPerimetersO, db.GetPerimeterO, db.InsertPerimeterO, db.UpdatePerimeterO, db.DeletePerimeter, "perimeter", &perimeter)
 	api.setupGetObjectByString(apiPath, db.GetPerimeterByNameO, "perimeter", "name")
 }
 
-func (api *Api) setupOperatingSystem(apiPath string) {
+func (api *API) setupOperatingSystem(apiPath string) {
 	var operatingSystem model.Object = new(model.OperatingSystem)
 	api.setupBasicFunctions(apiPath, db.GetOperatingSystemsO, db.GetOperatingSystemO, db.InsertOperatingSystemO, db.UpdateOperatingSystemO, db.DeleteOperatingSystem, "operatingSystem", &operatingSystem)
 	api.setupGetObjectsByString(apiPath, db.GetOperatingSystemsByNameO, "operatingSystem", "name")
 }
 
-func (api *Api) setupTag(apiPath string) {
+func (api *API) setupTag(apiPath string) {
 	var tag model.Object = new(model.Tag)
 	api.setupBasicFunctions(apiPath, db.GetTagsO, db.GetTagO, db.InsertTagO, db.UpdateTagO, db.DeleteTag, "tag", &tag)
 }
 
-func (api *Api) setupSoftware(apiPath string) {
+func (api *API) setupSoftware(apiPath string) {
 	var software model.Object = new(model.Software)
 	api.setupBasicFunctions(apiPath, db.GetSoftwaresO, db.GetSoftwareO, db.InsertSoftwareO, db.UpdateSoftwareO, db.DeleteSoftware, "software", &software)
 }
 
-func (api *Api) setupMachine(apiPath string) {
+func (api *API) setupMachine(apiPath string) {
 	var machine model.Object = new(model.Machine)
 	api.setupBasicFunctions(apiPath, db.GetMachinesO, db.GetMachineO, db.InsertMachineO, db.UpdateMachineO, db.DeleteMachine, "machine", &machine)
 }
 
-func (api *Api) setupInstalledSoftware(apiPath string) {
+func (api *API) setupInstalledSoftware(apiPath string) {
 	var installedSoftware model.Object = new(model.InstalledSoftware)
 	api.setupBasicFunctions(apiPath, db.GetInstalledSoftwaresO, db.GetInstalledSoftwareO, db.InsertInstalledSoftwareO, db.UpdateInstalledSoftwareO, db.DeleteInstalledSoftware, "installedSoftware", &installedSoftware)
 }
 
-func (api *Api) setupTaggedMachine(apiPath string) {
+func (api *API) setupTaggedMachine(apiPath string) {
 	var taggedMachine model.Object = new(model.TaggedMachine)
 	api.setupBasicFunctions(apiPath, db.GetTaggedMachinesO, db.GetTaggedMachineO, db.InsertTaggedMachineO, db.UpdateTaggedMachineO, db.DeleteTaggedMachine, "taggedMachine", &taggedMachine)
 }
 
-func (api *Api) setupNetwork(apiPath string) {
+func (api *API) setupNetwork(apiPath string) {
 	var network model.Object = new(model.Network)
 	api.setupBasicFunctions(apiPath, db.GetNetworksO, db.GetNetworkO, db.InsertNetworkO, db.UpdateNetworkO, db.DeleteNetwork, "network", &network)
-	api.setupGetObjectsByString(apiPath, db.GetNetworksByIpO, "network", "ip")
+	api.setupGetObjectsByString(apiPath, db.GetNetworksByIPO, "network", "ip")
 }
 
-func (api *Api) setupInterface(apiPath string) {
+func (api *API) setupInterface(apiPath string) {
 	var interfaceO model.Object = new(model.InterfaceO)
 	api.setupBasicFunctions(apiPath, db.GetInterfacesO, db.GetInterfaceO, db.InsertInterfaceO, db.UpdateInterfaceO, db.DeleteInterface, "interface", &interfaceO)
 	api.setupGetObjectByString(apiPath, db.GetInterfaceByMacO, "interface", "mac")
-	api.setupGetObjectsByInt(apiPath, db.GetInterfacesByMachineIdO, "interface", "machineId")
+	api.setupGetObjectsByInt(apiPath, db.GetInterfacesByMachineIDO, "interface", "machineId")
 }
 
-func (api *Api) setupGateway(apiPath string) {
+func (api *API) setupGateway(apiPath string) {
 	var gateway model.Object = new(model.Gateway)
 	api.setupBasicFunctions(apiPath, db.GetGatewaysO, db.GetGatewayO, db.InsertGatewayO, db.UpdateGatewayO, db.DeleteGateway, "gateway", &gateway)
-	api.setupGetObjectsByInt(apiPath, db.GetGatewaysByInterfaceIdO, "gateway", "interfaceId")
+	api.setupGetObjectsByInt(apiPath, db.GetGatewaysByInterfaceIDO, "gateway", "interfaceId")
 }
 
-func (api *Api) setupOmnis() {
-	apiPath := config.GetConfig().Server.OmnisApi
+func (api *API) setupOmnis() {
+	apiPath := config.GetConfig().Server.OmnisAPI
 	api.router.Methods("GET").Path(apiPath).HandlerFunc(api.root)
 	api.setupLocation(apiPath)
 	api.setupPerimeter(apiPath)
@@ -383,22 +383,22 @@ func (api *Api) setupOmnis() {
 
 ///// API ADMIN
 
-func (api *Api) setupUser(apiPath string) {
+func (api *API) setupUser(apiPath string) {
 	var user model.Object = new(model.User)
 	api.setupBasicFunctions(apiPath, db.GetUsersO, db.GetUserO, db.InsertUserO, db.UpdateUserO, db.DeleteUser, "user", &user)
 	api.setupGetObjectByString(apiPath, db.GetUserByUsernameO, "user", "username")
 }
 
-func (api *Api) setupAdminAPI() {
-	apiPath := config.GetConfig().Server.AdminApi
+func (api *API) setupAdminAPI() {
+	apiPath := config.GetConfig().Server.AdminAPI
 	api.setupUser(apiPath)
 }
 
-func (api *Api) setupOmnisAPI() {
+func (api *API) setupOmnisAPI() {
 	api.setupOmnis()
 }
 
-func (api *Api) setupRestAPI() {
+func (api *API) setupRestAPI() {
 	api.setupAdminAPI()
 	api.setupOmnisAPI()
 }

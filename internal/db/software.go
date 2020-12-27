@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetSoftwares should have a comment.
 func GetSoftwares(automatic bool) (model.Softwares, error) {
 	log.Debug(fmt.Sprintf("GetSoftwares(%t)", automatic))
 
@@ -27,7 +28,7 @@ func GetSoftwares(automatic bool) (model.Softwares, error) {
 	for rows.Next() {
 		var software model.Software
 
-		err := rows.Scan(&software.Id, &software.Name, &software.Version, &software.IsIntern)
+		err := rows.Scan(&software.ID, &software.Name, &software.Version, &software.IsIntern)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -42,6 +43,7 @@ func GetSoftwares(automatic bool) (model.Softwares, error) {
 	return softwares, nil
 }
 
+// GetSoftware should have a comment.
 func GetSoftware(id int32, automatic bool) (*model.Software, error) {
 	log.Debug(fmt.Sprintf("GetSoftware(%d,%t)", id, automatic))
 
@@ -51,7 +53,7 @@ func GetSoftware(id int32, automatic bool) (*model.Software, error) {
 	}
 
 	var software model.Software
-	err = db.QueryRow("CALL get_software_by_id(?,?);", id, automatic).Scan(&software.Id, &software.Name, &software.Version, &software.IsIntern)
+	err = db.QueryRow("CALL get_software_by_id(?,?);", id, automatic).Scan(&software.ID, &software.Name, &software.Version, &software.IsIntern)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -64,6 +66,7 @@ func GetSoftware(id int32, automatic bool) (*model.Software, error) {
 	return &software, nil
 }
 
+// InsertSoftware should have a comment.
 func InsertSoftware(software *model.Software, automatic bool) (int32, error) {
 	log.Debug(fmt.Sprintf("InsertSoftware(%t)", automatic))
 
@@ -84,6 +87,7 @@ func InsertSoftware(software *model.Software, automatic bool) (int32, error) {
 	return id, nil
 }
 
+// UpdateSoftware should have a comment.
 func UpdateSoftware(id int32, software *model.Software, automatic bool) (int64, error) {
 	log.Debug(fmt.Sprintf("UpdateSoftware(%t)", automatic))
 
@@ -108,6 +112,7 @@ func UpdateSoftware(id int32, software *model.Software, automatic bool) (int64, 
 	return rowsAffected, nil
 }
 
+// DeleteSoftware should have a comment.
 func DeleteSoftware(id int32) (int64, error) {
 	log.Debug(fmt.Sprintf("DeleteSoftware(%d)", id))
 
@@ -129,19 +134,23 @@ func DeleteSoftware(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetSoftwaresO should have a comment.
 func GetSoftwaresO(automatic bool) (model.Objects, error) {
 	return GetSoftwares(automatic)
 }
 
+// GetSoftwareO should have a comment.
 func GetSoftwareO(id int32, automatic bool) (model.Object, error) {
 	return GetSoftware(id, automatic)
 }
 
+// InsertSoftwareO should have a comment.
 func InsertSoftwareO(object *model.Object, automatic bool) (int32, error) {
 	var software *model.Software = (*object).(*model.Software)
 	return InsertSoftware(software, automatic)
 }
 
+// UpdateSoftwareO should have a comment.
 func UpdateSoftwareO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var software *model.Software = (*object).(*model.Software)
 	return UpdateSoftware(id, software, automatic)

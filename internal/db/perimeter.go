@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetPerimeters should have a comment.
 func GetPerimeters(automatic bool) (model.Perimeters, error) {
 	log.Debug(fmt.Sprintf("GetPerimeters(%t)", automatic))
 
@@ -27,7 +28,7 @@ func GetPerimeters(automatic bool) (model.Perimeters, error) {
 	for rows.Next() {
 		var perimeter model.Perimeter
 
-		err := rows.Scan(&perimeter.Id, &perimeter.Name, &perimeter.Description)
+		err := rows.Scan(&perimeter.ID, &perimeter.Name, &perimeter.Description)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -42,6 +43,7 @@ func GetPerimeters(automatic bool) (model.Perimeters, error) {
 	return perimeters, nil
 }
 
+// GetPerimeter should have a comment.
 func GetPerimeter(id int32, automatic bool) (*model.Perimeter, error) {
 	log.Debug(fmt.Sprintf("GetPerimeter(%d,%t)", id, automatic))
 
@@ -51,7 +53,7 @@ func GetPerimeter(id int32, automatic bool) (*model.Perimeter, error) {
 	}
 
 	var perimeter model.Perimeter
-	err = db.QueryRow("CALL get_perimeter_by_id(?,?);", id, automatic).Scan(&perimeter.Id, &perimeter.Name, &perimeter.Description)
+	err = db.QueryRow("CALL get_perimeter_by_id(?,?);", id, automatic).Scan(&perimeter.ID, &perimeter.Name, &perimeter.Description)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -64,6 +66,7 @@ func GetPerimeter(id int32, automatic bool) (*model.Perimeter, error) {
 	return &perimeter, nil
 }
 
+// InsertPerimeter should have a comment.
 func InsertPerimeter(perimeter *model.Perimeter, automatic bool) (int32, error) {
 	log.Debug(fmt.Sprintf("InsertPerimeter(%t)", automatic))
 
@@ -84,6 +87,7 @@ func InsertPerimeter(perimeter *model.Perimeter, automatic bool) (int32, error) 
 	return id, nil
 }
 
+// UpdatePerimeter should have a comment.
 func UpdatePerimeter(id int32, perimeter *model.Perimeter, automatic bool) (int64, error) {
 	log.Debug(fmt.Sprintf("UpdatePerimeter(%t)", automatic))
 
@@ -108,6 +112,7 @@ func UpdatePerimeter(id int32, perimeter *model.Perimeter, automatic bool) (int6
 	return rowsAffected, nil
 }
 
+// DeletePerimeter should have a comment.
 func DeletePerimeter(id int32) (int64, error) {
 	log.Debug(fmt.Sprintf("DeletePerimeter(%d)", id))
 
@@ -129,6 +134,7 @@ func DeletePerimeter(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetPerimeterByName should have a comment.
 func GetPerimeterByName(name string, automatic bool) (*model.Perimeter, error) {
 	log.Debug(fmt.Sprintf("GetPerimeterByName(%s,%t)", name, automatic))
 
@@ -138,7 +144,7 @@ func GetPerimeterByName(name string, automatic bool) (*model.Perimeter, error) {
 	}
 
 	var perimeter model.Perimeter
-	err = db.QueryRow("CALL get_perimeter_by_name(?,?);", name, automatic).Scan(&perimeter.Id, &perimeter.Name, &perimeter.Description)
+	err = db.QueryRow("CALL get_perimeter_by_name(?,?);", name, automatic).Scan(&perimeter.ID, &perimeter.Name, &perimeter.Description)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -151,24 +157,29 @@ func GetPerimeterByName(name string, automatic bool) (*model.Perimeter, error) {
 	return &perimeter, nil
 }
 
+// GetPerimetersO should have a comment.
 func GetPerimetersO(automatic bool) (model.Objects, error) {
 	return GetPerimeters(automatic)
 }
 
+// GetPerimeterO should have a comment.
 func GetPerimeterO(id int32, automatic bool) (model.Object, error) {
 	return GetPerimeter(id, automatic)
 }
 
+// InsertPerimeterO should have a comment.
 func InsertPerimeterO(object *model.Object, automatic bool) (int32, error) {
 	var perimeter *model.Perimeter = (*object).(*model.Perimeter)
 	return InsertPerimeter(perimeter, automatic)
 }
 
+// UpdatePerimeterO should have a comment.
 func UpdatePerimeterO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var perimeter *model.Perimeter = (*object).(*model.Perimeter)
 	return UpdatePerimeter(id, perimeter, automatic)
 }
 
+// GetPerimeterByNameO should have a comment.
 func GetPerimeterByNameO(name string, automatic bool) (model.Object, error) {
 	return GetPerimeterByName(name, automatic)
 }

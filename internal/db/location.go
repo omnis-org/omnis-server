@@ -8,6 +8,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// GetLocations should have a comment.
 func GetLocations(automatic bool) (model.Locations, error) {
 	log.Debug(fmt.Sprintf("GetLocations(%t)", automatic))
 
@@ -27,7 +28,7 @@ func GetLocations(automatic bool) (model.Locations, error) {
 	for rows.Next() {
 		var location model.Location
 
-		err := rows.Scan(&location.Id, &location.Name, &location.Description)
+		err := rows.Scan(&location.ID, &location.Name, &location.Description)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -42,6 +43,7 @@ func GetLocations(automatic bool) (model.Locations, error) {
 	return locations, nil
 }
 
+// GetLocation should have a comment.
 func GetLocation(id int32, automatic bool) (*model.Location, error) {
 	log.Debug(fmt.Sprintf("GetLocation(%d,%t)", id, automatic))
 
@@ -51,7 +53,7 @@ func GetLocation(id int32, automatic bool) (*model.Location, error) {
 	}
 
 	var location model.Location
-	err = db.QueryRow("CALL get_location_by_id(?,?);", id, automatic).Scan(&location.Id, &location.Name, &location.Description)
+	err = db.QueryRow("CALL get_location_by_id(?,?);", id, automatic).Scan(&location.ID, &location.Name, &location.Description)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -64,6 +66,7 @@ func GetLocation(id int32, automatic bool) (*model.Location, error) {
 	return &location, nil
 }
 
+// InsertLocation should have a comment.
 func InsertLocation(location *model.Location, automatic bool) (int32, error) {
 	log.Debug(fmt.Sprintf("InsertLocation(%t)", automatic))
 
@@ -84,6 +87,7 @@ func InsertLocation(location *model.Location, automatic bool) (int32, error) {
 	return id, nil
 }
 
+// UpdateLocation should have a comment.
 func UpdateLocation(id int32, location *model.Location, automatic bool) (int64, error) {
 	log.Debug(fmt.Sprintf("UpdateLocation(%t)", automatic))
 
@@ -108,6 +112,7 @@ func UpdateLocation(id int32, location *model.Location, automatic bool) (int64, 
 	return rowsAffected, nil
 }
 
+// DeleteLocation should have a comment.
 func DeleteLocation(id int32) (int64, error) {
 	log.Debug(fmt.Sprintf("DeleteLocation(%d)", id))
 
@@ -129,6 +134,7 @@ func DeleteLocation(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetLocationByName should have a comment.
 func GetLocationByName(name string, automatic bool) (*model.Location, error) {
 	log.Debug(fmt.Sprintf("GetLocationByName(%s,%t)", name, automatic))
 
@@ -138,7 +144,7 @@ func GetLocationByName(name string, automatic bool) (*model.Location, error) {
 	}
 
 	var location model.Location
-	err = db.QueryRow("CALL get_location_by_name(?,?);", name, automatic).Scan(&location.Id, &location.Name, &location.Description)
+	err = db.QueryRow("CALL get_location_by_name(?,?);", name, automatic).Scan(&location.ID, &location.Name, &location.Description)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -151,24 +157,29 @@ func GetLocationByName(name string, automatic bool) (*model.Location, error) {
 	return &location, nil
 }
 
+// GetLocationsO should have a comment.
 func GetLocationsO(automatic bool) (model.Objects, error) {
 	return GetLocations(automatic)
 }
 
+// GetLocationO should have a comment.
 func GetLocationO(id int32, automatic bool) (model.Object, error) {
 	return GetLocation(id, automatic)
 }
 
+// InsertLocationO should have a comment.
 func InsertLocationO(object *model.Object, automatic bool) (int32, error) {
 	var location *model.Location = (*object).(*model.Location)
 	return InsertLocation(location, automatic)
 }
 
+// UpdateLocationO should have a comment.
 func UpdateLocationO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var location *model.Location = (*object).(*model.Location)
 	return UpdateLocation(id, location, automatic)
 }
 
+// GetLocationByNameO should have a comment.
 func GetLocationByNameO(name string, automatic bool) (model.Object, error) {
 	return GetLocationByName(name, automatic)
 }

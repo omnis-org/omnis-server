@@ -66,7 +66,7 @@ func doOperatingSystem(osInfos *client_informations.OperatingSystemInformations)
 			os.PlatformFamily.String == osInfos.PlatformFamily &&
 			os.PlatformVersion.String == osInfos.PlatformVersion &&
 			os.KernelVersion.String == osInfos.KernelVersion {
-			operatingSystemID = os.Id.Int32
+			operatingSystemID = os.ID.Int32
 		}
 	}
 
@@ -145,9 +145,9 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 		Label:                label,
 		VirtualizationSystem: virtualizationSystem,
 		SerialNumber:         serialNumber,
-		PerimeterId:          perimeter,
-		LocationId:           location,
-		OperatingSystemId:    operatingSystem,
+		PerimeterID:          perimeter,
+		LocationID:           location,
+		OperatingSystemID:    operatingSystem,
 		MachineType:          machineType,
 		OmnisVersion:         omnisVersion}
 
