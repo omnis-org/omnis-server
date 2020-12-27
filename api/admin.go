@@ -89,6 +89,11 @@ func (api *API) refresh(w http.ResponseWriter, r *http.Request) {
 func (api *API) register(w http.ResponseWriter, r *http.Request) {
 	var users model.Users
 	users, err := db.GetUsers()
+	if err != nil {
+		api.internalError(w, fmt.Errorf("db.GetUsers failed <- %v", err))
+		return
+	}
+
 	if len(users) != 0 {
 		err := api.validateToken(w, r)
 		if err != nil {
@@ -152,6 +157,21 @@ func (api *API) update(w http.ResponseWriter, r *http.Request) {
 	api.sendJSON(w, jsonUser)
 }
 
+// check if first connection
+func (api *API) first(w http.ResponseWriter, r *http.Request) {
+	var users model.Users
+	users, err := db.GetUsers()
+	if err != nil {
+		api.internalError(w, fmt.Errorf("db.GetUsers failed <- %v", err))
+		return
+	}
+	if len(users) == 0 {
+		api.sendText(w, fmt.Sprintf("TRUE"))
+	} else {
+		api.sendText(w, fmt.Sprintf("FALSE"))
+	}
+}
+
 func (api *API) admin(w http.ResponseWriter, r *http.Request) {
 	err := api.validateToken(w, r)
 	if err != nil {
@@ -162,6 +182,7 @@ func (api *API) admin(w http.ResponseWriter, r *http.Request) {
 
 func (api *API) setupAdmin() {
 	api.router.Methods("GET").Path("/admin/").HandlerFunc(api.admin)
+	api.router.Methods("GET").Path("/admin/first").HandlerFunc(api.first)
 	api.router.Methods("POST").Path("/admin/login").HandlerFunc(api.login)
 	api.router.Methods("POST").Path("/admin/register").HandlerFunc(api.register)
 	api.router.Methods("GET").Path("/admin/refresh").HandlerFunc(api.refresh)
