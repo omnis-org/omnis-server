@@ -575,7 +575,7 @@ END //
 DROP PROCEDURE IF EXISTS get_pending_machines//
 CREATE PROCEDURE get_pending_machines()
 BEGIN
-    SELECT id,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version FROM Machine WHERE authorized IS NULL AND authorized=false AND automatic=false;
+    SELECT id,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version FROM Machine WHERE authorized IS NULL AND automatic=0;
 END //
 
 
@@ -611,9 +611,9 @@ END //
 
 -- insert_machine
 DROP PROCEDURE IF EXISTS insert_machine//
-CREATE PROCEDURE insert_machine(IN uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_machine_type VARCHAR(255),IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
+CREATE PROCEDURE insert_machine(IN p_uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_machine_type VARCHAR(255),IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Machine(automatic, uuid, authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification)  
+    INSERT INTO Machine(automatic,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification)  
     VALUES(p_automatic, p_uuid, p_authorized, p_hostname,p_label,p_description,p_virtualization_system,p_serial_number,p_perimeter_id,p_location_id,p_operating_system_id,p_machine_type,p_omnis_version, 
     CASE WHEN (p_uuid IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_authorized IS NULL) THEN NULL ELSE NOW() END,
