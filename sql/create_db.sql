@@ -137,6 +137,8 @@ CREATE TABLE Software (
 
 CREATE TABLE Machine (
     id INT NOT NULL AUTO_INCREMENT,
+    uuid VARCHAR(36) NOT NULL,
+    authorized BOOLEAN DEFAULT NULL,
     hostname VARCHAR(255) NOT NULL,
     label VARCHAR(255) NOT NULL,
     description TEXT, -- 2^16 - 1
@@ -147,6 +149,8 @@ CREATE TABLE Machine (
     location_id INT NOT NULL,
     operating_system_id INT,
     omnis_version VARCHAR(255),
+    uuid_last_modification TIMESTAMP NULL DEFAULT NULL INVISIBLE WITHOUT SYSTEM VERSIONING,
+    authorized_last_modification TIMESTAMP NULL DEFAULT NULL INVISIBLE WITHOUT SYSTEM VERSIONING,
     hostname_last_modification TIMESTAMP NULL DEFAULT NULL INVISIBLE WITHOUT SYSTEM VERSIONING,
     label_last_modification TIMESTAMP NULL DEFAULT NULL INVISIBLE WITHOUT SYSTEM VERSIONING,
     description_last_modification TIMESTAMP NULL DEFAULT NULL INVISIBLE WITHOUT SYSTEM VERSIONING,
@@ -158,6 +162,7 @@ CREATE TABLE Machine (
     operating_system_id_last_modification TIMESTAMP NULL DEFAULT NULL INVISIBLE WITHOUT SYSTEM VERSIONING,
     omnis_version_last_modification TIMESTAMP NULL DEFAULT NULL INVISIBLE WITHOUT SYSTEM VERSIONING,
     automatic BOOLEAN NOT NULL WITHOUT SYSTEM VERSIONING,
+    CONSTRAINT machine_uuid_uq UNIQUE (uuid, automatic),
     CONSTRAINT machine_perimeter_fk FOREIGN KEY (perimeter_id) REFERENCES Perimeter(id),
     CONSTRAINT machine_location_fk FOREIGN KEY (location_id) REFERENCES Location(id),
     CONSTRAINT machine_operating_system_fk FOREIGN KEY (operating_system_id) REFERENCES OperatingSystem(id),

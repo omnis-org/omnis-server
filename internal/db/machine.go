@@ -28,7 +28,7 @@ func GetMachines(automatic bool) (model.Machines, error) {
 	for rows.Next() {
 		var machine model.Machine
 
-		err := rows.Scan(&machine.ID, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
+		err := rows.Scan(&machine.Id, &machine.UUID, &machine.Authorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterId, &machine.LocationId, &machine.OperatingSystemId, &machine.MachineType, &machine.OmnisVersion)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -53,7 +53,7 @@ func GetMachine(id int32, automatic bool) (*model.Machine, error) {
 	}
 
 	var machine model.Machine
-	err = db.QueryRow("CALL get_machine_by_id(?,?);", id, automatic).Scan(&machine.ID, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
+	err = db.QueryRow("CALL get_machine_by_id(?,?);", id, automatic).Scan(&machine.Id, &machine.UUID, &machine.Authorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterId, &machine.LocationId, &machine.OperatingSystemId, &machine.MachineType, &machine.OmnisVersion)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -66,7 +66,40 @@ func GetMachine(id int32, automatic bool) (*model.Machine, error) {
 	return &machine, nil
 }
 
-// InsertMachine should have a comment.
+func GetPendingMachines() (model.Machines, error) {
+	log.Debug(fmt.Sprintf("GetPendingMachines(%t)"))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_pending_machines();")
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var machines model.Machines
+
+	for rows.Next() {
+		var machine model.Machine
+
+		err := rows.Scan(&machine.Id, &machine.UUID, &machine.Authorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterId, &machine.LocationId, &machine.OperatingSystemId, &machine.MachineType, &machine.OmnisVersion)
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		machines = append(machines, machine)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return machines, nil
+}
+
 func InsertMachine(machine *model.Machine, automatic bool) (int32, error) {
 	log.Debug(fmt.Sprintf("InsertMachine(%t)", automatic))
 
@@ -76,9 +109,9 @@ func InsertMachine(machine *model.Machine, automatic bool) (int32, error) {
 	}
 
 	var id int32 = 0
-	sqlStr := "CALL insert_machine(?,?,?,?,?,?,?,?,?,?,?);"
+	sqlStr := "CALL insert_machine(?,?,?,?,?,?,?,?,?,?,?,?,?);"
 
-	err = db.QueryRow(sqlStr, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterID, machine.LocationID, machine.OperatingSystemID, machine.MachineType, machine.OmnisVersion, automatic).Scan(&id)
+	err = db.QueryRow(sqlStr, machine.UUID, machine.Authorized, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterId, machine.LocationId, machine.OperatingSystemId, machine.MachineType, machine.OmnisVersion, automatic).Scan(&id)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.QueryRow failed <- %v", err)
@@ -98,7 +131,7 @@ func UpdateMachine(id int32, machine *model.Machine, automatic bool) (int64, err
 
 	sqlStr := "CALL update_machine(?,?,?,?,?,?,?,?,?,?,?,?);"
 
-	res, err := db.Exec(sqlStr, id, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterID, machine.LocationID, machine.OperatingSystemID, machine.MachineType, machine.OmnisVersion, automatic)
+	res, err := db.Exec(sqlStr, id, machine.UUID, machine.Authorized, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterId, machine.LocationId, machine.OperatingSystemId, machine.MachineType, machine.OmnisVersion, automatic)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.Exec failed <- %v", err)

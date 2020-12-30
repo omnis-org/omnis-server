@@ -18,6 +18,36 @@ func (api *API) informations(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	/*
+		machine
+			[x] script SQL creation base
+			[x] modification du model
+			[x] modification des methodes
+			[x] methode listing machines en attente de validation
+				[x] creer nouvelle procedure SQL dans sql/create_procedure.sql
+			[x] methode validation d'une machine
+				utiliser la procedure deja existante d'update de machine
+			[x] API listing machines
+			[x] API validation machine
+				utiliser endpoint d'update deja existant
+			[ ] vue/template listing machines
+			[ ] vue/template validation machine
+	*/
+
+	// MODIFIER DANS EXEMPLE INSERT DB - ADD UUID ET BOOL
+
+	// Fonction de liste de machine en attente
+	// Fonction savoir si UUID connu et valide
+	// Fonction de validation d'une machine via son UUID
+
+	// UI - faire un endpoint de listing : list des machines en attente de validation + endpoint valider machine par UUID
+	// Faire une vue pour le listing et de validation
+
+	// Checker si UUID est bien valide avant analyse - ou sont stockes les machines avec leur ID ?
+	// Si oui analyser
+	// Si non, mettre en attente de confirmation, api not authorised avec message uuid non confirmer
+	// Dans panel admin, mettre en queue les confirmations des UUID (vue, api qui accepte, api qui refuse, api qui liste (queue))
+	// Quand confirmer, lancer analyseClient qui mettra en BDD la machine avec l'id etc
 	client.AnalyzeClientInformations(&infos)
 
 	api.success(w)

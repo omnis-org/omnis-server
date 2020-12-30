@@ -9,6 +9,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// TODO Refactor name
 func doClientInformations(infos *client_informations.Informations, updateMachineID int32) error {
 	locationID, perimeterID, err := doOtherInformations(infos.OtherInformations)
 	if err != nil {
@@ -33,12 +34,12 @@ func doClientInformations(infos *client_informations.Informations, updateMachine
 	return nil
 }
 
-// AnalyzeClientInformations should have a comment.
+// TODO refactor casting
 func AnalyzeClientInformations(i interface{}) {
 	infos := i.(*client_informations.Informations)
 
 	log.Info(fmt.Sprintf("get new informations from : %s", infos.SystemInformations.Hostname))
-
+	log.Info(infos)
 	var machineID int32 = 0
 	for _, itf := range infos.NetworkInformations.Interfaces {
 		if itf.MAC == "" {
