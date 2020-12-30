@@ -5,41 +5,51 @@ import (
 	"fmt"
 )
 
+// Network should have a comment.
 type Network struct {
-	Id          NullInt32  `json:"id"`
+	ID          NullInt32  `json:"id"`
 	Name        NullString `json:"name"`
 	Ipv4        NullString `json:"ipv4"`
-	Ipv4Mask    NullInt32  `json:"ipv4_mask"`
-	IsDMZ       NullBool   `json:"is_dmz"`
-	HasWifi     NullBool   `json:"has_wifi"`
-	PerimeterId NullInt32  `json:"perimeter_id"`
+	Ipv4Mask    NullInt32  `json:"ipv4Mask"`
+	IsDMZ       NullBool   `json:"isDmz"`
+	HasWifi     NullBool   `json:"hasWifi"`
+	PerimeterID NullInt32  `json:"perimeterId"`
 }
 
+// Networks should have a comment.
 type Networks []Network
 
+// String should have a comment.
 func (network *Network) String() string {
 	return fmt.Sprintf("Network {%d, %s, %s, %d, %t, %t, %d}",
-		network.Id.Int32,
+		network.ID.Int32,
 		network.Name.String,
 		network.Ipv4.String,
 		network.Ipv4Mask.Int32,
 		network.IsDMZ.Bool,
 		network.HasWifi.Bool,
-		network.PerimeterId.Int32)
+		network.PerimeterID.Int32)
 }
 
+// New should have a comment.
 func (network *Network) New() Object {
 	return new(Network)
 }
 
+// Valid should have a comment.
 func (network *Network) Valid() bool {
-	return network.Name.Valid && network.Ipv4.Valid && network.Ipv4Mask.Valid && network.PerimeterId.Valid
+	if network == nil {
+		return false
+	}
+	return network.Name.Valid && network.Ipv4.Valid && network.Ipv4Mask.Valid && network.PerimeterID.Valid
 }
 
-func (network *Network) Json() ([]byte, error) {
+// JSON should have a comment.
+func (network *Network) JSON() ([]byte, error) {
 	return json.Marshal(network)
 }
 
-func (networks Networks) Json() ([]byte, error) {
+// JSON should have a comment.
+func (networks Networks) JSON() ([]byte, error) {
 	return json.Marshal(networks)
 }

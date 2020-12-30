@@ -30,6 +30,7 @@ func createConnection(dbString string) (*sql.DB, error) {
 	return db, nil
 }
 
+// CreateOmnisConnection should have a comment.
 func CreateOmnisConnection() (*sql.DB, error) {
 	dbString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.GetConfig().OmnisDB.Username,
 		config.GetConfig().OmnisDB.Password,
@@ -39,6 +40,7 @@ func CreateOmnisConnection() (*sql.DB, error) {
 	return createConnection(dbString)
 }
 
+// CreateAdminConnection should have a comment.
 func CreateAdminConnection() (*sql.DB, error) {
 	dbString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.GetConfig().AdminDB.Username,
 		config.GetConfig().AdminDB.Password,
@@ -48,6 +50,7 @@ func CreateAdminConnection() (*sql.DB, error) {
 	return createConnection(dbString)
 }
 
+// GetOmnisConnection should have a comment.
 func GetOmnisConnection() (*sql.DB, error) {
 	var err error = nil
 	lockOmnisConnection.Lock()
@@ -58,6 +61,7 @@ func GetOmnisConnection() (*sql.DB, error) {
 	return omnisConnection, err
 }
 
+// GetAdminConnection should have a comment.
 func GetAdminConnection() (*sql.DB, error) {
 	var err error = nil
 	lockAdminConnection.Lock()

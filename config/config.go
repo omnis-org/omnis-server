@@ -7,14 +7,16 @@ import (
 	"sync"
 )
 
+// ServerConfig should have a comment.
 type ServerConfig struct {
-	Ip       string `json:"ip"`
+	IP       string `json:"ip"`
 	Port     int64  `json:"port"`
-	OmnisApi string `json:"omnis_api"`
-	AdminApi string `json:"admin_api"`
+	OmnisAPI string `json:"omnisApi"`
+	AdminAPI string `json:"adminApi"`
 }
 
-type DbConfig struct {
+// DBConfig should have a comment.
+type DBConfig struct {
 	Name     string `json:"name"`
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -22,30 +24,34 @@ type DbConfig struct {
 	Port     int64  `json:"port"`
 }
 
+// AdminConfig should have a comment.
 type AdminConfig struct {
-	ExpirationTokenTime int64  `json:"expiration_token_time"`
-	AuthKeyFile         string `json:"auth_key_file"`
-	AuthPubFile         string `json:"auth_pub_file"`
+	ExpirationTokenTime int64  `json:"expirationTokenTime"`
+	AuthKeyFile         string `json:"authKeyFile"`
+	AuthPubFile         string `json:"authPubFile"`
 	AuthSimpleKey       []byte `json:"AuthSimpleKey"`
 }
 
-type TlsConfig struct {
+// TLSConfig should have a comment.
+type TLSConfig struct {
 	Activated     bool   `json:"activated"`
-	ServerKeyFile string `json:"server_key_file"`
-	ServerCrtFile string `json:"server_crt_file"`
+	ServerKeyFile string `json:"serverKeyFile"`
+	ServerCrtFile string `json:"serverCrtFile"`
 }
 
+// Config should have a comment.
 type Config struct {
 	Server  *ServerConfig `json:"server"`
 	Admin   *AdminConfig  `json:"admin"`
-	OmnisDB *DbConfig     `json:"omnis_db"`
-	AdminDB *DbConfig     `json:"admin_db"`
-	TLS     *TlsConfig    `json:"tls"`
+	OmnisDB *DBConfig     `json:"omnisDb"`
+	AdminDB *DBConfig     `json:"adminDb"`
+	TLS     *TLSConfig    `json:"tls"`
 }
 
 var lockConfig = &sync.Mutex{}
 var loadedConfig *Config = nil
 
+// LoadConfig should have a comment.
 func LoadConfig(configFile *string) error {
 	lockConfig.Lock()
 	defer lockConfig.Unlock()
@@ -66,12 +72,13 @@ func LoadConfig(configFile *string) error {
 func defaultConfig() *Config {
 	sc := ServerConfig{"127.0.0.1", 4320, "/api/omnis", "/api/admin"}
 	ac := AdminConfig{5, "", "", []byte("SECRET_KEY")}
-	omnisDbc := DbConfig{"OMNIS", "omnis", "PASSWORD", "localhost", 3306}
-	adminDbc := DbConfig{"OMNIS_ADMIN", "omnis", "PASSWORD", "localhost", 3306}
-	tc := TlsConfig{Activated: false}
+	omnisDbc := DBConfig{"OMNIS", "omnis", "PASSWORD", "localhost", 3306}
+	adminDbc := DBConfig{"OMNIS_ADMIN", "omnis", "PASSWORD", "localhost", 3306}
+	tc := TLSConfig{Activated: false}
 	return &Config{&sc, &ac, &omnisDbc, &adminDbc, &tc}
 }
 
+// GetConfig should have a comment.
 func GetConfig() *Config {
 	lockConfig.Lock()
 	defer lockConfig.Unlock()

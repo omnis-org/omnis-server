@@ -5,43 +5,53 @@ import (
 	"fmt"
 )
 
+// InterfaceO should have a comment.
 type InterfaceO struct {
-	Id            NullInt32  `json:"id"`
+	ID            NullInt32  `json:"id"`
 	Name          NullString `json:"name"`
 	Ipv4          NullString `json:"ipv4"`
-	Ipv4Mask      NullInt32  `json:"ipv4_mask"`
+	Ipv4Mask      NullInt32  `json:"ipv4Mask"`
 	MAC           NullString `json:"mac"`
-	InterfaceType NullString `json:"interface_type"`
-	MachineId     NullInt32  `json:"machine_id"`
-	NetworkId     NullInt32  `json:"network_id"`
+	InterfaceType NullString `json:"interfaceType"`
+	MachineID     NullInt32  `json:"machineId"`
+	NetworkID     NullInt32  `json:"networkId"`
 }
 
+// InterfaceOs should have a comment.
 type InterfaceOs []InterfaceO
 
+// String should have a comment.
 func (interfaceO *InterfaceO) String() string {
-	return fmt.Sprintf("InterfaceO {%d, %s, %s, %d, %s, %d, %s, %s, %d, %d}",
-		interfaceO.Id.Int32,
+	return fmt.Sprintf("InterfaceO {%d, %s, %s, %d, %s, %s, %d, %d}",
+		interfaceO.ID.Int32,
 		interfaceO.Name.String,
 		interfaceO.Ipv4.String,
 		interfaceO.Ipv4Mask.Int32,
 		interfaceO.MAC.String,
 		interfaceO.InterfaceType.String,
-		interfaceO.MachineId.Int32,
-		interfaceO.NetworkId.Int32)
+		interfaceO.MachineID.Int32,
+		interfaceO.NetworkID.Int32)
 }
 
+// New should have a comment.
 func (interfaceO *InterfaceO) New() Object {
 	return new(InterfaceO)
 }
 
+// Valid should have a comment.
 func (interfaceO *InterfaceO) Valid() bool {
-	return interfaceO.Name.Valid && interfaceO.Ipv4.Valid && interfaceO.Ipv4Mask.Valid && interfaceO.MachineId.Valid && interfaceO.NetworkId.Valid
+	if interfaceO == nil {
+		return false
+	}
+	return interfaceO.Name.Valid && interfaceO.Ipv4.Valid && interfaceO.Ipv4Mask.Valid && interfaceO.MachineID.Valid && interfaceO.NetworkID.Valid
 }
 
-func (interfaceO *InterfaceO) Json() ([]byte, error) {
+// JSON should have a comment.
+func (interfaceO *InterfaceO) JSON() ([]byte, error) {
 	return json.Marshal(interfaceO)
 }
 
-func (interfaceOs InterfaceOs) Json() ([]byte, error) {
+// JSON should have a comment.
+func (interfaceOs InterfaceOs) JSON() ([]byte, error) {
 	return json.Marshal(interfaceOs)
 }

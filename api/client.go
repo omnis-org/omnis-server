@@ -10,7 +10,7 @@ import (
 
 //////////////////	FUNCTIONS CLIENT	//////////////////
 
-func (api *Api) informations(w http.ResponseWriter, r *http.Request) {
+func (api *API) informations(w http.ResponseWriter, r *http.Request) {
 	var infos client_informations.Informations
 	err := json.NewDecoder(r.Body).Decode(&infos)
 	if err != nil {
@@ -23,6 +23,6 @@ func (api *Api) informations(w http.ResponseWriter, r *http.Request) {
 	api.success(w)
 }
 
-func (api *Api) setupClient() {
+func (api *API) setupClient() {
 	api.router.Methods("POST").Path("/client/informations").HandlerFunc(api.informations)
 }

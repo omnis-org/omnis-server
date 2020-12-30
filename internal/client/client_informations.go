@@ -33,6 +33,7 @@ func doClientInformations(infos *client_informations.Informations, updateMachine
 	return nil
 }
 
+// AnalyzeClientInformations should have a comment.
 func AnalyzeClientInformations(i interface{}) {
 	infos := i.(*client_informations.Informations)
 
@@ -52,8 +53,8 @@ func AnalyzeClientInformations(i interface{}) {
 			return
 		}
 
-		if itf2.Id.Valid {
-			machineID = itf2.MachineId.Int32
+		if itf2.ID.Valid {
+			machineID = itf2.MachineID.Int32
 			break
 		}
 	}

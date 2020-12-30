@@ -14,8 +14,9 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+// JWTClaims should have a comment.
 type JWTClaims struct {
-	Id        int32  `json:"id"`
+	ID        int32  `json:"id"`
 	Username  string `json:"username"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
@@ -23,15 +24,23 @@ type JWTClaims struct {
 	jwt.StandardClaims
 }
 
+// UserToken should have a comment.
 type UserToken struct {
 	Token    string `json:"token"`
 	ExpireAt int64  `json:"expireAt"`
 }
 
-var InvalidTokenError error = errors.New("Invalid Token")
-var AlreadyExistError error = errors.New("User already exist")
-var NotExistError error = errors.New("User not exist")
-var InvalidCredentialError error = errors.New("Invalid Credentials")
+// ErrInvalidToken should have a comment.
+var ErrInvalidToken error = errors.New("Invalid Token")
+
+// ErrAlreadyExist should have a comment.
+var ErrAlreadyExist error = errors.New("User already exist")
+
+// ErrNotExist should have a comment.
+var ErrNotExist error = errors.New("User not exist")
+
+// ErrInvalidCredential should have a comment.
+var ErrInvalidCredential error = errors.New("Invalid Credentials")
 
 func getPrivKey(jwtClaims *JWTClaims, token **jwt.Token) (interface{}, error) {
 	var err error
@@ -76,7 +85,7 @@ func createToken(id int32, username string, firstName string, lastName string, a
 	expirationTokenTime := time.Now().Add(time.Duration(adminConf.ExpirationTokenTime) * time.Minute)
 
 	jwtClaims := JWTClaims{
-		Id:        id,
+		ID:        id,
 		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
@@ -99,6 +108,7 @@ func createToken(id int32, username string, firstName string, lastName string, a
 	return &UserToken{Token: tokenSignedString, ExpireAt: expirationTokenTime.Unix()}, nil
 }
 
+// Login should have a comment.
 func Login(user *model.User) (*UserToken, error) {
 	userDB, err := db.GetUserByUsername(user.Username.String)
 	if err != nil {
@@ -106,18 +116,19 @@ func Login(user *model.User) (*UserToken, error) {
 	}
 
 	if !userDB.Valid() {
-		return nil, InvalidCredentialError
+		return nil, ErrInvalidCredential
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(userDB.Password.String), []byte(user.Password.String))
 	if err != nil {
-		return nil, InvalidCredentialError
+		return nil, ErrInvalidCredential
 	}
 	// auth ok
-	return createToken(userDB.Id.Int32, userDB.Username.String, userDB.FirstName.String,
+	return createToken(userDB.ID.Int32, userDB.Username.String, userDB.FirstName.String,
 		userDB.LastName.String, userDB.Admin.Bool)
 }
 
+// Register should have a comment.
 func Register(user *model.User) error {
 
 	userDB, err := db.GetUserByUsername(user.Username.String)
@@ -126,7 +137,7 @@ func Register(user *model.User) error {
 	}
 
 	if userDB.Valid() {
-		return AlreadyExistError
+		return ErrAlreadyExist
 	}
 
 	enc, err := bcrypt.GenerateFromPassword([]byte(user.Password.String), bcrypt.DefaultCost)
@@ -148,6 +159,7 @@ func Register(user *model.User) error {
 	return nil
 }
 
+// Update should have a comment.
 func Update(id int32, user *model.User) error {
 
 	userDB, err := db.GetUser(id)
@@ -156,7 +168,7 @@ func Update(id int32, user *model.User) error {
 	}
 
 	if !userDB.Valid() {
-		return NotExistError
+		return ErrNotExist
 	}
 
 	if user.Password.Valid && user.Password.String != "" {
@@ -180,26 +192,28 @@ func Update(id int32, user *model.User) error {
 	return nil
 }
 
+// ParseToken should have a comment.
 func ParseToken(token string) (*JWTClaims, error) {
 	jwtClaims := JWTClaims{}
 	tokenParse, err := jwt.ParseWithClaims(token, &jwtClaims, getPubKey)
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return nil, InvalidTokenError
+			return nil, ErrInvalidToken
 		}
 		return nil, fmt.Errorf("jwt.ParseWithClaims failed <- %v", err)
 	}
 
 	if !tokenParse.Valid {
-		return nil, InvalidTokenError
+		return nil, ErrInvalidToken
 	}
 	return &jwtClaims, nil
 }
 
+// RefreshToken should have a comment.
 func RefreshToken(token string) (*UserToken, error) {
 	jwtClaims, err := ParseToken(token)
 	if err != nil {
-		if err == InvalidTokenError {
+		if err == ErrInvalidToken {
 			return nil, err
 		}
 		return nil, fmt.Errorf("ParseToken failed <- %v", err)
@@ -211,5 +225,5 @@ func RefreshToken(token string) (*UserToken, error) {
 		return &UserToken{Token: token, ExpireAt: expire.Unix()}, nil
 	}
 
-	return createToken(jwtClaims.Id, jwtClaims.Username, jwtClaims.FirstName, jwtClaims.LastName, jwtClaims.Admin)
+	return createToken(jwtClaims.ID, jwtClaims.Username, jwtClaims.FirstName, jwtClaims.LastName, jwtClaims.Admin)
 }
