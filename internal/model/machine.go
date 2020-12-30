@@ -8,6 +8,8 @@ import (
 // Machine should have a comment.
 type Machine struct {
 	ID                   NullInt32  `json:"id"`
+	UUID                 NullString `json:"uuid"`
+	Authorized           NullBool   `json:"authorized"`
 	Hostname             NullString `json:"hostname"`
 	Label                NullString `json:"label"`
 	Description          NullString `json:"description"`
@@ -25,8 +27,10 @@ type Machines []Machine
 
 // String should have a comment.
 func (machine *Machine) String() string {
-	return fmt.Sprintf("Machine {%d, %s, %s, %s, %s, %s, %d, %d, %d, %s, %s}",
+	return fmt.Sprintf("Machine {%d, %s, %t, %s, %s, %s, %s, %d, %d, %d, %s, %s}",
 		machine.ID.Int32,
+		machine.UUID.String,
+		machine.Authorized.Bool,
 		machine.Hostname.String,
 		machine.Label.String,
 		machine.Description.String,

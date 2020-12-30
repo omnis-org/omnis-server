@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/omnis-org/omnis-server/internal/auth"
 	"github.com/omnis-org/omnis-server/internal/db"
@@ -38,6 +39,54 @@ func (api *API) validateToken(w http.ResponseWriter, r *http.Request) error {
 		return err
 	}
 	return nil
+}
+
+func (api *API) listPendingMachine(w http.ResponseWriter, r *http.Request) {
+	// Call la fonction de liste des machines et retourner la liste
+	log.Debug("listPendingMachine")
+	obj, err := db.GetPendingMachines()
+	if err != nil {
+		api.internalError(w, err)
+		return
+	}
+
+	json, err := obj.Json()
+	if err != nil {
+		api.internalError(w, err)
+		return
+	}
+
+	api.sendJSON(w, json)
+}
+
+func doAuthorize(w http.ResponseWriter, r *http.Request, authorize bool) {
+	// Call la fonction d'update de machine en passant authorize a true
+
+	idS := mux.Vars(r)["id"]
+	id, err := strconv.Atoi(idS)
+	if err != nil {
+		api.internalError(w, err)
+		return
+	}
+
+	obj := model.Machine{}
+	obj.Authorized.Scan(authorize)
+	_, err = db.UpdateMachine(id, &obj, false)
+	if err != nil {
+		api.internalError(w, err)
+		return
+	}
+
+	api.success(w)
+}
+
+func (api *API) authorizeMachine(w http.ResponseWriter, r *http.Request) {
+	// Call la fonction d'update de machine en passant authorize a true
+	doAuthorize(w, r, true)
+}
+
+func (api *API) unauthorizeMachine(w http.ResponseWriter, r *http.Request) {
+	doAuthorize(w, r, false)
 }
 
 func (api *API) login(w http.ResponseWriter, r *http.Request) {
@@ -187,4 +236,7 @@ func (api *API) setupAdmin() {
 	api.router.Methods("POST").Path("/admin/register").HandlerFunc(api.register)
 	api.router.Methods("GET").Path("/admin/refresh").HandlerFunc(api.refresh)
 	api.router.Methods("PUT").Path("/admin/update/{id:[0-9]+}").HandlerFunc(api.update)
+	api.router.Methods("GET").Path("/admin/pending_machines/").HandlerFunc(api.listPendingMachine)
+	api.router.Methods("PUT").Path("/admin/pending_machine/{id:[0-9]+}/authorize").HandlerFunc(api.authorizeMachine)
+	api.router.Methods("PUT").Path("/admin/pending_machine/{id:[0-9]+}/unauthorize").HandlerFunc(api.unauthorizeMachine)
 }
