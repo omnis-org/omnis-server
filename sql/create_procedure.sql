@@ -24,7 +24,7 @@ CREATE PROCEDURE get_timestamp_perimeters(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  name_last_modification,description_last_modification
     FROM Perimeter
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (name_last_modification IS NOT NULL OR description_last_modification IS NOT NULL);
 END //
 
@@ -44,12 +44,12 @@ END //
 DROP PROCEDURE IF EXISTS insert_perimeter//
 CREATE PROCEDURE insert_perimeter(IN p_name VARCHAR(255),IN p_description TEXT, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Perimeter(automatic, name,description,  name_last_modification,description_last_modification)  
-    VALUES(p_automatic, p_name,p_description, 
+    INSERT INTO Perimeter(automatic, name,description,  name_last_modification,description_last_modification)
+    VALUES(p_automatic, p_name,p_description,
     CASE WHEN (p_name IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_description IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Perimeter(id, automatic, name,description) 
+    INSERT INTO Perimeter(id, automatic, name,description)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_name,p_description);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -73,7 +73,7 @@ DROP PROCEDURE IF EXISTS update_perimeter//
 CREATE PROCEDURE update_perimeter(IN p_id INT, IN p_name VARCHAR(255),IN p_description TEXT, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Perimeter SET 
+        UPDATE Perimeter SET
         name = COALESCE(p_name, name),
         description = COALESCE(p_description, description)
         WHERE id = p_id AND automatic = true;
@@ -87,7 +87,7 @@ BEGIN
         description_last_modification = CASE WHEN (description_last_modification IS NULL) THEN NULL ELSE  description_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Perimeter SET 
+        UPDATE Perimeter SET
         name = COALESCE(p_name, name),
         description = COALESCE(p_description, description)
         WHERE id = p_id AND automatic = false;
@@ -133,7 +133,7 @@ CREATE PROCEDURE get_timestamp_locations(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  name_last_modification,description_last_modification
     FROM Location
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (name_last_modification IS NOT NULL OR description_last_modification IS NOT NULL);
 END //
 
@@ -153,12 +153,12 @@ END //
 DROP PROCEDURE IF EXISTS insert_location//
 CREATE PROCEDURE insert_location(IN p_name VARCHAR(255),IN p_description TEXT, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Location(automatic, name,description,  name_last_modification,description_last_modification)  
-    VALUES(p_automatic, p_name,p_description, 
+    INSERT INTO Location(automatic, name,description,  name_last_modification,description_last_modification)
+    VALUES(p_automatic, p_name,p_description,
     CASE WHEN (p_name IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_description IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Location(id, automatic, name,description) 
+    INSERT INTO Location(id, automatic, name,description)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_name,p_description);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -182,7 +182,7 @@ DROP PROCEDURE IF EXISTS update_location//
 CREATE PROCEDURE update_location(IN p_id INT, IN p_name VARCHAR(255),IN p_description TEXT, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Location SET 
+        UPDATE Location SET
         name = COALESCE(p_name, name),
         description = COALESCE(p_description, description)
         WHERE id = p_id AND automatic = true;
@@ -196,7 +196,7 @@ BEGIN
         description_last_modification = CASE WHEN (description_last_modification IS NULL) THEN NULL ELSE  description_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Location SET 
+        UPDATE Location SET
         name = COALESCE(p_name, name),
         description = COALESCE(p_description, description)
         WHERE id = p_id AND automatic = false;
@@ -242,7 +242,7 @@ CREATE PROCEDURE get_timestamp_operating_systems(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  name_last_modification,platform_last_modification,platform_family_last_modification,platform_version_last_modification,kernel_version_last_modification
     FROM OperatingSystem
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (name_last_modification IS NOT NULL OR platform_last_modification IS NOT NULL OR platform_family_last_modification IS NOT NULL OR platform_version_last_modification IS NOT NULL OR kernel_version_last_modification IS NOT NULL);
 END //
 
@@ -262,15 +262,15 @@ END //
 DROP PROCEDURE IF EXISTS insert_operating_system//
 CREATE PROCEDURE insert_operating_system(IN p_name VARCHAR(100),IN p_platform VARCHAR(100),IN p_platform_family VARCHAR(100),IN p_platform_version VARCHAR(100),IN p_kernel_version VARCHAR(100), IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO OperatingSystem(automatic, name,platform,platform_family,platform_version,kernel_version,  name_last_modification,platform_last_modification,platform_family_last_modification,platform_version_last_modification,kernel_version_last_modification)  
-    VALUES(p_automatic, p_name,p_platform,p_platform_family,p_platform_version,p_kernel_version, 
+    INSERT INTO OperatingSystem(automatic, name,platform,platform_family,platform_version,kernel_version,  name_last_modification,platform_last_modification,platform_family_last_modification,platform_version_last_modification,kernel_version_last_modification)
+    VALUES(p_automatic, p_name,p_platform,p_platform_family,p_platform_version,p_kernel_version,
     CASE WHEN (p_name IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_platform IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_platform_family IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_platform_version IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_kernel_version IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO OperatingSystem(id, automatic, name,platform,platform_family,platform_version,kernel_version) 
+    INSERT INTO OperatingSystem(id, automatic, name,platform,platform_family,platform_version,kernel_version)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_name,p_platform,p_platform_family,p_platform_version,p_kernel_version);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -300,7 +300,7 @@ DROP PROCEDURE IF EXISTS update_operating_system//
 CREATE PROCEDURE update_operating_system(IN p_id INT, IN p_name VARCHAR(100),IN p_platform VARCHAR(100),IN p_platform_family VARCHAR(100),IN p_platform_version VARCHAR(100),IN p_kernel_version VARCHAR(100), IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE OperatingSystem SET 
+        UPDATE OperatingSystem SET
         name = COALESCE(p_name, name),
         platform = COALESCE(p_platform, platform),
         platform_family = COALESCE(p_platform_family, platform_family),
@@ -326,7 +326,7 @@ BEGIN
         kernel_version_last_modification = CASE WHEN (kernel_version_last_modification IS NULL) THEN NULL ELSE  kernel_version_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE OperatingSystem SET 
+        UPDATE OperatingSystem SET
         name = COALESCE(p_name, name),
         platform = COALESCE(p_platform, platform),
         platform_family = COALESCE(p_platform_family, platform_family),
@@ -375,7 +375,7 @@ CREATE PROCEDURE get_timestamp_tags(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  name_last_modification,color_last_modification
     FROM Tag
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (name_last_modification IS NOT NULL OR color_last_modification IS NOT NULL);
 END //
 
@@ -395,12 +395,12 @@ END //
 DROP PROCEDURE IF EXISTS insert_tag//
 CREATE PROCEDURE insert_tag(IN p_name VARCHAR(255),IN p_color VARCHAR(10), IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Tag(automatic, name,color,  name_last_modification,color_last_modification)  
-    VALUES(p_automatic, p_name,p_color, 
+    INSERT INTO Tag(automatic, name,color,  name_last_modification,color_last_modification)
+    VALUES(p_automatic, p_name,p_color,
     CASE WHEN (p_name IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_color IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Tag(id, automatic, name,color) 
+    INSERT INTO Tag(id, automatic, name,color)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_name,p_color);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -424,7 +424,7 @@ DROP PROCEDURE IF EXISTS update_tag//
 CREATE PROCEDURE update_tag(IN p_id INT, IN p_name VARCHAR(255),IN p_color VARCHAR(10), IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Tag SET 
+        UPDATE Tag SET
         name = COALESCE(p_name, name),
         color = COALESCE(p_color, color)
         WHERE id = p_id AND automatic = true;
@@ -438,7 +438,7 @@ BEGIN
         color_last_modification = CASE WHEN (color_last_modification IS NULL) THEN NULL ELSE  color_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Tag SET 
+        UPDATE Tag SET
         name = COALESCE(p_name, name),
         color = COALESCE(p_color, color)
         WHERE id = p_id AND automatic = false;
@@ -476,7 +476,7 @@ CREATE PROCEDURE get_timestamp_softwares(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  name_last_modification,version_last_modification,is_intern_last_modification
     FROM Software
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (name_last_modification IS NOT NULL OR version_last_modification IS NOT NULL OR is_intern_last_modification IS NOT NULL);
 END //
 
@@ -496,13 +496,13 @@ END //
 DROP PROCEDURE IF EXISTS insert_software//
 CREATE PROCEDURE insert_software(IN p_name VARCHAR(255),IN p_version VARCHAR(255),IN p_is_intern BOOLEAN, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Software(automatic, name,version,is_intern,  name_last_modification,version_last_modification,is_intern_last_modification)  
-    VALUES(p_automatic, p_name,p_version,p_is_intern, 
+    INSERT INTO Software(automatic, name,version,is_intern,  name_last_modification,version_last_modification,is_intern_last_modification)
+    VALUES(p_automatic, p_name,p_version,p_is_intern,
     CASE WHEN (p_name IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_version IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_is_intern IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Software(id, automatic, name,version,is_intern) 
+    INSERT INTO Software(id, automatic, name,version,is_intern)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_name,p_version,p_is_intern);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -528,7 +528,7 @@ DROP PROCEDURE IF EXISTS update_software//
 CREATE PROCEDURE update_software(IN p_id INT, IN p_name VARCHAR(255),IN p_version VARCHAR(255),IN p_is_intern BOOLEAN, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Software SET 
+        UPDATE Software SET
         name = COALESCE(p_name, name),
         version = COALESCE(p_version, version),
         is_intern = COALESCE(p_is_intern, is_intern)
@@ -546,7 +546,7 @@ BEGIN
         is_intern_last_modification = CASE WHEN (is_intern_last_modification IS NULL) THEN NULL ELSE  is_intern_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Software SET 
+        UPDATE Software SET
         name = COALESCE(p_name, name),
         version = COALESCE(p_version, version),
         is_intern = COALESCE(p_is_intern, is_intern)
@@ -593,7 +593,7 @@ CREATE PROCEDURE get_timestamp_machines(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification
     FROM Machine
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (uuid_last_modification IS NOT NULL OR authorized_last_modification IS NOT NULL OR hostname_last_modification IS NOT NULL OR label_last_modification IS NOT NULL OR description_last_modification IS NOT NULL OR virtualization_system_last_modification IS NOT NULL OR serial_number_last_modification IS NOT NULL OR perimeter_id_last_modification IS NOT NULL OR location_id_last_modification IS NOT NULL OR operating_system_id_last_modification IS NOT NULL OR machine_type_last_modification IS NOT NULL OR omnis_version_last_modification IS NOT NULL);
 END //
 
@@ -613,8 +613,8 @@ END //
 DROP PROCEDURE IF EXISTS insert_machine//
 CREATE PROCEDURE insert_machine(IN p_uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_machine_type VARCHAR(255),IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Machine(automatic,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification)  
-    VALUES(p_automatic, p_uuid, p_authorized, p_hostname,p_label,p_description,p_virtualization_system,p_serial_number,p_perimeter_id,p_location_id,p_operating_system_id,p_machine_type,p_omnis_version, 
+    INSERT INTO Machine(automatic,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification)
+    VALUES(p_automatic, p_uuid, p_authorized, p_hostname,p_label,p_description,p_virtualization_system,p_serial_number,p_perimeter_id,p_location_id,p_operating_system_id,p_machine_type,p_omnis_version,
     CASE WHEN (p_uuid IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_authorized IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_hostname IS NULL) THEN NULL ELSE NOW() END,
@@ -628,7 +628,7 @@ BEGIN
     CASE WHEN (p_machine_type IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_omnis_version IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Machine(id, automatic, uuid, authorized, hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version) 
+    INSERT INTO Machine(id, automatic, uuid, authorized, hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_uuid, p_authorized, p_hostname,p_label,p_description,p_virtualization_system,p_serial_number,p_perimeter_id,p_location_id,p_operating_system_id,p_machine_type,p_omnis_version);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -671,7 +671,7 @@ DROP PROCEDURE IF EXISTS update_machine//
 CREATE PROCEDURE update_machine(IN p_id INT, IN p_uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_machine_type VARCHAR(255),IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Machine SET 
+        UPDATE Machine SET
         uuid = COALESCE(p_uuid, uuid),
         authorized = COALESCE(p_authorized, authorized),
         hostname = COALESCE(p_hostname, hostname),
@@ -725,7 +725,7 @@ BEGIN
         omnis_version_last_modification = CASE WHEN (omnis_version_last_modification IS NULL) THEN NULL ELSE  omnis_version_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Machine SET 
+        UPDATE Machine SET
         uuid = COALESCE(p_uuid , uuid),
         authorized = COALESCE(p_authorized , authorized),
         hostname = COALESCE(p_hostname, hostname),
@@ -773,7 +773,7 @@ CREATE PROCEDURE get_timestamp_installed_softwares(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  software_id_last_modification,machine_id_last_modification
     FROM InstalledSoftware
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (software_id_last_modification IS NOT NULL OR machine_id_last_modification IS NOT NULL);
 END //
 
@@ -793,12 +793,12 @@ END //
 DROP PROCEDURE IF EXISTS insert_installed_software//
 CREATE PROCEDURE insert_installed_software(IN p_software_id INT,IN p_machine_id INT, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO InstalledSoftware(automatic, software_id,machine_id,  software_id_last_modification,machine_id_last_modification)  
-    VALUES(p_automatic, p_software_id,p_machine_id, 
+    INSERT INTO InstalledSoftware(automatic, software_id,machine_id,  software_id_last_modification,machine_id_last_modification)
+    VALUES(p_automatic, p_software_id,p_machine_id,
     CASE WHEN (p_software_id IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_machine_id IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO InstalledSoftware(id, automatic, software_id,machine_id) 
+    INSERT INTO InstalledSoftware(id, automatic, software_id,machine_id)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_software_id,p_machine_id);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -822,7 +822,7 @@ DROP PROCEDURE IF EXISTS update_installed_software//
 CREATE PROCEDURE update_installed_software(IN p_id INT, IN p_software_id INT,IN p_machine_id INT, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE InstalledSoftware SET 
+        UPDATE InstalledSoftware SET
         software_id = COALESCE(p_software_id, software_id),
         machine_id = COALESCE(p_machine_id, machine_id)
         WHERE id = p_id AND automatic = true;
@@ -836,7 +836,7 @@ BEGIN
         machine_id_last_modification = CASE WHEN (machine_id_last_modification IS NULL) THEN NULL ELSE  machine_id_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE InstalledSoftware SET 
+        UPDATE InstalledSoftware SET
         software_id = COALESCE(p_software_id, software_id),
         machine_id = COALESCE(p_machine_id, machine_id)
         WHERE id = p_id AND automatic = false;
@@ -874,7 +874,7 @@ CREATE PROCEDURE get_timestamp_tagged_machines(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  tag_id_last_modification,machine_id_last_modification
     FROM TaggedMachine
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (tag_id_last_modification IS NOT NULL OR machine_id_last_modification IS NOT NULL);
 END //
 
@@ -894,12 +894,12 @@ END //
 DROP PROCEDURE IF EXISTS insert_tagged_machine//
 CREATE PROCEDURE insert_tagged_machine(IN p_tag_id INT,IN p_machine_id INT, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO TaggedMachine(automatic, tag_id,machine_id,  tag_id_last_modification,machine_id_last_modification)  
-    VALUES(p_automatic, p_tag_id,p_machine_id, 
+    INSERT INTO TaggedMachine(automatic, tag_id,machine_id,  tag_id_last_modification,machine_id_last_modification)
+    VALUES(p_automatic, p_tag_id,p_machine_id,
     CASE WHEN (p_tag_id IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_machine_id IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO TaggedMachine(id, automatic, tag_id,machine_id) 
+    INSERT INTO TaggedMachine(id, automatic, tag_id,machine_id)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_tag_id,p_machine_id);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -923,7 +923,7 @@ DROP PROCEDURE IF EXISTS update_tagged_machine//
 CREATE PROCEDURE update_tagged_machine(IN p_id INT, IN p_tag_id INT,IN p_machine_id INT, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE TaggedMachine SET 
+        UPDATE TaggedMachine SET
         tag_id = COALESCE(p_tag_id, tag_id),
         machine_id = COALESCE(p_machine_id, machine_id)
         WHERE id = p_id AND automatic = true;
@@ -937,7 +937,7 @@ BEGIN
         machine_id_last_modification = CASE WHEN (machine_id_last_modification IS NULL) THEN NULL ELSE  machine_id_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE TaggedMachine SET 
+        UPDATE TaggedMachine SET
         tag_id = COALESCE(p_tag_id, tag_id),
         machine_id = COALESCE(p_machine_id, machine_id)
         WHERE id = p_id AND automatic = false;
@@ -975,7 +975,7 @@ CREATE PROCEDURE get_timestamp_networks(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  name_last_modification,ipv4_last_modification,ipv4_mask_last_modification,is_dmz_last_modification,has_wifi_last_modification,perimeter_id_last_modification
     FROM Network
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (name_last_modification IS NOT NULL OR ipv4_last_modification IS NOT NULL OR ipv4_mask_last_modification IS NOT NULL OR is_dmz_last_modification IS NOT NULL OR has_wifi_last_modification IS NOT NULL OR perimeter_id_last_modification IS NOT NULL);
 END //
 
@@ -995,8 +995,8 @@ END //
 DROP PROCEDURE IF EXISTS insert_network//
 CREATE PROCEDURE insert_network(IN p_name VARCHAR(255),IN p_ipv4 VARCHAR(20),IN p_ipv4_mask INT,IN p_is_dmz INT,IN p_has_wifi INT,IN p_perimeter_id INT, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Network(automatic, name,ipv4,ipv4_mask,is_dmz,has_wifi,perimeter_id,  name_last_modification,ipv4_last_modification,ipv4_mask_last_modification,is_dmz_last_modification,has_wifi_last_modification,perimeter_id_last_modification)  
-    VALUES(p_automatic, p_name,INET_ATON(p_ipv4),p_ipv4_mask,p_is_dmz,p_has_wifi,p_perimeter_id, 
+    INSERT INTO Network(automatic, name,ipv4,ipv4_mask,is_dmz,has_wifi,perimeter_id,  name_last_modification,ipv4_last_modification,ipv4_mask_last_modification,is_dmz_last_modification,has_wifi_last_modification,perimeter_id_last_modification)
+    VALUES(p_automatic, p_name,INET_ATON(p_ipv4),p_ipv4_mask,p_is_dmz,p_has_wifi,p_perimeter_id,
     CASE WHEN (p_name IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (INET_ATON(p_ipv4) IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_ipv4_mask IS NULL) THEN NULL ELSE NOW() END,
@@ -1004,7 +1004,7 @@ BEGIN
     CASE WHEN (p_has_wifi IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_perimeter_id IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Network(id, automatic, name,ipv4,ipv4_mask,is_dmz,has_wifi,perimeter_id) 
+    INSERT INTO Network(id, automatic, name,ipv4,ipv4_mask,is_dmz,has_wifi,perimeter_id)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_name,INET_ATON(p_ipv4),p_ipv4_mask,p_is_dmz,p_has_wifi,p_perimeter_id);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -1036,7 +1036,7 @@ DROP PROCEDURE IF EXISTS update_network//
 CREATE PROCEDURE update_network(IN p_id INT, IN p_name VARCHAR(255),IN p_ipv4 VARCHAR(20),IN p_ipv4_mask INT,IN p_is_dmz INT,IN p_has_wifi INT,IN p_perimeter_id INT, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Network SET 
+        UPDATE Network SET
         name = COALESCE(p_name, name),
         ipv4 = COALESCE(INET_ATON(p_ipv4), ipv4),
         ipv4_mask = COALESCE(p_ipv4_mask, ipv4_mask),
@@ -1066,7 +1066,7 @@ BEGIN
         perimeter_id_last_modification = CASE WHEN (perimeter_id_last_modification IS NULL) THEN NULL ELSE  perimeter_id_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Network SET 
+        UPDATE Network SET
         name = COALESCE(p_name, name),
         ipv4 = COALESCE(INET_ATON(p_ipv4), ipv4),
         ipv4_mask = COALESCE(p_ipv4_mask, ipv4_mask),
@@ -1116,7 +1116,7 @@ CREATE PROCEDURE get_timestamp_interfaces(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  name_last_modification,ipv4_last_modification,ipv4_mask_last_modification,mac_last_modification,interface_type_last_modification,machine_id_last_modification,network_id_last_modification
     FROM Interface
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (name_last_modification IS NOT NULL OR ipv4_last_modification IS NOT NULL OR ipv4_mask_last_modification IS NOT NULL OR mac_last_modification IS NOT NULL OR interface_type_last_modification IS NOT NULL OR machine_id_last_modification IS NOT NULL OR network_id_last_modification IS NOT NULL);
 END //
 
@@ -1136,8 +1136,8 @@ END //
 DROP PROCEDURE IF EXISTS insert_interface//
 CREATE PROCEDURE insert_interface(IN p_name VARCHAR(255),IN p_ipv4 VARCHAR(20),IN p_ipv4_mask INT,IN p_mac VARCHAR(255),IN p_interface_type VARCHAR(255),IN p_machine_id INT,IN p_network_id INT, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Interface(automatic, name,ipv4,ipv4_mask,mac,interface_type,machine_id,network_id,  name_last_modification,ipv4_last_modification,ipv4_mask_last_modification,mac_last_modification,interface_type_last_modification,machine_id_last_modification,network_id_last_modification)  
-    VALUES(p_automatic, p_name,INET_ATON(p_ipv4),p_ipv4_mask,p_mac,p_interface_type,p_machine_id,p_network_id, 
+    INSERT INTO Interface(automatic, name,ipv4,ipv4_mask,mac,interface_type,machine_id,network_id,  name_last_modification,ipv4_last_modification,ipv4_mask_last_modification,mac_last_modification,interface_type_last_modification,machine_id_last_modification,network_id_last_modification)
+    VALUES(p_automatic, p_name,INET_ATON(p_ipv4),p_ipv4_mask,p_mac,p_interface_type,p_machine_id,p_network_id,
     CASE WHEN (p_name IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (INET_ATON(p_ipv4) IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_ipv4_mask IS NULL) THEN NULL ELSE NOW() END,
@@ -1146,7 +1146,7 @@ BEGIN
     CASE WHEN (p_machine_id IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_network_id IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Interface(id, automatic, name,ipv4,ipv4_mask,mac,interface_type,machine_id,network_id) 
+    INSERT INTO Interface(id, automatic, name,ipv4,ipv4_mask,mac,interface_type,machine_id,network_id)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, p_name,INET_ATON(p_ipv4),p_ipv4_mask,p_mac,p_interface_type,p_machine_id,p_network_id);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -1180,7 +1180,7 @@ DROP PROCEDURE IF EXISTS update_interface//
 CREATE PROCEDURE update_interface(IN p_id INT, IN p_name VARCHAR(255),IN p_ipv4 VARCHAR(20),IN p_ipv4_mask INT,IN p_mac VARCHAR(255),IN p_interface_type VARCHAR(255),IN p_machine_id INT,IN p_network_id INT, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Interface SET 
+        UPDATE Interface SET
         name = COALESCE(p_name, name),
         ipv4 = COALESCE(INET_ATON(p_ipv4), ipv4),
         ipv4_mask = COALESCE(p_ipv4_mask, ipv4_mask),
@@ -1214,7 +1214,7 @@ BEGIN
         network_id_last_modification = CASE WHEN (network_id_last_modification IS NULL) THEN NULL ELSE  network_id_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Interface SET 
+        UPDATE Interface SET
         name = COALESCE(p_name, name),
         ipv4 = COALESCE(INET_ATON(p_ipv4), ipv4),
         ipv4_mask = COALESCE(p_ipv4_mask, ipv4_mask),
@@ -1273,7 +1273,7 @@ CREATE PROCEDURE get_timestamp_gateways(IN p_automatic BOOLEAN)
 BEGIN
     SELECT id,  ipv4_last_modification,mask_last_modification,interface_id_last_modification
     FROM Gateway
-    WHERE automatic = p_automatic 
+    WHERE automatic = p_automatic
     AND (ipv4_last_modification IS NOT NULL OR mask_last_modification IS NOT NULL OR interface_id_last_modification IS NOT NULL);
 END //
 
@@ -1293,13 +1293,13 @@ END //
 DROP PROCEDURE IF EXISTS insert_gateway//
 CREATE PROCEDURE insert_gateway(IN p_ipv4 VARCHAR(20),IN p_mask INT,IN p_interface_id INT, IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Gateway(automatic, ipv4,mask,interface_id,  ipv4_last_modification,mask_last_modification,interface_id_last_modification)  
-    VALUES(p_automatic, INET_ATON(p_ipv4),p_mask,p_interface_id, 
+    INSERT INTO Gateway(automatic, ipv4,mask,interface_id,  ipv4_last_modification,mask_last_modification,interface_id_last_modification)
+    VALUES(p_automatic, INET_ATON(p_ipv4),p_mask,p_interface_id,
     CASE WHEN (INET_ATON(p_ipv4) IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_mask IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_interface_id IS NULL) THEN NULL ELSE NOW() END);
 
-    INSERT INTO Gateway(id, automatic, ipv4,mask,interface_id) 
+    INSERT INTO Gateway(id, automatic, ipv4,mask,interface_id)
     VALUES(LAST_INSERT_ID(), NOT p_automatic, INET_ATON(p_ipv4),p_mask,p_interface_id);
 
     SELECT LAST_INSERT_ID() AS id;
@@ -1325,7 +1325,7 @@ DROP PROCEDURE IF EXISTS update_gateway//
 CREATE PROCEDURE update_gateway(IN p_id INT, IN p_ipv4 VARCHAR(20),IN p_mask INT,IN p_interface_id INT, IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
-        UPDATE Gateway SET 
+        UPDATE Gateway SET
         ipv4 = COALESCE(INET_ATON(p_ipv4), ipv4),
         mask = COALESCE(p_mask, mask),
         interface_id = COALESCE(p_interface_id, interface_id)
@@ -1343,7 +1343,7 @@ BEGIN
         interface_id_last_modification = CASE WHEN (interface_id_last_modification IS NULL) THEN NULL ELSE  interface_id_last_modification END
         WHERE id = p_id AND automatic = false;
     ELSE -- manual
-        UPDATE Gateway SET 
+        UPDATE Gateway SET
         ipv4 = COALESCE(INET_ATON(p_ipv4), ipv4),
         mask = COALESCE(p_mask, mask),
         interface_id = COALESCE(p_interface_id, interface_id)
