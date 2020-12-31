@@ -39,12 +39,10 @@ sudo mysql_secure_installation
 cd sql/
 
 # If you haven't define root password :
-sudo mysql < create_db.sql
-sudo mysql OMNIS < create_procedure.sql
+sudo mysql < init.sql
 
 # Else :
-mysql -u root -p < create_db.sql
-mysql -u root -p OMNIS  < create_procedure.sql
+mysql -u root -p < init.sql
 ```
 
 > ⚠️ You should change the password of the default create users in file : sql/create_db.sql

@@ -72,8 +72,6 @@ CREATE TABLE Perimeter (
 ) WITH SYSTEM VERSIONING;
 
 -- Location
-
-
 CREATE TABLE Location (
     id INT NOT NULL AUTO_INCREMENT,
     name VARCHAR(255) NOT NULL,
