@@ -28,7 +28,7 @@ func GetUsers() (model.Users, error) {
 	for rows.Next() {
 		var user model.User
 
-		err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
+		err := rows.Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.RoleID)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -53,7 +53,7 @@ func GetUser(id int32) (*model.User, error) {
 	}
 
 	var user model.User
-	err = db.QueryRow("SELECT * FROM User WHERE id=?;", id).Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
+	err = db.QueryRow("SELECT * FROM User WHERE id=?;", id).Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.RoleID)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -75,9 +75,9 @@ func InsertUser(user *model.User) (int32, error) {
 		return 0, fmt.Errorf("GetAdminConnection failed <- %v", err)
 	}
 
-	sqlStr := "INSERT INTO User(username,password,first_name,last_name,admin) VALUES(?,?,?,?,?);"
+	sqlStr := "INSERT INTO User(username,password,first_name,last_name,role_id) VALUES(?,?,?,?,?);"
 
-	res, err := db.Exec(sqlStr, user.Username, user.Password, user.FirstName, user.LastName, user.Admin)
+	res, err := db.Exec(sqlStr, user.Username, user.Password, user.FirstName, user.LastName, user.RoleID)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.QueryRow failed <- %v", err)
@@ -102,9 +102,10 @@ func UpdateUser(id int32, user *model.User) (int64, error) {
 	}
 
 	sqlStr := "UPDATE User SET username = COALESCE(?, username), password = COALESCE(?, password),"
-	sqlStr += "first_name = COALESCE(?, first_name), last_name = COALESCE(?, last_name), admin = COALESCE(?, admin) WHERE id = ?;"
+	sqlStr += "first_name = COALESCE(?, first_name), last_name = COALESCE(?, last_name),"
+	sqlStr += "role_id = COALESCE(?, role_id) WHERE id = ?;"
 
-	res, err := db.Exec(sqlStr, user.Username, user.Password, user.FirstName, user.LastName, user.Admin, id)
+	res, err := db.Exec(sqlStr, user.Username, user.Password, user.FirstName, user.LastName, user.RoleID, id)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.Exec failed <- %v", err)
@@ -150,7 +151,7 @@ func GetUserByUsername(username string) (*model.User, error) {
 	}
 
 	var user model.User
-	err = db.QueryRow("SELECT * FROM User WHERE username=?;", username).Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.Admin)
+	err = db.QueryRow("SELECT * FROM User WHERE username=?;", username).Scan(&user.ID, &user.Username, &user.Password, &user.FirstName, &user.LastName, &user.RoleID)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
