@@ -13,6 +13,8 @@ type ServerConfig struct {
 	Port     int64  `json:"port"`
 	OmnisAPI string `json:"omnisApi"`
 	AdminAPI string `json:"adminApi"`
+	Admin    string `json:"admin"`
+	Client   string `json:"client"`
 }
 
 // DBConfig should have a comment.
@@ -70,7 +72,7 @@ func LoadConfig(configFile *string) error {
 }
 
 func defaultConfig() *Config {
-	sc := ServerConfig{"127.0.0.1", 4320, "/api/omnis", "/api/admin"}
+	sc := ServerConfig{"127.0.0.1", 4320, "/api/omnis", "/api/admin", "/admin", "/client"}
 	ac := AdminConfig{5, "", "", []byte("SECRET_KEY")}
 	omnisDbc := DBConfig{"OMNIS", "omnis", "PASSWORD", "localhost", 3306}
 	adminDbc := DBConfig{"OMNIS_ADMIN", "omnis", "PASSWORD", "localhost", 3306}

@@ -366,7 +366,7 @@ func (api *API) setupGateway(apiPath string) {
 	api.setupGetObjectsByInt(apiPath, db.GetGatewaysByInterfaceIDO, "gateway", "interfaceId")
 }
 
-func (api *API) setupOmnis() {
+func (api *API) setupOmnisAPI() {
 	apiPath := config.GetConfig().Server.OmnisAPI
 	api.router.Methods("GET").Path(apiPath).HandlerFunc(api.root)
 	api.setupLocation(apiPath)
@@ -389,13 +389,15 @@ func (api *API) setupUser(apiPath string) {
 	api.setupGetObjectByString(apiPath, db.GetUserByUsernameO, "user", "username")
 }
 
+func (api *API) setupRole(apiPath string) {
+	var role model.Object = new(model.Role)
+	api.setupBasicFunctions(apiPath, db.GetRolesO, db.GetRoleO, db.InsertRoleO, db.UpdateRoleO, db.DeleteRole, "role", &role)
+}
+
 func (api *API) setupAdminAPI() {
 	apiPath := config.GetConfig().Server.AdminAPI
 	api.setupUser(apiPath)
-}
-
-func (api *API) setupOmnisAPI() {
-	api.setupOmnis()
+	api.setupRole(apiPath)
 }
 
 func (api *API) setupRestAPI() {
