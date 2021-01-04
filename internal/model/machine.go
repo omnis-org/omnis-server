@@ -27,7 +27,7 @@ type Machines []Machine
 
 // String should have a comment.
 func (machine *Machine) String() string {
-	return fmt.Sprintf("Machine {%d, %s, %t, %s, %s, %s, %s, %d, %d, %d, %s, %s}",
+	return fmt.Sprintf("Machine {%d, %s, %t, %s, %s, %s, %s, %s, %d, %d, %d, %s, %s}",
 		machine.ID.Int32,
 		machine.UUID.String,
 		machine.Authorized.Bool,
