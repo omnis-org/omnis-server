@@ -2,9 +2,11 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/omnis-org/omnis-client/pkg/client_informations"
+	"github.com/omnis-org/omnis-server/config"
 	"github.com/omnis-org/omnis-server/internal/client"
 )
 
@@ -54,5 +56,6 @@ func (api *API) informations(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) setupClient() {
-	api.router.Methods("POST").Path("/client/informations").HandlerFunc(api.informations)
+	clientPath := config.GetConfig().Server.Client
+	api.router.Methods("POST").Path(fmt.Sprintf("%s/informations", clientPath)).HandlerFunc(api.informations)
 }

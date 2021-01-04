@@ -3,7 +3,9 @@
         "ip" : "0.0.0.0",
         "port" : 4320,
         "omnisApi" : "/api/omnis",
-        "adminApi" : "/api/admin"
+        "adminApi" : "/api/admin",
+        "admin" : "/admin",
+        "client" : "/client"
     },
     "admin":{
         "expirationTokenTime" : 10,
