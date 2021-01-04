@@ -277,13 +277,43 @@ CREATE TABLE Gateway(
 USE OMNIS_ADMIN;
 
 
+CREATE TABLE Permission(
+    id INT NOT NULL AUTO_INCREMENT,
+    can_select BOOLEAN NOT NULL,
+    can_insert BOOLEAN NOT NULL,
+    can_update BOOLEAN NOT NULL,
+    can_delete BOOLEAN NOT NULL,
+    CONSTRAINT right_pk PRIMARY KEY (id)
+);
+
+-- PERMISSION
+-- 0000 = NO PERMSSION = 0;
+-- 0001 = SELECT = 1;
+-- 0010 = INSERT = 2;
+-- 0100 = UPDATE = 4;
+-- 1000 = DELETE = 8;
+-- 1111 = ALL PERMSSION = 15;
+
+CREATE TABLE Role(
+    id INT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    omnis_permissions INT NOT NULL,
+    roles_permissions INT NOT NULL,
+    users_permissions INT NOT NULL,
+    pending_machines_permissions INT NOT NULL,
+    CONSTRAINT role_pk PRIMARY KEY (id)
+);
+
+INSERT INTO Role VALUES(1,"Administrator",15,15,15,15);
+
 CREATE TABLE User(
     id INT NOT NULL AUTO_INCREMENT,
-    username VARCHAR(255),
-    password VARCHAR(64),
+    username VARCHAR(255) NOT NULL,
+    password VARCHAR(64) NOT NULL,
     first_name VARCHAR(255),
     last_name VARCHAR(255),
-    admin boolean,
+    role_id INT NOT NULL,
     CONSTRAINT username_uq UNIQUE (username),
-    CONSTRAINT users_pk PRIMARY KEY (id)
+    CONSTRAINT role_fk FOREIGN KEY (role_id) REFERENCES Role(id),
+    CONSTRAINT user_pk PRIMARY KEY (id)
 );
