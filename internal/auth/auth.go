@@ -20,7 +20,7 @@ type JWTClaims struct {
 	Username  string `json:"username"`
 	FirstName string `json:"firstName"`
 	LastName  string `json:"lastName"`
-	Admin     bool   `json:"admin"`
+	RoleID    int32  `json:"roleId"`
 	jwt.StandardClaims
 }
 
@@ -78,7 +78,7 @@ func getPubKey(token *jwt.Token) (interface{}, error) {
 	return key, nil
 }
 
-func createToken(id int32, username string, firstName string, lastName string, admin bool) (*UserToken, error) {
+func createToken(id int32, username string, firstName string, lastName string, roleID int32) (*UserToken, error) {
 	var err error
 	var token *jwt.Token
 	adminConf := config.GetConfig().Admin
@@ -89,7 +89,7 @@ func createToken(id int32, username string, firstName string, lastName string, a
 		Username:  username,
 		FirstName: firstName,
 		LastName:  lastName,
-		Admin:     admin,
+		RoleID:    roleID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTokenTime.Unix(),
 		},
@@ -125,7 +125,7 @@ func Login(user *model.User) (*UserToken, error) {
 	}
 	// auth ok
 	return createToken(userDB.ID.Int32, userDB.Username.String, userDB.FirstName.String,
-		userDB.LastName.String, userDB.Admin.Bool)
+		userDB.LastName.String, userDB.RoleID.Int32)
 }
 
 // Register should have a comment.
@@ -225,5 +225,5 @@ func RefreshToken(token string) (*UserToken, error) {
 		return &UserToken{Token: token, ExpireAt: expire.Unix()}, nil
 	}
 
-	return createToken(jwtClaims.ID, jwtClaims.Username, jwtClaims.FirstName, jwtClaims.LastName, jwtClaims.Admin)
+	return createToken(jwtClaims.ID, jwtClaims.Username, jwtClaims.FirstName, jwtClaims.LastName, jwtClaims.RoleID)
 }
