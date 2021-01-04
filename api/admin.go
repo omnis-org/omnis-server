@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
+	"github.com/omnis-org/omnis-server/config"
 	"github.com/omnis-org/omnis-server/internal/auth"
 	"github.com/omnis-org/omnis-server/internal/db"
 	"github.com/omnis-org/omnis-server/internal/model"
@@ -26,21 +27,6 @@ func getToken(r *http.Request) (string, error) {
 	return tokenBearerArray[1], nil
 }
 
-func (api *API) validateToken(w http.ResponseWriter, r *http.Request) error {
-	tokenValue, err := getToken(r)
-	if err != nil {
-		api.unauthorizedError(w, err)
-		return err
-	}
-
-	_, err = auth.ParseToken(tokenValue)
-	if err != nil {
-		api.unauthorizedError(w, err)
-		return err
-	}
-	return nil
-}
-
 func (api *API) listPendingMachine(w http.ResponseWriter, r *http.Request) {
 	// Call la fonction de liste des machines et retourner la liste
 	log.Debug("listPendingMachine")
@@ -50,7 +36,7 @@ func (api *API) listPendingMachine(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json, err := obj.Json()
+	json, err := obj.JSON()
 	if err != nil {
 		api.internalError(w, err)
 		return
@@ -59,9 +45,7 @@ func (api *API) listPendingMachine(w http.ResponseWriter, r *http.Request) {
 	api.sendJSON(w, json)
 }
 
-func doAuthorize(w http.ResponseWriter, r *http.Request, authorize bool) {
-	// Call la fonction d'update de machine en passant authorize a true
-
+func (api *API) doAuthorize(w http.ResponseWriter, r *http.Request, authorize bool) {
 	idS := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idS)
 	if err != nil {
@@ -69,9 +53,7 @@ func doAuthorize(w http.ResponseWriter, r *http.Request, authorize bool) {
 		return
 	}
 
-	obj := model.Machine{}
-	obj.Authorized.Scan(authorize)
-	_, err = db.UpdateMachine(id, &obj, false)
+	_, err = db.AuthorizeMachine(int32(id), authorize)
 	if err != nil {
 		api.internalError(w, err)
 		return
@@ -82,11 +64,11 @@ func doAuthorize(w http.ResponseWriter, r *http.Request, authorize bool) {
 
 func (api *API) authorizeMachine(w http.ResponseWriter, r *http.Request) {
 	// Call la fonction d'update de machine en passant authorize a true
-	doAuthorize(w, r, true)
+	api.doAuthorize(w, r, true)
 }
 
 func (api *API) unauthorizeMachine(w http.ResponseWriter, r *http.Request) {
-	doAuthorize(w, r, false)
+	api.doAuthorize(w, r, false)
 }
 
 func (api *API) login(w http.ResponseWriter, r *http.Request) {
@@ -113,7 +95,6 @@ func (api *API) login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) refresh(w http.ResponseWriter, r *http.Request) {
-
 	tokenValue, err := getToken(r)
 	if err != nil {
 		api.unauthorizedError(w, err)
@@ -136,22 +117,8 @@ func (api *API) refresh(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) register(w http.ResponseWriter, r *http.Request) {
-	var users model.Users
-	users, err := db.GetUsers()
-	if err != nil {
-		api.internalError(w, fmt.Errorf("db.GetUsers failed <- %v", err))
-		return
-	}
-
-	if len(users) != 0 {
-		err := api.validateToken(w, r)
-		if err != nil {
-			return
-		}
-	}
-
 	var user model.User
-	err = json.NewDecoder(r.Body).Decode(&user)
+	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
 		api.internalError(w, fmt.Errorf("json.NewDecoder(r.Body).Decode failed <- %v", err))
 		return
@@ -221,22 +188,17 @@ func (api *API) first(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (api *API) admin(w http.ResponseWriter, r *http.Request) {
-	err := api.validateToken(w, r)
-	if err != nil {
-		return
-	}
-	api.sendText(w, fmt.Sprintf("Welcome admin"))
-}
-
 func (api *API) setupAdmin() {
-	api.router.Methods("GET").Path("/admin/").HandlerFunc(api.admin)
-	api.router.Methods("GET").Path("/admin/first").HandlerFunc(api.first)
-	api.router.Methods("POST").Path("/admin/login").HandlerFunc(api.login)
-	api.router.Methods("POST").Path("/admin/register").HandlerFunc(api.register)
-	api.router.Methods("GET").Path("/admin/refresh").HandlerFunc(api.refresh)
-	api.router.Methods("PUT").Path("/admin/update/{id:[0-9]+}").HandlerFunc(api.update)
-	api.router.Methods("GET").Path("/admin/pending_machines/").HandlerFunc(api.listPendingMachine)
-	api.router.Methods("PUT").Path("/admin/pending_machine/{id:[0-9]+}/authorize").HandlerFunc(api.authorizeMachine)
-	api.router.Methods("PUT").Path("/admin/pending_machine/{id:[0-9]+}/unauthorize").HandlerFunc(api.unauthorizeMachine)
+	adminPath := config.GetConfig().Server.Admin
+	// connection & token
+	api.router.Methods("GET").Path(fmt.Sprintf("%s/first", adminPath)).HandlerFunc(api.first)
+	api.router.Methods("POST").Path(fmt.Sprintf("%s/login", adminPath)).HandlerFunc(api.login)
+	api.router.Methods("GET").Path(fmt.Sprintf("%s/refresh", adminPath)).HandlerFunc(api.refresh)
+	// admin users
+	api.router.Methods("POST").Path(fmt.Sprintf("%s/register", adminPath)).HandlerFunc(api.register)
+	api.router.Methods("PUT").Path(fmt.Sprintf("%s/update/{id:[0-9]+}", adminPath)).HandlerFunc(api.update)
+	// pending machine
+	api.router.Methods("GET").Path(fmt.Sprintf("%s/pending_machines/", adminPath)).HandlerFunc(api.listPendingMachine)
+	api.router.Methods("PUT").Path(fmt.Sprintf("%s/pending_machine/{id:[0-9]+}/authorize", adminPath)).HandlerFunc(api.authorizeMachine)
+	api.router.Methods("PUT").Path(fmt.Sprintf("%s/pending_machine/{id:[0-9]+}/unauthorize", adminPath)).HandlerFunc(api.unauthorizeMachine)
 }
