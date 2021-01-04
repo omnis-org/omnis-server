@@ -1,12 +1,14 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/omnis-org/omnis-server/config"
 	"github.com/omnis-org/omnis-server/internal/auth"
+	"github.com/omnis-org/omnis-server/internal/db"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -70,10 +72,93 @@ func (api *API) root(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome in OmnIS Server API\n")
 }
 
+func checkAccess(permissionsToCheck int, roleID int32, method string) error {
+	role, err := db.GetRole(roleID)
+	if err != nil {
+		return err
+	}
+
+	// GET => 0
+	// POST => 1
+	// PUT => 2
+	// DELETE => 3
+	var methodToCheck int = -1
+
+	if method == "GET" {
+		methodToCheck = 0
+	} else if method == "POST" {
+		methodToCheck = 1
+	} else if method == "PUT" {
+		methodToCheck = 2
+	} else if method == "DELETE" {
+		methodToCheck = 3
+	} else {
+		return errors.New("Invalid method")
+	}
+
+	var permissions int32 = 0
+	if permissionsToCheck == 1 {
+		permissions = role.OmnisPermissions.Int32
+	} else if permissionsToCheck == 2 {
+		permissions = role.RolesPermissions.Int32
+	} else if permissionsToCheck == 3 {
+		permissions = role.UsersPermissions.Int32
+	} else if permissionsToCheck == 4 {
+		permissions = role.PendingMachinesPermissions.Int32
+	}
+
+	if permissions>>methodToCheck&1 == 1 {
+		return nil
+	} else {
+		return fmt.Errorf("Unauthorize : %d >> %d & 1", permissions, methodToCheck)
+	}
+
+}
+
+// permission to check
+// OMNIS => 1
+// ROLES => 2
+// USERS => 3
+// PENDING MACHINES => 4
 func (api *API) middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
-		if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.AdminAPI) || strings.HasPrefix(r.RequestURI, config.GetConfig().Server.OmnisAPI) {
+		var permissionsToCheck int = 0
+
+		if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.Client) {
+			log.Info("No security check")
+		} else if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.OmnisAPI) {
+			permissionsToCheck = 1
+		} else if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.AdminAPI) {
+			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/user", config.GetConfig().Server.AdminAPI)) {
+				permissionsToCheck = 3
+			}
+			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/role", config.GetConfig().Server.AdminAPI)) {
+				permissionsToCheck = 2
+			}
+		} else if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.Admin) {
+			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/pending_machine", config.GetConfig().Server.Admin)) {
+				permissionsToCheck = 4
+			} else if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/update", config.GetConfig().Server.Admin)) {
+				permissionsToCheck = 3
+			} else if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/register", config.GetConfig().Server.Admin)) {
+
+				users, err := db.GetUsers()
+				if err != nil {
+					api.internalError(w, fmt.Errorf("db.GetUsers failed <- %v", err))
+					return
+				}
+
+				if len(users) != 0 { // authorize register if no users
+					permissionsToCheck = 3
+				}
+			}
+		} else {
+			api.unauthorizedError(w, errors.New("Invalid path"))
+			return
+		}
+
+		if permissionsToCheck != 0 {
 			tokenValue, err := getToken(r)
 			if err != nil {
 				api.unauthorizedError(w, err)
@@ -86,11 +171,14 @@ func (api *API) middleware(next http.Handler) http.Handler {
 				return
 			}
 
-			if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.AdminAPI) && !jwtClaims.Admin {
+			err = checkAccess(permissionsToCheck, jwtClaims.RoleID, r.Method)
+			if err != nil {
 				api.unauthorizedError(w, err)
 				return
 			}
 		}
+
+		log.Info("Authorize : ", r.RequestURI)
 
 		next.ServeHTTP(w, r)
 	})
