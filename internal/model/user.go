@@ -12,7 +12,7 @@ type User struct {
 	Password  NullString `json:"password"`
 	FirstName NullString `json:"firstName"`
 	LastName  NullString `json:"lastName"`
-	Admin     NullBool   `json:"admin"`
+	RoleID    NullInt32  `json:"roleId"`
 }
 
 // Users should have a comment.
@@ -20,12 +20,12 @@ type Users []User
 
 // String should have a comment.
 func (user *User) String() string {
-	return fmt.Sprintf("User {%d, %s, %s, %s, %t}",
+	return fmt.Sprintf("User {%d, %s, %s, %s, %d}",
 		user.ID.Int32,
 		user.Username.String,
 		user.FirstName.String,
 		user.LastName.String,
-		user.Admin.Bool)
+		user.RoleID.Int32)
 }
 
 // New should have a comment.
@@ -38,7 +38,7 @@ func (user *User) Valid() bool {
 	if user == nil {
 		return false
 	}
-	return user.Username.Valid && user.Password.Valid
+	return user.Username.Valid && user.Password.Valid && user.RoleID.Valid
 }
 
 // JSON should have a comment.
