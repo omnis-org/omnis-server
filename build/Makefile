@@ -37,7 +37,7 @@ run: hello
 
 test: hello
 	@echo "Launch tests..."
-	go test ../...
+	go test ../... -cover
 
 version:
 	sed -i "/BuildVersion string/c\    BuildVersion string = \"$(VERSION)"\" ../internal/version/version.go
