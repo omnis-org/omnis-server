@@ -13,7 +13,7 @@ OmnIS Server is part of the OmnIS project. It allows the processing of client da
 
 ```bash
 cd build
-./build_server.sh
+make build
 # That will generate a binary omnis-server
 ```
 
