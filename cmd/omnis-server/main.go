@@ -40,7 +40,7 @@ func init() {
 	}
 
 	// config
-	err = config.LoadConfig(configFile)
+	err = config.LoadConfig(*configFile)
 	if err != nil {
 		log.Warn("config.LoadConfig failed <- ", err)
 	}

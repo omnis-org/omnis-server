@@ -1,0 +1,34 @@
+{
+    "server" : {
+        "ip" : "0.0.0.0",
+        "port" : 4320,
+        "omnisApi" : "/api/omnis",
+        "adminApi" : "/api/admin",
+        "admin" : "/admin",
+        "client" : "/client"
+    },
+    "admin":{
+        "expirationTokenTime" : 10,
+        "authKeyFile" : "../keys/auth.key",
+        "authPubFile" : "../keys/auth.pub"
+    },
+    "omnisDb" : {
+        "name" : "OMNIS",
+        "username" : "omnis",
+        "password" : "MyBeautifulPassword8273!",
+        "host" : "localhost",
+        "port" : 3306
+    },
+    "adminDb" : {
+        "name" : "OMNIS_ADMIN",
+        "username" : "omnis",
+        "password" : "MyBeautifulPassword8273!",
+        "host" : "localhost",
+        "port" : 3306
+    },
+    "tls": {
+        "activated" : true,
+        "serverKeyFile": "../keys/server.key",
+        "serverCrtFile" : "../keys/server.crt"
+    }
+}

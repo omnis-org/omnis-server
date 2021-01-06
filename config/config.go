@@ -54,11 +54,12 @@ var lockConfig = &sync.Mutex{}
 var loadedConfig *Config = nil
 
 // LoadConfig should have a comment.
-func LoadConfig(configFile *string) error {
+func LoadConfig(configFile string) error {
 	lockConfig.Lock()
 	defer lockConfig.Unlock()
+
 	var loadedConfigTmp Config
-	jsonS, err := ioutil.ReadFile(*configFile)
+	jsonS, err := ioutil.ReadFile(configFile)
 	if err != nil {
 		return fmt.Errorf("ioutil.ReadFile failed <- %v", err)
 	}
