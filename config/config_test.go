@@ -4,12 +4,12 @@ import (
 	"testing"
 )
 
-func init_test() {
+func initTest() {
 	loadedConfig = nil
 }
 
 func TestLoadConfigEmpty(t *testing.T) {
-	init_test()
+	initTest()
 	err := LoadConfig("")
 	if err == nil {
 		t.Error("Expected error")
@@ -17,7 +17,7 @@ func TestLoadConfigEmpty(t *testing.T) {
 }
 
 func TestLoadConfigError(t *testing.T) {
-	init_test()
+	initTest()
 	err := LoadConfig("testdata/bad_example.json")
 	if err == nil {
 		t.Error("Expected error")
@@ -25,7 +25,7 @@ func TestLoadConfigError(t *testing.T) {
 }
 
 func TestLoadConfig(t *testing.T) {
-	init_test()
+	initTest()
 	err := LoadConfig("testdata/example.json")
 	if err != nil {
 		t.Errorf("Error : %v", err)
@@ -155,7 +155,7 @@ func TestLoadConfig(t *testing.T) {
 }
 
 func TestGetConfigNotLoaded(t *testing.T) {
-	init_test()
+	initTest()
 	conf := GetConfig()
 
 	if conf == nil {
@@ -168,7 +168,7 @@ func TestGetConfigNotLoaded(t *testing.T) {
 }
 
 func TestGetConfigLoaded(t *testing.T) {
-	init_test()
+	initTest()
 	err := LoadConfig("testdata/example.json")
 	if err != nil {
 		t.Errorf("Error : %v", err)
