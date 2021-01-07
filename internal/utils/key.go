@@ -8,7 +8,9 @@ import (
 	"github.com/dgrijalva/jwt-go"
 )
 
-// ParsePrivKey should have a comment.
+// ParsePrivKey allow to parse a private key file
+// if the path or the content of the file is invalid return an error
+// The function return a pointer of rsa.PrivateKey when valid
 func ParsePrivKey(AuthKeyFile string) (*rsa.PrivateKey, error) {
 	keyBytes, err := ioutil.ReadFile(AuthKeyFile)
 	if err != nil {
@@ -23,7 +25,9 @@ func ParsePrivKey(AuthKeyFile string) (*rsa.PrivateKey, error) {
 	return key, nil
 }
 
-// ParsePubKey should have a comment.
+// ParsePubKey allow to parse a public key file
+// if the path or the content of the file is invalid return an error
+// The function return a pointer of rsa.PublicKey when valid
 func ParsePubKey(AuthPubFile string) (*rsa.PublicKey, error) {
 	pubBytes, err := ioutil.ReadFile(AuthPubFile)
 	if err != nil {
