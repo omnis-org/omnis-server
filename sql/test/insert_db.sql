@@ -19,6 +19,13 @@ CALL insert_machine("0d82a3eb-8c74-4013-b6bf-df50afd4c7cb",NULL,"user03","user03
 CALL insert_machine("07012778-9e05-44db-91a0-270ef76caa02",NULL,"user04","user04","Domain user computer",NULL,"012345",1,3,2,"client", "1.0", 1);
 CALL insert_machine("7f3533c1-2a1c-4d3a-b238-66ac8ed15296",0,"user05","user05","Domain user computer",NULL,"012355",1,3,2,"client", "1.0", 1);
 
+CALL update_machine(1,NULL,NULL,NULL, NULL,"Update Description ADO1",NULL,NULL,NULL,NULL,NULL,NULL,NULL,0);
+UPDATE Machine SET description_last_modification='2020-01-01 01:01:01' WHERE id=1 AND automatic=false;
+
+CALL update_machine(2,NULL,NULL,NULL, NULL,"Update Description FILE-SHARE",NULL,NULL,NULL,NULL,NULL,NULL,NULL,0);
+UPDATE Machine SET description_last_modification='2020-10-10 10:10:10' WHERE id=2 AND automatic=false;
+
+
 CALL insert_network("LAN-DOMAIN-CONTROL", "192.168.10.0", 24, 0, 0, 1, 1);
 CALL insert_network("LAN-DOMAIN-CONTROL-PCA", "172.16.10.0", 24, 0, 0, 1, 1);
 CALL insert_network("LAN-DOMAIN-CONTROL-BACKUP", "192.168.11.0", 24, 0, 0, 2, 1);
