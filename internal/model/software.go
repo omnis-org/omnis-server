@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -36,14 +35,4 @@ func (software *Software) Valid() bool {
 		return false
 	}
 	return software.Name.Valid
-}
-
-// JSON should have a comment.
-func (software *Software) JSON() ([]byte, error) {
-	return json.Marshal(software)
-}
-
-// JSON should have a comment.
-func (softwares Softwares) JSON() ([]byte, error) {
-	return json.Marshal(softwares)
 }

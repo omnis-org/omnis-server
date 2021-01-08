@@ -8,15 +8,12 @@ import (
 
 // Object should have a comment.
 type Object interface {
-	JSON() ([]byte, error)
 	Valid() bool
 	New() Object
 }
 
 // Objects should have a comment.
-type Objects interface {
-	JSON() ([]byte, error)
-}
+type Objects interface{}
 
 // IDJSON should have a comment.
 type IDJSON struct {

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -34,14 +33,4 @@ func (tag *Tag) Valid() bool {
 		return false
 	}
 	return tag.Name.Valid
-}
-
-// JSON should have a comment.
-func (tag *Tag) JSON() ([]byte, error) {
-	return json.Marshal(tag)
-}
-
-// JSON should have a comment.
-func (tags Tags) JSON() ([]byte, error) {
-	return json.Marshal(tags)
 }

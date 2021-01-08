@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -42,14 +41,4 @@ func (network *Network) Valid() bool {
 		return false
 	}
 	return network.Name.Valid && network.Ipv4.Valid && network.Ipv4Mask.Valid && network.PerimeterID.Valid
-}
-
-// JSON should have a comment.
-func (network *Network) JSON() ([]byte, error) {
-	return json.Marshal(network)
-}
-
-// JSON should have a comment.
-func (networks Networks) JSON() ([]byte, error) {
-	return json.Marshal(networks)
 }

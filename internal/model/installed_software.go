@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -34,14 +33,4 @@ func (installedSoftware *InstalledSoftware) Valid() bool {
 		return false
 	}
 	return installedSoftware.SoftwareID.Valid && installedSoftware.MachineID.Valid
-}
-
-// JSON should have a comment.
-func (installedSoftware *InstalledSoftware) JSON() ([]byte, error) {
-	return json.Marshal(installedSoftware)
-}
-
-// JSON should have a comment.
-func (installedSoftwares InstalledSoftwares) JSON() ([]byte, error) {
-	return json.Marshal(installedSoftwares)
 }

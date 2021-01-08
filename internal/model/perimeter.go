@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -34,14 +33,4 @@ func (perimeter *Perimeter) Valid() bool {
 		return false
 	}
 	return perimeter.Name.Valid
-}
-
-// JSON should have a comment.
-func (perimeter *Perimeter) JSON() ([]byte, error) {
-	return json.Marshal(perimeter)
-}
-
-// JSON should have a comment.
-func (perimeters Perimeters) JSON() ([]byte, error) {
-	return json.Marshal(perimeters)
 }

@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -44,14 +43,4 @@ func (interfaceO *InterfaceO) Valid() bool {
 		return false
 	}
 	return interfaceO.Name.Valid && interfaceO.Ipv4.Valid && interfaceO.Ipv4Mask.Valid && interfaceO.MachineID.Valid && interfaceO.NetworkID.Valid
-}
-
-// JSON should have a comment.
-func (interfaceO *InterfaceO) JSON() ([]byte, error) {
-	return json.Marshal(interfaceO)
-}
-
-// JSON should have a comment.
-func (interfaceOs InterfaceOs) JSON() ([]byte, error) {
-	return json.Marshal(interfaceOs)
 }

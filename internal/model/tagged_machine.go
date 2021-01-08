@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -34,14 +33,4 @@ func (taggedMachine *TaggedMachine) Valid() bool {
 		return false
 	}
 	return taggedMachine.TagID.Valid && taggedMachine.MachineID.Valid
-}
-
-// JSON should have a comment.
-func (taggedMachine *TaggedMachine) JSON() ([]byte, error) {
-	return json.Marshal(taggedMachine)
-}
-
-// JSON should have a comment.
-func (taggedMachines TaggedMachines) JSON() ([]byte, error) {
-	return json.Marshal(taggedMachines)
 }

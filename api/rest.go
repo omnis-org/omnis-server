@@ -27,7 +27,7 @@ func (api *API) getObjects(f func(bool) (model.Objects, error), automatic bool) 
 			return
 		}
 
-		json, err := obj.JSON()
+		json, err := json.Marshal(obj)
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -54,7 +54,7 @@ func (api *API) getObjectsByInt(f func(int32, bool) (model.Objects, error), s st
 			return
 		}
 
-		json, err := obj.JSON()
+		json, err := json.Marshal(obj)
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -75,7 +75,7 @@ func (api *API) getObjectsByString(f func(string, bool) (model.Objects, error), 
 			return
 		}
 
-		json, err := obj.JSON()
+		json, err := json.Marshal(obj)
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -107,7 +107,7 @@ func (api *API) getObject(f func(int32, bool) (model.Object, error), automatic b
 			return
 		}
 
-		json, err := obj.JSON()
+		json, err := json.Marshal(obj)
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -133,7 +133,7 @@ func (api *API) getObjectByString(f func(string, bool) (model.Object, error), s 
 			return
 		}
 
-		json, err := obj.JSON()
+		json, err := json.Marshal(obj)
 		if err != nil {
 			api.internalError(w, err)
 			return
@@ -159,7 +159,7 @@ func (api *API) getOutdated(f func(int) (model.Objects, error)) http.HandlerFunc
 			return
 		}
 
-		json, err := obj.JSON()
+		json, err := json.Marshal(obj)
 		if err != nil {
 			api.internalError(w, err)
 			return

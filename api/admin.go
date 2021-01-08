@@ -36,7 +36,7 @@ func (api *API) listPendingMachine(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json, err := obj.JSON()
+	json, err := json.Marshal(obj)
 	if err != nil {
 		api.internalError(w, err)
 		return

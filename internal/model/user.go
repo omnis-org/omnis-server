@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -39,14 +38,4 @@ func (user *User) Valid() bool {
 		return false
 	}
 	return user.Username.Valid && user.Password.Valid && user.RoleID.Valid
-}
-
-// JSON should have a comment.
-func (user *User) JSON() ([]byte, error) {
-	return json.Marshal(user)
-}
-
-// JSON should have a comment.
-func (users Users) JSON() ([]byte, error) {
-	return json.Marshal(users)
 }
