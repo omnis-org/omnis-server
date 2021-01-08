@@ -196,6 +196,42 @@ func AuthorizeMachine(id int32, authorize bool) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetOutdatedMachines only return authorized machines
+func GetOutdatedMachines(outdatedDay int) (model.Machines, error) {
+	log.Debug(fmt.Sprintf("GetMachines(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_machines(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var machines model.Machines
+
+	var ignoreAuthorized model.NullBool
+	for rows.Next() {
+		var machine model.Machine
+
+		err := rows.Scan(&machine.ID, &machine.UUID, &ignoreAuthorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		machines = append(machines, machine)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return machines, nil
+}
+
 // GetMachinesO should have a comment.
 func GetMachinesO(automatic bool) (model.Objects, error) {
 	return GetMachines(automatic)
@@ -216,4 +252,9 @@ func InsertMachineO(object *model.Object, automatic bool) (int32, error) {
 func UpdateMachineO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var machine *model.Machine = (*object).(*model.Machine)
 	return UpdateMachine(id, machine, automatic)
+}
+
+// GetOutdatedMachinesO should have a comment.
+func GetOutdatedMachinesO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedMachines(outdatedDay)
 }

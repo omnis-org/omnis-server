@@ -143,6 +143,33 @@ func (api *API) getObjectByString(f func(string, bool) (model.Object, error), s 
 	}
 }
 
+func (api *API) getOutdated(f func(int) (model.Objects, error)) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		log.Debug("getOutdated")
+		outdatedDayS := mux.Vars(r)["outdated_day"]
+		outdatedDay, err := strconv.Atoi(outdatedDayS)
+		if err != nil {
+			api.internalError(w, err)
+			return
+		}
+
+		obj, err := f(outdatedDay)
+		if err != nil {
+			api.internalError(w, err)
+			return
+		}
+
+		json, err := obj.JSON()
+		if err != nil {
+			api.internalError(w, err)
+			return
+		}
+
+		api.sendJSON(w, json)
+
+	}
+}
+
 func (api *API) insertObject(f func(*model.Object, bool) (int32, error), o *model.Object, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("insertObject")
@@ -241,7 +268,8 @@ func (api *API) setupBasicFunctions(apiPath string, getObjs func(bool) (model.Ob
 	getObj func(int32, bool) (model.Object, error),
 	insertObj func(*model.Object, bool) (int32, error),
 	updateObj func(int32, *model.Object, bool) (int64, error),
-	deleteObjt func(int32) (int64, error),
+	deleteObj func(int32) (int64, error),
+	outdatedObj func(int) (model.Objects, error),
 	objName string,
 	obj *model.Object) {
 
@@ -269,10 +297,15 @@ func (api *API) setupBasicFunctions(apiPath string, getObjs func(bool) (model.Ob
 		api.router.Methods("PUT").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPathAuto, objName)).HandlerFunc(api.updateObject(updateObj, obj, true))
 	}
 	// delete
-	if deleteObjt != nil {
-		api.router.Methods("DELETE").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPath, objName)).HandlerFunc(api.deleteObject(deleteObjt, false))
-		api.router.Methods("DELETE").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPathAuto, objName)).HandlerFunc(api.deleteObject(deleteObjt, true))
+	if deleteObj != nil {
+		api.router.Methods("DELETE").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPath, objName)).HandlerFunc(api.deleteObject(deleteObj, false))
+		api.router.Methods("DELETE").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPathAuto, objName)).HandlerFunc(api.deleteObject(deleteObj, true))
 	}
+
+	if objName != "" {
+		api.router.Methods("GET").Path(fmt.Sprintf("%s/%ss/outdated/{outdated_day:[0-9]+}", apiPath, objName)).HandlerFunc(api.getOutdated(outdatedObj))
+	}
+
 }
 
 func (api *API) setupGetObjectsByString(apiPath string, f func(string, bool) (model.Objects, error), objName string, s string) {
@@ -306,63 +339,63 @@ func (api *API) setupGetObjectByString(apiPath string, f func(string, bool) (mod
 
 func (api *API) setupLocation(apiPath string) {
 	var location model.Object = new(model.Location)
-	api.setupBasicFunctions(apiPath, db.GetLocationsO, db.GetLocationO, db.InsertLocationO, db.UpdateLocationO, db.DeleteLocation, "location", &location)
+	api.setupBasicFunctions(apiPath, db.GetLocationsO, db.GetLocationO, db.InsertLocationO, db.UpdateLocationO, db.DeleteLocation, nil, "location", &location)
 	api.setupGetObjectByString(apiPath, db.GetLocationByNameO, "location", "name")
 }
 
 func (api *API) setupPerimeter(apiPath string) {
 	var perimeter model.Object = new(model.Perimeter)
-	api.setupBasicFunctions(apiPath, db.GetPerimetersO, db.GetPerimeterO, db.InsertPerimeterO, db.UpdatePerimeterO, db.DeletePerimeter, "perimeter", &perimeter)
+	api.setupBasicFunctions(apiPath, db.GetPerimetersO, db.GetPerimeterO, db.InsertPerimeterO, db.UpdatePerimeterO, db.DeletePerimeter, nil, "perimeter", &perimeter)
 	api.setupGetObjectByString(apiPath, db.GetPerimeterByNameO, "perimeter", "name")
 }
 
 func (api *API) setupOperatingSystem(apiPath string) {
 	var operatingSystem model.Object = new(model.OperatingSystem)
-	api.setupBasicFunctions(apiPath, db.GetOperatingSystemsO, db.GetOperatingSystemO, db.InsertOperatingSystemO, db.UpdateOperatingSystemO, db.DeleteOperatingSystem, "operatingSystem", &operatingSystem)
+	api.setupBasicFunctions(apiPath, db.GetOperatingSystemsO, db.GetOperatingSystemO, db.InsertOperatingSystemO, db.UpdateOperatingSystemO, db.DeleteOperatingSystem, nil, "operatingSystem", &operatingSystem)
 	api.setupGetObjectsByString(apiPath, db.GetOperatingSystemsByNameO, "operatingSystem", "name")
 }
 
 func (api *API) setupTag(apiPath string) {
 	var tag model.Object = new(model.Tag)
-	api.setupBasicFunctions(apiPath, db.GetTagsO, db.GetTagO, db.InsertTagO, db.UpdateTagO, db.DeleteTag, "tag", &tag)
+	api.setupBasicFunctions(apiPath, db.GetTagsO, db.GetTagO, db.InsertTagO, db.UpdateTagO, db.DeleteTag, nil, "tag", &tag)
 }
 
 func (api *API) setupSoftware(apiPath string) {
 	var software model.Object = new(model.Software)
-	api.setupBasicFunctions(apiPath, db.GetSoftwaresO, db.GetSoftwareO, db.InsertSoftwareO, db.UpdateSoftwareO, db.DeleteSoftware, "software", &software)
+	api.setupBasicFunctions(apiPath, db.GetSoftwaresO, db.GetSoftwareO, db.InsertSoftwareO, db.UpdateSoftwareO, db.DeleteSoftware, nil, "software", &software)
 }
 
 func (api *API) setupMachine(apiPath string) {
 	var machine model.Object = new(model.Machine)
-	api.setupBasicFunctions(apiPath, db.GetMachinesO, db.GetMachineO, db.InsertMachineO, db.UpdateMachineO, db.DeleteMachine, "machine", &machine)
+	api.setupBasicFunctions(apiPath, db.GetMachinesO, db.GetMachineO, db.InsertMachineO, db.UpdateMachineO, db.DeleteMachine, db.GetOutdatedMachinesO, "machine", &machine)
 }
 
 func (api *API) setupInstalledSoftware(apiPath string) {
 	var installedSoftware model.Object = new(model.InstalledSoftware)
-	api.setupBasicFunctions(apiPath, db.GetInstalledSoftwaresO, db.GetInstalledSoftwareO, db.InsertInstalledSoftwareO, db.UpdateInstalledSoftwareO, db.DeleteInstalledSoftware, "installedSoftware", &installedSoftware)
+	api.setupBasicFunctions(apiPath, db.GetInstalledSoftwaresO, db.GetInstalledSoftwareO, db.InsertInstalledSoftwareO, db.UpdateInstalledSoftwareO, db.DeleteInstalledSoftware, nil, "installedSoftware", &installedSoftware)
 }
 
 func (api *API) setupTaggedMachine(apiPath string) {
 	var taggedMachine model.Object = new(model.TaggedMachine)
-	api.setupBasicFunctions(apiPath, db.GetTaggedMachinesO, db.GetTaggedMachineO, db.InsertTaggedMachineO, db.UpdateTaggedMachineO, db.DeleteTaggedMachine, "taggedMachine", &taggedMachine)
+	api.setupBasicFunctions(apiPath, db.GetTaggedMachinesO, db.GetTaggedMachineO, db.InsertTaggedMachineO, db.UpdateTaggedMachineO, db.DeleteTaggedMachine, nil, "taggedMachine", &taggedMachine)
 }
 
 func (api *API) setupNetwork(apiPath string) {
 	var network model.Object = new(model.Network)
-	api.setupBasicFunctions(apiPath, db.GetNetworksO, db.GetNetworkO, db.InsertNetworkO, db.UpdateNetworkO, db.DeleteNetwork, "network", &network)
+	api.setupBasicFunctions(apiPath, db.GetNetworksO, db.GetNetworkO, db.InsertNetworkO, db.UpdateNetworkO, db.DeleteNetwork, nil, "network", &network)
 	api.setupGetObjectsByString(apiPath, db.GetNetworksByIPO, "network", "ip")
 }
 
 func (api *API) setupInterface(apiPath string) {
 	var interfaceO model.Object = new(model.InterfaceO)
-	api.setupBasicFunctions(apiPath, db.GetInterfacesO, db.GetInterfaceO, db.InsertInterfaceO, db.UpdateInterfaceO, db.DeleteInterface, "interface", &interfaceO)
+	api.setupBasicFunctions(apiPath, db.GetInterfacesO, db.GetInterfaceO, db.InsertInterfaceO, db.UpdateInterfaceO, db.DeleteInterface, nil, "interface", &interfaceO)
 	api.setupGetObjectByString(apiPath, db.GetInterfaceByMacO, "interface", "mac")
 	api.setupGetObjectsByInt(apiPath, db.GetInterfacesByMachineIDO, "interface", "machineId")
 }
 
 func (api *API) setupGateway(apiPath string) {
 	var gateway model.Object = new(model.Gateway)
-	api.setupBasicFunctions(apiPath, db.GetGatewaysO, db.GetGatewayO, db.InsertGatewayO, db.UpdateGatewayO, db.DeleteGateway, "gateway", &gateway)
+	api.setupBasicFunctions(apiPath, db.GetGatewaysO, db.GetGatewayO, db.InsertGatewayO, db.UpdateGatewayO, db.DeleteGateway, nil, "gateway", &gateway)
 	api.setupGetObjectsByInt(apiPath, db.GetGatewaysByInterfaceIDO, "gateway", "interfaceId")
 }
 
@@ -385,13 +418,13 @@ func (api *API) setupOmnisAPI() {
 
 func (api *API) setupUser(apiPath string) {
 	var user model.Object = new(model.User)
-	api.setupBasicFunctions(apiPath, db.GetUsersO, db.GetUserO, db.InsertUserO, db.UpdateUserO, db.DeleteUser, "user", &user)
+	api.setupBasicFunctions(apiPath, db.GetUsersO, db.GetUserO, db.InsertUserO, db.UpdateUserO, db.DeleteUser, nil, "user", &user)
 	api.setupGetObjectByString(apiPath, db.GetUserByUsernameO, "user", "username")
 }
 
 func (api *API) setupRole(apiPath string) {
 	var role model.Object = new(model.Role)
-	api.setupBasicFunctions(apiPath, db.GetRolesO, db.GetRoleO, db.InsertRoleO, db.UpdateRoleO, db.DeleteRole, "role", &role)
+	api.setupBasicFunctions(apiPath, db.GetRolesO, db.GetRoleO, db.InsertRoleO, db.UpdateRoleO, db.DeleteRole, nil, "role", &role)
 }
 
 func (api *API) setupAdminAPI() {

@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"encoding/json"
+	"time"
 )
 
 // Object should have a comment.
@@ -40,6 +41,11 @@ type NullString struct {
 // NullBool should have a comment.
 type NullBool struct {
 	sql.NullBool
+}
+
+// NullTime should have a comment.
+type NullTime struct {
+	sql.NullTime
 }
 
 // MarshalJSON should have a comment.
@@ -134,6 +140,30 @@ func (b *NullBool) UnmarshalJSON(data []byte) error {
 		b.Bool = *x
 	} else {
 		b.Valid = false
+	}
+	return nil
+}
+
+// WARNING : MarshalJSON doesn't return val if t is not valid
+func (t NullTime) MarshalJSON() ([]byte, error) {
+	if t.Valid {
+		return json.Marshal(t.Time)
+	}
+
+	return json.Marshal(nil)
+}
+
+// UnmarshalJSON should have a comment.
+func (t *NullTime) UnmarshalJSON(data []byte) error {
+	var x *time.Time
+	if err := json.Unmarshal(data, &x); err != nil {
+		return err
+	}
+	if t != nil {
+		t.Valid = true
+		t.Time = *x
+	} else {
+		t.Valid = false
 	}
 	return nil
 }
