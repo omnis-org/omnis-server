@@ -1,1 +1,1 @@
-source insert_db.sql;
+source test/insert_db.sql;
