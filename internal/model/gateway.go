@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // Gateway should have a comment.
 type Gateway struct {
 	ID          NullInt32  `json:"id"`
@@ -14,15 +10,6 @@ type Gateway struct {
 
 // Gateways should have a comment.
 type Gateways []Gateway
-
-// String should have a comment.
-func (gateway *Gateway) String() string {
-	return fmt.Sprintf("Gateway {%d, %s, %d, %d}",
-		gateway.ID.Int32,
-		gateway.Ipv4.String,
-		gateway.Mask.Int32,
-		gateway.InterfaceID.Int32)
-}
 
 // New should have a comment.
 func (gateway *Gateway) New() Object {

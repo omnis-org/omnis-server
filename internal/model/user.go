@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // User should have a comment.
 type User struct {
 	ID        NullInt32  `json:"id"`
@@ -16,16 +12,6 @@ type User struct {
 
 // Users should have a comment.
 type Users []User
-
-// String should have a comment.
-func (user *User) String() string {
-	return fmt.Sprintf("User {%d, %s, %s, %s, %d}",
-		user.ID.Int32,
-		user.Username.String,
-		user.FirstName.String,
-		user.LastName.String,
-		user.RoleID.Int32)
-}
 
 // New should have a comment.
 func (user *User) New() Object {

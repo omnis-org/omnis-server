@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // Machine should have a comment.
 type Machine struct {
 	ID                                   NullInt32  `json:"id"`
@@ -35,24 +31,6 @@ type Machine struct {
 
 // Machines should have a comment.
 type Machines []Machine
-
-// String should have a comment.
-func (machine *Machine) String() string {
-	return fmt.Sprintf("Machine {%d, %s, %t, %s, %s, %s, %s, %s, %d, %d, %d, %s, %s}",
-		machine.ID.Int32,
-		machine.UUID.String,
-		machine.Authorized.Bool,
-		machine.Hostname.String,
-		machine.Label.String,
-		machine.Description.String,
-		machine.VirtualizationSystem.String,
-		machine.SerialNumber.String,
-		machine.PerimeterID.Int32,
-		machine.LocationID.Int32,
-		machine.OperatingSystemID.Int32,
-		machine.MachineType.String,
-		machine.OmnisVersion.String)
-}
 
 // New should have a comment.
 func (machine *Machine) New() Object {

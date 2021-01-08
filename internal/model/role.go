@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // Role should have a comment.
 type Role struct {
 	ID                         NullInt32  `json:"id"`
@@ -16,17 +12,6 @@ type Role struct {
 
 // Roles should have a comment.
 type Roles []Role
-
-// String should have a comment.
-func (role *Role) String() string {
-	return fmt.Sprintf("Role {%d, %s, %d, %d, %d, %d}",
-		role.ID.Int32,
-		role.Name.String,
-		role.OmnisPermissions.Int32,
-		role.RolesPermissions.Int32,
-		role.UsersPermissions.Int32,
-		role.PendingMachinesPermissions.Int32)
-}
 
 // New should have a comment.
 func (role *Role) New() Object {
