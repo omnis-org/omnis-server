@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -34,14 +33,4 @@ func (location *Location) Valid() bool {
 		return false
 	}
 	return location.Name.Valid
-}
-
-// JSON should have a comment.
-func (location *Location) JSON() ([]byte, error) {
-	return json.Marshal(location)
-}
-
-// JSON should have a comment.
-func (locations Locations) JSON() ([]byte, error) {
-	return json.Marshal(locations)
 }

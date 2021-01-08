@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -66,14 +65,4 @@ func (machine *Machine) Valid() bool {
 		return false
 	}
 	return machine.Hostname.Valid && machine.Label.Valid && machine.PerimeterID.Valid && machine.LocationID.Valid
-}
-
-// JSON should have a comment.
-func (machine *Machine) JSON() ([]byte, error) {
-	return json.Marshal(machine)
-}
-
-// JSON should have a comment.
-func (machines Machines) JSON() ([]byte, error) {
-	return json.Marshal(machines)
 }

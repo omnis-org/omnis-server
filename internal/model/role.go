@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -40,14 +39,4 @@ func (role *Role) Valid() bool {
 		return false
 	}
 	return role.Name.Valid && role.OmnisPermissions.Valid && role.RolesPermissions.Valid && role.UsersPermissions.Valid && role.PendingMachinesPermissions.Valid
-}
-
-// JSON should have a comment.
-func (role *Role) JSON() ([]byte, error) {
-	return json.Marshal(role)
-}
-
-// JSON should have a comment.
-func (roles Roles) JSON() ([]byte, error) {
-	return json.Marshal(roles)
 }

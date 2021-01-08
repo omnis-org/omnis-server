@@ -1,7 +1,6 @@
 package model
 
 import (
-	"encoding/json"
 	"fmt"
 )
 
@@ -40,14 +39,4 @@ func (operatingSystem *OperatingSystem) Valid() bool {
 		return false
 	}
 	return operatingSystem.Name.Valid
-}
-
-// JSON should have a comment.
-func (operatingSystem *OperatingSystem) JSON() ([]byte, error) {
-	return json.Marshal(operatingSystem)
-}
-
-// JSON should have a comment.
-func (operatingSystems OperatingSystems) JSON() ([]byte, error) {
-	return json.Marshal(operatingSystems)
 }
