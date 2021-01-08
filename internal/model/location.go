@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // Location should have a comment.
 type Location struct {
 	ID          NullInt32  `json:"id"`
@@ -13,14 +9,6 @@ type Location struct {
 
 // Locations should have a comment.
 type Locations []Location
-
-// String should have a comment.
-func (location *Location) String() string {
-	return fmt.Sprintf("Location {%d, %s, %s}",
-		location.ID.Int32,
-		location.Name.String,
-		location.Description.String)
-}
 
 // New should have a comment.
 func (location *Location) New() Object {

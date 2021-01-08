@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // InstalledSoftware should have a comment.
 type InstalledSoftware struct {
 	ID         NullInt32 `json:"id"`
@@ -13,14 +9,6 @@ type InstalledSoftware struct {
 
 // InstalledSoftwares should have a comment.
 type InstalledSoftwares []InstalledSoftware
-
-// String should have a comment.
-func (installedSoftware *InstalledSoftware) String() string {
-	return fmt.Sprintf("InstalledSoftware {%d, %d, %d}",
-		installedSoftware.ID.Int32,
-		installedSoftware.SoftwareID.Int32,
-		installedSoftware.MachineID.Int32)
-}
 
 // New should have a comment.
 func (installedSoftware *InstalledSoftware) New() Object {

@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // Network should have a comment.
 type Network struct {
 	ID          NullInt32  `json:"id"`
@@ -17,18 +13,6 @@ type Network struct {
 
 // Networks should have a comment.
 type Networks []Network
-
-// String should have a comment.
-func (network *Network) String() string {
-	return fmt.Sprintf("Network {%d, %s, %s, %d, %t, %t, %d}",
-		network.ID.Int32,
-		network.Name.String,
-		network.Ipv4.String,
-		network.Ipv4Mask.Int32,
-		network.IsDMZ.Bool,
-		network.HasWifi.Bool,
-		network.PerimeterID.Int32)
-}
 
 // New should have a comment.
 func (network *Network) New() Object {

@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // OperatingSystem should have a comment.
 type OperatingSystem struct {
 	ID              NullInt32  `json:"id"`
@@ -16,17 +12,6 @@ type OperatingSystem struct {
 
 // OperatingSystems should have a comment.
 type OperatingSystems []OperatingSystem
-
-// String should have a comment.
-func (operatingSystem *OperatingSystem) String() string {
-	return fmt.Sprintf("OperatingSystem {%d, %s, %s, %s, %s, %s}",
-		operatingSystem.ID.Int32,
-		operatingSystem.Name.String,
-		operatingSystem.Platform.String,
-		operatingSystem.PlatformFamily.String,
-		operatingSystem.PlatformVersion.String,
-		operatingSystem.KernelVersion.String)
-}
 
 // New should have a comment.
 func (operatingSystem *OperatingSystem) New() Object {

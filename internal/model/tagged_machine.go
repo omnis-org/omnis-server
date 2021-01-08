@@ -1,9 +1,5 @@
 package model
 
-import (
-	"fmt"
-)
-
 // TaggedMachine should have a comment.
 type TaggedMachine struct {
 	ID        NullInt32 `json:"id"`
@@ -13,14 +9,6 @@ type TaggedMachine struct {
 
 // TaggedMachines should have a comment.
 type TaggedMachines []TaggedMachine
-
-// String should have a comment.
-func (taggedMachine *TaggedMachine) String() string {
-	return fmt.Sprintf("TaggedMachine {%d, %d, %d}",
-		taggedMachine.ID.Int32,
-		taggedMachine.TagID.Int32,
-		taggedMachine.MachineID.Int32)
-}
 
 // New should have a comment.
 func (taggedMachine *TaggedMachine) New() Object {
