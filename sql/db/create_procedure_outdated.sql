@@ -21,7 +21,7 @@ BEGIN
 END //
 
 -- retrieve outdated OperatingSystems
-CREATE OR REPLACE PROCEDURE get_outdated_OperatingSystems(IN p_outdated_day INT)
+CREATE OR REPLACE PROCEDURE get_outdated_operating_systems(IN p_outdated_day INT)
 BEGIN
     SELECT * FROM OperatingSystem WHERE automatic=false AND (
         name_last_modification < NOW() - INTERVAL p_outdated_day DAY OR
@@ -69,7 +69,7 @@ BEGIN
 END //
 
 -- retrieve outdated InstalledSoftwares
-CREATE OR REPLACE PROCEDURE get_outdated_InstalledSoftwares(IN p_outdated_day INT)
+CREATE OR REPLACE PROCEDURE get_outdated_installed_softwares(IN p_outdated_day INT)
 BEGIN
     SELECT * FROM InstalledSoftware WHERE automatic=false AND (
         software_id_last_modification < NOW() - INTERVAL p_outdated_day DAY OR
@@ -78,7 +78,7 @@ BEGIN
 END //
 
 -- retrieve outdated TaggedMachines
-CREATE OR REPLACE PROCEDURE get_outdated_TaggedMachines(IN p_outdated_day INT)
+CREATE OR REPLACE PROCEDURE get_outdated_tagged_machines(IN p_outdated_day INT)
 BEGIN
     SELECT * FROM TaggedMachine WHERE automatic=false AND (
         tag_id_last_modification < NOW() - INTERVAL p_outdated_day DAY OR
