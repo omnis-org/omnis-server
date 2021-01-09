@@ -2,9 +2,11 @@ package model
 
 // TaggedMachine should have a comment.
 type TaggedMachine struct {
-	ID        NullInt32 `json:"id"`
-	TagID     NullInt32 `json:"tagId"`
-	MachineID NullInt32 `json:"machineId"`
+	ID                        *NullInt32 `json:"id"`
+	TagID                     *NullInt32 `json:"tagId"`
+	MachineID                 *NullInt32 `json:"machineId"`
+	TagIDLastModification     *NullTime  `json:"tagIdLastModification"`
+	MachineIDLastModification *NullTime  `json:"machineIdLastModification"`
 }
 
 // TaggedMachines should have a comment.

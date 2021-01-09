@@ -192,6 +192,56 @@ func GetInterfacesByMachineID(machineID int32, automatic bool) (model.InterfaceO
 	return interfaceOs, nil
 }
 
+// GetOutdatedInterfaces only return authorized machines
+func GetOutdatedInterfaces(outdatedDay int) (model.InterfaceOs, error) {
+	log.Debug(fmt.Sprintf("GetMachines(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_interfaces(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var interfaceOs model.InterfaceOs
+
+	for rows.Next() {
+		var interfaceO model.InterfaceO
+
+		err := rows.Scan(&interfaceO.ID,
+			&interfaceO.Name,
+			&interfaceO.Ipv4,
+			&interfaceO.Ipv4Mask,
+			&interfaceO.MAC,
+			&interfaceO.InterfaceType,
+			&interfaceO.MachineID,
+			&interfaceO.NetworkID,
+			&interfaceO.NameLastModification,
+			&interfaceO.Ipv4LastModification,
+			&interfaceO.Ipv4MaskLastModification,
+			&interfaceO.MACLastModification,
+			&interfaceO.InterfaceTypeLastModification,
+			&interfaceO.MachineIDLastModification,
+			&interfaceO.NetworkIDLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		interfaceOs = append(interfaceOs, interfaceO)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return interfaceOs, nil
+}
+
 // GetInterfacesO should have a comment.
 func GetInterfacesO(automatic bool) (model.Objects, error) {
 	return GetInterfaces(automatic)
@@ -222,4 +272,9 @@ func GetInterfaceByMacO(mac string, automatic bool) (model.Object, error) {
 // GetInterfacesByMachineIDO should have a comment.
 func GetInterfacesByMachineIDO(machineID int32, automatic bool) (model.Objects, error) {
 	return GetInterfacesByMachineID(machineID, automatic)
+}
+
+// GetOutdatedInterfacesO should have a comment.
+func GetOutdatedInterfacesO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedInterfaces(outdatedDay)
 }

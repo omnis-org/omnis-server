@@ -134,6 +134,47 @@ func DeleteTaggedMachine(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetOutdatedTaggedMachines only return authorized machines
+func GetOutdatedTaggedMachines(outdatedDay int) (model.TaggedMachines, error) {
+	log.Debug(fmt.Sprintf("GetOutdatedTaggedMachines(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_tagged_machines(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var taggedMachines model.TaggedMachines
+
+	for rows.Next() {
+		var taggedMachine model.TaggedMachine
+
+		err := rows.Scan(
+			&taggedMachine.ID,
+			&taggedMachine.TagID,
+			&taggedMachine.MachineID,
+			&taggedMachine.TagIDLastModification,
+			&taggedMachine.MachineIDLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		taggedMachines = append(taggedMachines, taggedMachine)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return taggedMachines, nil
+}
+
 // GetTaggedMachinesO should have a comment.
 func GetTaggedMachinesO(automatic bool) (model.Objects, error) {
 	return GetTaggedMachines(automatic)
@@ -154,4 +195,9 @@ func InsertTaggedMachineO(object *model.Object, automatic bool) (int32, error) {
 func UpdateTaggedMachineO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var taggedMachine *model.TaggedMachine = (*object).(*model.TaggedMachine)
 	return UpdateTaggedMachine(id, taggedMachine, automatic)
+}
+
+// GetOutdatedTaggedMachinesO should have a comment.
+func GetOutdatedTaggedMachinesO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedTaggedMachines(outdatedDay)
 }

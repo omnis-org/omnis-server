@@ -2,9 +2,11 @@ package model
 
 // InstalledSoftware should have a comment.
 type InstalledSoftware struct {
-	ID         NullInt32 `json:"id"`
-	SoftwareID NullInt32 `json:"softwareId"`
-	MachineID  NullInt32 `json:"machineId"`
+	ID                         *NullInt32 `json:"id"`
+	SoftwareID                 *NullInt32 `json:"softwareId"`
+	MachineID                  *NullInt32 `json:"machineId"`
+	SoftwareIDLastModification *NullTime  `json:"softwareIdLastModification"`
+	MachineIDLastModification  *NullTime  `json:"machineIdLastModification"`
 }
 
 // InstalledSoftwares should have a comment.

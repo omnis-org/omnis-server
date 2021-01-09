@@ -134,6 +134,49 @@ func DeleteSoftware(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetOutdatedSoftwares only return authorized machines
+func GetOutdatedSoftwares(outdatedDay int) (model.Softwares, error) {
+	log.Debug(fmt.Sprintf("GetMachines(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_softwares(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var softwares model.Softwares
+
+	for rows.Next() {
+		var software model.Software
+
+		err := rows.Scan(&software.ID,
+			&software.Name,
+			&software.Version,
+			&software.IsIntern,
+			&software.NameLastModification,
+			&software.VersionLastModification,
+			&software.IsInternLastModification,
+		)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		softwares = append(softwares, software)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return softwares, nil
+}
+
 // GetSoftwaresO should have a comment.
 func GetSoftwaresO(automatic bool) (model.Objects, error) {
 	return GetSoftwares(automatic)
@@ -154,4 +197,9 @@ func InsertSoftwareO(object *model.Object, automatic bool) (int32, error) {
 func UpdateSoftwareO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var software *model.Software = (*object).(*model.Software)
 	return UpdateSoftware(id, software, automatic)
+}
+
+// GetOutdatedSoftwaresO should have a comment.
+func GetOutdatedSoftwaresO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedSoftwares(outdatedDay)
 }

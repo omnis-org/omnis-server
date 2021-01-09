@@ -169,6 +169,48 @@ func GetGatewaysByInterfaceID(interfaceID int32, automatic bool) (model.Gateways
 	return gateways, nil
 }
 
+// GetOutdatedGateways only return authorized machines
+func GetOutdatedGateways(outdatedDay int) (model.Gateways, error) {
+	log.Debug(fmt.Sprintf("GetOutdatedGateways(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_gateways(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var gateways model.Gateways
+
+	for rows.Next() {
+		var gateway model.Gateway
+
+		err := rows.Scan(&gateway.ID,
+			&gateway.Ipv4,
+			&gateway.Mask,
+			&gateway.InterfaceID,
+			&gateway.Ipv4LastModification,
+			&gateway.MaskLastModification,
+			&gateway.InterfaceIDLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		gateways = append(gateways, gateway)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return gateways, nil
+}
+
 // GetGatewaysO should have a comment.
 func GetGatewaysO(automatic bool) (model.Objects, error) {
 	return GetGateways(automatic)
@@ -194,4 +236,9 @@ func UpdateGatewayO(id int32, object *model.Object, automatic bool) (int64, erro
 // GetGatewaysByInterfaceIDO should have a comment.
 func GetGatewaysByInterfaceIDO(interfaceID int32, automatic bool) (model.Objects, error) {
 	return GetGatewaysByInterfaceID(interfaceID, automatic)
+}
+
+// GetOutdatedGatewaysO should have a comment.
+func GetOutdatedGatewaysO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedGateways(outdatedDay)
 }

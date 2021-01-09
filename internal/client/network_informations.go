@@ -33,10 +33,10 @@ func newNetwork(networkPart string, mask int, perimeterID int32) (int32, error) 
 	if err != nil {
 		return 0, fmt.Errorf("perimeter.Scan failed <- %v", err)
 	}
-	networkO := model.Network{Name: name,
-		Ipv4:        ipv4,
-		Ipv4Mask:    ipv4Mask,
-		PerimeterID: perimeter,
+	networkO := model.Network{Name: &name,
+		Ipv4:        &ipv4,
+		Ipv4Mask:    &ipv4Mask,
+		PerimeterID: &perimeter,
 	}
 	networkID, err := db.InsertNetwork(&networkO, true)
 	if err != nil {
@@ -90,9 +90,9 @@ func newGateway(ip string, maskI int, interfaceID int32) (int32, error) {
 		return 0, fmt.Errorf("interfaceO.Scan failed <- %v", err)
 	}
 
-	gateway := model.Gateway{Ipv4: ipv4,
-		Mask:        mask,
-		InterfaceID: interfaceO}
+	gateway := model.Gateway{Ipv4: &ipv4,
+		Mask:        &mask,
+		InterfaceID: &interfaceO}
 
 	gatewayID, err := db.InsertGateway(&gateway, true)
 	if err != nil {
@@ -195,13 +195,13 @@ func doInterface(itf *client_informations.InterfaceInformations, machineID int32
 		return fmt.Errorf("network.Scan failed <- %v", err)
 	}
 
-	itfO := model.InterfaceO{Name: name,
-		Ipv4:          ipv4,
-		Ipv4Mask:      ipv4Mask,
-		MAC:           mac,
-		InterfaceType: interfaceType,
-		MachineID:     machine,
-		NetworkID:     network}
+	itfO := model.InterfaceO{Name: &name,
+		Ipv4:          &ipv4,
+		Ipv4Mask:      &ipv4Mask,
+		MAC:           &mac,
+		InterfaceType: &interfaceType,
+		MachineID:     &machine,
+		NetworkID:     &network}
 
 	var itfID int32 = 0
 

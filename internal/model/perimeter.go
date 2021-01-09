@@ -2,9 +2,11 @@ package model
 
 // Perimeter should have a comment.
 type Perimeter struct {
-	ID          NullInt32  `json:"id"`
-	Name        NullString `json:"name"`
-	Description NullString `json:"description"`
+	ID                          *NullInt32  `json:"id"`
+	Name                        *NullString `json:"name"`
+	Description                 *NullString `json:"description"`
+	NameLastModification        *NullTime   `json:"nameLastModification"`
+	DescriptionLastModification *NullTime   `json:"descriptionLastModification"`
 }
 
 // Perimeters should have a comment.
