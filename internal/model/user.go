@@ -2,12 +2,12 @@ package model
 
 // User should have a comment.
 type User struct {
-	ID        NullInt32  `json:"id"`
-	Username  NullString `json:"username"`
-	Password  NullString `json:"password"`
-	FirstName NullString `json:"firstName"`
-	LastName  NullString `json:"lastName"`
-	RoleID    NullInt32  `json:"roleId"`
+	ID        *NullInt32  `json:"id"`
+	Username  *NullString `json:"username"`
+	Password  *NullString `json:"password"`
+	FirstName *NullString `json:"firstName"`
+	LastName  *NullString `json:"lastName"`
+	RoleID    *NullInt32  `json:"roleId"`
 }
 
 // Users should have a comment.

@@ -2,9 +2,11 @@ package model
 
 // Location should have a comment.
 type Location struct {
-	ID          NullInt32  `json:"id"`
-	Name        NullString `json:"name"`
-	Description NullString `json:"description"`
+	ID                          *NullInt32  `json:"id"`
+	Name                        *NullString `json:"name"`
+	Description                 *NullString `json:"description"`
+	NameLastModification        *NullTime   `json:"nameLastModification"`
+	DescriptionLastModification *NullTime   `json:"descriptionLastModification"`
 }
 
 // Locations should have a comment.

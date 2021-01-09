@@ -2,12 +2,12 @@ package model
 
 // Role should have a comment.
 type Role struct {
-	ID                         NullInt32  `json:"id"`
-	Name                       NullString `json:"name"`
-	OmnisPermissions           NullInt32  `json:"omnisPermissions"`
-	RolesPermissions           NullInt32  `json:"rolesPermissions"`
-	UsersPermissions           NullInt32  `json:"usersPermissions"`
-	PendingMachinesPermissions NullInt32  `json:"pendingMachinesPermissions"`
+	ID                         *NullInt32  `json:"id"`
+	Name                       *NullString `json:"name"`
+	OmnisPermissions           *NullInt32  `json:"omnisPermissions"`
+	RolesPermissions           *NullInt32  `json:"rolesPermissions"`
+	UsersPermissions           *NullInt32  `json:"usersPermissions"`
+	PendingMachinesPermissions *NullInt32  `json:"pendingMachinesPermissions"`
 }
 
 // Roles should have a comment.

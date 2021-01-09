@@ -169,6 +169,54 @@ func GetNetworksByIP(ip string, automatic bool) (model.Networks, error) {
 	return networks, nil
 }
 
+// GetOutdatedNetworks only return authorized machines
+func GetOutdatedNetworks(outdatedDay int) (model.Networks, error) {
+	log.Debug(fmt.Sprintf("GetOutdatedNetworks(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_networks(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var networks model.Networks
+
+	for rows.Next() {
+		var network model.Network
+
+		err := rows.Scan(&network.ID,
+			&network.Name,
+			&network.Ipv4,
+			&network.Ipv4Mask,
+			&network.IsDMZ,
+			&network.HasWifi,
+			&network.PerimeterID,
+			&network.NameLastModification,
+			&network.Ipv4LastModification,
+			&network.Ipv4MaskLastModification,
+			&network.IsDMZLastModification,
+			&network.HasWifiLastModification,
+			&network.PerimeterIDLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		networks = append(networks, network)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return networks, nil
+}
+
 // GetNetworksO should have a comment.
 func GetNetworksO(automatic bool) (model.Objects, error) {
 	return GetNetworks(automatic)
@@ -194,4 +242,9 @@ func UpdateNetworkO(id int32, object *model.Object, automatic bool) (int64, erro
 // GetNetworksByIPO should have a comment.
 func GetNetworksByIPO(ip string, automatic bool) (model.Objects, error) {
 	return GetNetworksByIP(ip, automatic)
+}
+
+// GetOutdatedNetworksO should have a comment.
+func GetOutdatedNetworksO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedNetworks(outdatedDay)
 }

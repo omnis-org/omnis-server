@@ -134,6 +134,47 @@ func DeleteTag(id int32) (int64, error) {
 	return rowsAffected, nil
 }
 
+// GetOutdatedTags only return authorized machines
+func GetOutdatedTags(outdatedDay int) (model.Tags, error) {
+	log.Debug(fmt.Sprintf("GetMachines(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_tags(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var tags model.Tags
+
+	for rows.Next() {
+		var tag model.Tag
+
+		err := rows.Scan(
+			&tag.ID,
+			&tag.Name,
+			&tag.Color,
+			&tag.NameLastModification,
+			&tag.ColorLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		tags = append(tags, tag)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return tags, nil
+}
+
 // GetTagsO should have a comment.
 func GetTagsO(automatic bool) (model.Objects, error) {
 	return GetTags(automatic)
@@ -154,4 +195,9 @@ func InsertTagO(object *model.Object, automatic bool) (int32, error) {
 func UpdateTagO(id int32, object *model.Object, automatic bool) (int64, error) {
 	var tag *model.Tag = (*object).(*model.Tag)
 	return UpdateTag(id, tag, automatic)
+}
+
+// GetOutdatedTagsO should have a comment.
+func GetOutdatedTagsO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedTags(outdatedDay)
 }

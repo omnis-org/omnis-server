@@ -169,6 +169,52 @@ func GetOperatingSystemsByName(name string, automatic bool) (model.OperatingSyst
 	return operatingSystems, nil
 }
 
+// GetOutdatedOperatingSystems only return authorized machines
+func GetOutdatedOperatingSystems(outdatedDay int) (model.OperatingSystems, error) {
+	log.Debug(fmt.Sprintf("GetOutdatedOperatingSystems(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_operating_systems(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var operatingSystems model.OperatingSystems
+
+	for rows.Next() {
+		var operatingSystem model.OperatingSystem
+
+		err := rows.Scan(&operatingSystem.ID,
+			&operatingSystem.Name,
+			&operatingSystem.Platform,
+			&operatingSystem.PlatformFamily,
+			&operatingSystem.PlatformVersion,
+			&operatingSystem.KernelVersion,
+			&operatingSystem.NameLastModification,
+			&operatingSystem.PlatformLastModification,
+			&operatingSystem.PlatformFamilyLastModification,
+			&operatingSystem.PlatformVersionLastModification,
+			&operatingSystem.KernelVersionLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		operatingSystems = append(operatingSystems, operatingSystem)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return operatingSystems, nil
+}
+
 // GetOperatingSystemsO should have a comment.
 func GetOperatingSystemsO(automatic bool) (model.Objects, error) {
 	return GetOperatingSystems(automatic)
@@ -194,4 +240,9 @@ func UpdateOperatingSystemO(id int32, object *model.Object, automatic bool) (int
 // GetOperatingSystemsByNameO should have a comment.
 func GetOperatingSystemsByNameO(name string, automatic bool) (model.Objects, error) {
 	return GetOperatingSystemsByName(name, automatic)
+}
+
+// GetOutdatedOperatingSystemsO should have a comment.
+func GetOutdatedOperatingSystemsO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedOperatingSystems(outdatedDay)
 }

@@ -157,6 +157,46 @@ func GetLocationByName(name string, automatic bool) (*model.Location, error) {
 	return &location, nil
 }
 
+// GetOutdatedLocations only return authorized machines
+func GetOutdatedLocations(outdatedDay int) (model.Locations, error) {
+	log.Debug(fmt.Sprintf("GetOutdatedLocations(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_locations(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var locations model.Locations
+
+	for rows.Next() {
+		var location model.Location
+
+		err := rows.Scan(&location.ID,
+			&location.Name,
+			&location.Description,
+			&location.NameLastModification,
+			&location.DescriptionLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		locations = append(locations, location)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return locations, nil
+}
+
 // GetLocationsO should have a comment.
 func GetLocationsO(automatic bool) (model.Objects, error) {
 	return GetLocations(automatic)
@@ -182,4 +222,9 @@ func UpdateLocationO(id int32, object *model.Object, automatic bool) (int64, err
 // GetLocationByNameO should have a comment.
 func GetLocationByNameO(name string, automatic bool) (model.Object, error) {
 	return GetLocationByName(name, automatic)
+}
+
+// GetOutdatedLocationsO should have a comment.
+func GetOutdatedLocationsO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedLocations(outdatedDay)
 }

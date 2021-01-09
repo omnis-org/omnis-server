@@ -6,14 +6,21 @@ import (
 
 // InterfaceO should have a comment.
 type InterfaceO struct {
-	ID            NullInt32  `json:"id"`
-	Name          NullString `json:"name"`
-	Ipv4          NullString `json:"ipv4"`
-	Ipv4Mask      NullInt32  `json:"ipv4Mask"`
-	MAC           NullString `json:"mac"`
-	InterfaceType NullString `json:"interfaceType"`
-	MachineID     NullInt32  `json:"machineId"`
-	NetworkID     NullInt32  `json:"networkId"`
+	ID                            *NullInt32  `json:"id"`
+	Name                          *NullString `json:"name"`
+	Ipv4                          *NullString `json:"ipv4"`
+	Ipv4Mask                      *NullInt32  `json:"ipv4Mask"`
+	MAC                           *NullString `json:"mac"`
+	InterfaceType                 *NullString `json:"interfaceType"`
+	MachineID                     *NullInt32  `json:"machineId"`
+	NetworkID                     *NullInt32  `json:"networkId"`
+	NameLastModification          *NullTime   `json:"nameLastModification"`
+	Ipv4LastModification          *NullTime   `json:"ipv4LastModification"`
+	Ipv4MaskLastModification      *NullTime   `json:"ipv4MaskLastModification"`
+	MACLastModification           *NullTime   `json:"macLastModification"`
+	InterfaceTypeLastModification *NullTime   `json:"interfaceTypeLastModification"`
+	MachineIDLastModification     *NullTime   `json:"machineIdLastModification"`
+	NetworkIDLastModification     *NullTime   `json:"networkIdLastModification"`
 }
 
 // InterfaceOs should have a comment.

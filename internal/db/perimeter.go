@@ -157,6 +157,46 @@ func GetPerimeterByName(name string, automatic bool) (*model.Perimeter, error) {
 	return &perimeter, nil
 }
 
+// GetOutdatedPerimeters only return authorized machines
+func GetOutdatedPerimeters(outdatedDay int) (model.Perimeters, error) {
+	log.Debug(fmt.Sprintf("GetOutdatedPerimeters(%d)", outdatedDay))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	rows, err := db.Query("CALL get_outdated_perimeters(?);", outdatedDay)
+	if err != nil {
+		return nil, fmt.Errorf("db.Query failed <- %v", err)
+	}
+	defer rows.Close()
+
+	var perimeters model.Perimeters
+
+	for rows.Next() {
+		var perimeter model.Perimeter
+
+		err := rows.Scan(&perimeter.ID,
+			&perimeter.Name,
+			&perimeter.Description,
+			&perimeter.NameLastModification,
+			&perimeter.DescriptionLastModification)
+
+		if err != nil {
+			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+		}
+
+		perimeters = append(perimeters, perimeter)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, fmt.Errorf("rows.Scan failed <- %v", err)
+	}
+
+	return perimeters, nil
+}
+
 // GetPerimetersO should have a comment.
 func GetPerimetersO(automatic bool) (model.Objects, error) {
 	return GetPerimeters(automatic)
@@ -182,4 +222,9 @@ func UpdatePerimeterO(id int32, object *model.Object, automatic bool) (int64, er
 // GetPerimeterByNameO should have a comment.
 func GetPerimeterByNameO(name string, automatic bool) (model.Object, error) {
 	return GetPerimeterByName(name, automatic)
+}
+
+// GetOutdatedPerimetersO should have a comment.
+func GetOutdatedPerimetersO(outdatedDay int) (model.Objects, error) {
+	return GetOutdatedPerimeters(outdatedDay)
 }

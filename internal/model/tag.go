@@ -2,9 +2,11 @@ package model
 
 // Tag should have a comment.
 type Tag struct {
-	ID    NullInt32  `json:"id"`
-	Name  NullString `json:"name"`
-	Color NullString `json:"color"`
+	ID                    *NullInt32  `json:"id"`
+	Name                  *NullString `json:"name"`
+	Color                 *NullString `json:"color"`
+	NameLastModification  *NullTime   `json:"nameLastModification"`
+	ColorLastModification *NullTime   `json:"colorLastModification"`
 }
 
 // Tags should have a comment.

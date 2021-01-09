@@ -20,7 +20,7 @@ func doLocation(locationName string) (int32, error) {
 	if !location.ID.Valid {
 		var name model.NullString
 		name.Scan(locationName)
-		idLocation, err = db.InsertLocation(&model.Location{Name: name}, true)
+		idLocation, err = db.InsertLocation(&model.Location{Name: &name}, true)
 		if err != nil {
 			return 0, fmt.Errorf("net.InsertLocation failed <- %v", err)
 		}
@@ -46,7 +46,7 @@ func doPerimeter(perimeterName string) (int32, error) {
 		var name model.NullString
 		name.Scan(perimeterName)
 
-		idPerimeter, err = db.InsertPerimeter(&model.Perimeter{Name: name}, true)
+		idPerimeter, err = db.InsertPerimeter(&model.Perimeter{Name: &name}, true)
 		if err != nil {
 			return 0, fmt.Errorf("net.InsertLocation failed <- %v", err)
 		}

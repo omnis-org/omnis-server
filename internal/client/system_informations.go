@@ -39,11 +39,11 @@ func newOperatingSystem(osInfos *client_informations.OperatingSystemInformations
 		return 0, fmt.Errorf("kernelVersion.Scan failed <- %v", err)
 	}
 
-	os := model.OperatingSystem{Name: name,
-		Platform:        platform,
-		PlatformFamily:  platformFamily,
-		PlatformVersion: platformVersion,
-		KernelVersion:   kernelVersion}
+	os := model.OperatingSystem{Name: &name,
+		Platform:        &platform,
+		PlatformFamily:  &platformFamily,
+		PlatformVersion: &platformVersion,
+		KernelVersion:   &kernelVersion}
 
 	id, err := db.InsertOperatingSystem(&os, true)
 	if err != nil {

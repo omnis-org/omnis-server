@@ -2,10 +2,13 @@ package model
 
 // Gateway should have a comment.
 type Gateway struct {
-	ID          NullInt32  `json:"id"`
-	Ipv4        NullString `json:"ipv4"`
-	Mask        NullInt32  `json:"mask"`
-	InterfaceID NullInt32  `json:"interfaceId"`
+	ID                          *NullInt32  `json:"id"`
+	Ipv4                        *NullString `json:"ipv4"`
+	Mask                        *NullInt32  `json:"mask"`
+	InterfaceID                 *NullInt32  `json:"interfaceId"`
+	Ipv4LastModification        *NullTime   `json:"ipv4LastModification"`
+	MaskLastModification        *NullTime   `json:"maskLastModification"`
+	InterfaceIDLastModification *NullTime   `json:"interfaceIdLastModification"`
 }
 
 // Gateways should have a comment.

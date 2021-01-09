@@ -2,10 +2,13 @@ package model
 
 // Software should have a comment.
 type Software struct {
-	ID       NullInt32  `json:"id"`
-	Name     NullString `json:"name"`
-	Version  NullString `json:"version"`
-	IsIntern NullBool   `json:"isIntern"`
+	ID                       *NullInt32  `json:"id"`
+	Name                     *NullString `json:"name"`
+	Version                  *NullString `json:"version"`
+	IsIntern                 *NullBool   `json:"isIntern"`
+	NameLastModification     *NullTime   `json:"nameLastModification"`
+	VersionLastModification  *NullTime   `json:"versionLastModification"`
+	IsInternLastModification *NullTime   `json:"isInternLastModification"`
 }
 
 // Softwares should have a comment.
