@@ -86,10 +86,10 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 	var label model.NullString
 	var virtualizationSystem model.NullString
 	var serialNumber model.NullString
+	var machineType model.NullString
 	var perimeter model.NullInt32
 	var location model.NullInt32
 	var operatingSystem model.NullInt32
-	var machineType model.NullString
 	var omnisVersion model.NullString
 
 	err := hostname.Scan(systemInformations.Hostname)
@@ -112,6 +112,18 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 	if err != nil {
 		return 0, fmt.Errorf("serialNumber.Scan failed <- %v", err)
 	}
+
+	if strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformVersion), "server") ||
+		strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformFamily), "server") { // TO DO : check work on all server type
+		err = machineType.Scan("server")
+	} else {
+		err = machineType.Scan("client")
+	}
+
+	if err != nil {
+		return 0, fmt.Errorf("machineType.Scan failed <- %v", err)
+	}
+
 	err = perimeter.Scan(perimeterID)
 	if err != nil {
 		return 0, fmt.Errorf("perimeter.Scan failed <- %v", err)
@@ -125,31 +137,20 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 		return 0, fmt.Errorf("operatingSystem.Scan failed <- %v", err)
 	}
 
-	if strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformVersion), "server") ||
-		strings.Contains(strings.ToLower(systemInformations.OperatingSystem.PlatformFamily), "server") { // TO DO : check work on all server type
-		err = machineType.Scan("server")
-	} else {
-		err = machineType.Scan("client")
-	}
-
-	if err != nil {
-		return 0, fmt.Errorf("machineType.Scan failed <- %v", err)
-	}
-
 	err = omnisVersion.Scan(systemInformations.OmnisVersion)
 	if err != nil {
 		return 0, fmt.Errorf("omnisVersion.Scan failed <- %v", err)
 	}
 
-	machine := model.Machine{Hostname: hostname,
-		Label:                label,
-		VirtualizationSystem: virtualizationSystem,
-		SerialNumber:         serialNumber,
-		PerimeterID:          perimeter,
-		LocationID:           location,
-		OperatingSystemID:    operatingSystem,
-		MachineType:          machineType,
-		OmnisVersion:         omnisVersion}
+	machine := model.Machine{Hostname: &hostname,
+		Label:                &label,
+		VirtualizationSystem: &virtualizationSystem,
+		SerialNumber:         &serialNumber,
+		MachineType:          &machineType,
+		PerimeterID:          &perimeter,
+		LocationID:           &location,
+		OperatingSystemID:    &operatingSystem,
+		OmnisVersion:         &omnisVersion}
 
 	var machineID int32 = 0
 	if updateMachineID == 0 { // new

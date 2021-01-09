@@ -25,11 +25,22 @@ func GetMachines(automatic bool) (model.Machines, error) {
 
 	var machines model.Machines
 
-	var ignoreAuthorized model.NullBool
 	for rows.Next() {
 		var machine model.Machine
 
-		err := rows.Scan(&machine.ID, &machine.UUID, &ignoreAuthorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
+		err := rows.Scan(&machine.ID,
+			&machine.UUID,
+			&machine.Hostname,
+			&machine.Label,
+			&machine.Description,
+			&machine.VirtualizationSystem,
+			&machine.SerialNumber,
+			&machine.MachineType,
+			&machine.PerimeterID,
+			&machine.LocationID,
+			&machine.OperatingSystemID,
+			&machine.OmnisVersion)
+
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -54,8 +65,18 @@ func GetMachine(id int32, automatic bool) (*model.Machine, error) {
 	}
 
 	var machine model.Machine
-	var ignoreAuthorized model.NullBool
-	err = db.QueryRow("CALL get_machine_by_id(?,?);", id, automatic).Scan(&machine.ID, &machine.UUID, &ignoreAuthorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
+	err = db.QueryRow("CALL get_machine_by_id(?,?);", id, automatic).Scan(&machine.ID,
+		&machine.UUID,
+		&machine.Hostname,
+		&machine.Label,
+		&machine.Description,
+		&machine.VirtualizationSystem,
+		&machine.SerialNumber,
+		&machine.MachineType,
+		&machine.PerimeterID,
+		&machine.LocationID,
+		&machine.OperatingSystemID,
+		&machine.OmnisVersion)
 
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -88,7 +109,19 @@ func GetPendingMachines() (model.Machines, error) {
 	for rows.Next() {
 		var machine model.Machine
 
-		err := rows.Scan(&machine.ID, &machine.UUID, &machine.Authorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
+		err := rows.Scan(&machine.ID,
+			&machine.UUID,
+			&machine.Authorized,
+			&machine.Hostname,
+			&machine.Label,
+			&machine.Description,
+			&machine.VirtualizationSystem,
+			&machine.SerialNumber,
+			&machine.MachineType,
+			&machine.PerimeterID,
+			&machine.LocationID,
+			&machine.OperatingSystemID,
+			&machine.OmnisVersion)
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
@@ -115,7 +148,19 @@ func InsertMachine(machine *model.Machine, automatic bool) (int32, error) {
 	var id int32 = 0
 	sqlStr := "CALL insert_machine(?,?,NULL,?,?,?,?,?,?,?,?,?,?);"
 
-	err = db.QueryRow(sqlStr, machine.UUID, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterID, machine.LocationID, machine.OperatingSystemID, machine.MachineType, machine.OmnisVersion, automatic).Scan(&id)
+	err = db.QueryRow(sqlStr,
+		machine.UUID,
+		machine.Hostname,
+		machine.Label,
+		machine.Description,
+		machine.VirtualizationSystem,
+		machine.SerialNumber,
+		machine.MachineType,
+		machine.PerimeterID,
+		machine.LocationID,
+		machine.OperatingSystemID,
+		machine.OmnisVersion,
+		automatic).Scan(&id)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.QueryRow failed <- %v", err)
@@ -135,7 +180,20 @@ func UpdateMachine(id int32, machine *model.Machine, automatic bool) (int64, err
 
 	sqlStr := "CALL update_machine(?,?,NULL,?,?,?,?,?,?,?,?,?,?,?);"
 
-	res, err := db.Exec(sqlStr, id, machine.UUID, machine.Hostname, machine.Label, machine.Description, machine.VirtualizationSystem, machine.SerialNumber, machine.PerimeterID, machine.LocationID, machine.OperatingSystemID, machine.MachineType, machine.OmnisVersion, automatic)
+	res, err := db.Exec(sqlStr,
+		id,
+		machine.UUID,
+		machine.Hostname,
+		machine.Label,
+		machine.Description,
+		machine.VirtualizationSystem,
+		machine.SerialNumber,
+		machine.MachineType,
+		machine.PerimeterID,
+		machine.LocationID,
+		machine.OperatingSystemID,
+		machine.OmnisVersion,
+		automatic)
 
 	if err != nil {
 		return 0, fmt.Errorf("db.Exec failed <- %v", err)
@@ -198,7 +256,7 @@ func AuthorizeMachine(id int32, authorize bool) (int64, error) {
 
 // GetOutdatedMachines only return authorized machines
 func GetOutdatedMachines(outdatedDay int) (model.Machines, error) {
-	log.Debug(fmt.Sprintf("GetMachines(%d)", outdatedDay))
+	log.Debug(fmt.Sprintf("GetOutdatedMachines(%d)", outdatedDay))
 
 	db, err := GetOmnisConnection()
 	if err != nil {
@@ -213,11 +271,33 @@ func GetOutdatedMachines(outdatedDay int) (model.Machines, error) {
 
 	var machines model.Machines
 
-	var ignoreAuthorized model.NullBool
 	for rows.Next() {
 		var machine model.Machine
 
-		err := rows.Scan(&machine.ID, &machine.UUID, &ignoreAuthorized, &machine.Hostname, &machine.Label, &machine.Description, &machine.VirtualizationSystem, &machine.SerialNumber, &machine.PerimeterID, &machine.LocationID, &machine.OperatingSystemID, &machine.MachineType, &machine.OmnisVersion)
+		err := rows.Scan(&machine.ID,
+			&machine.UUID,
+			&machine.Hostname,
+			&machine.Label,
+			&machine.Description,
+			&machine.VirtualizationSystem,
+			&machine.SerialNumber,
+			&machine.MachineType,
+			&machine.PerimeterID,
+			&machine.LocationID,
+			&machine.OperatingSystemID,
+			&machine.OmnisVersion,
+			&machine.UUIDLastModification,
+			&machine.HostnameLastModification,
+			&machine.LabelLastModification,
+			&machine.DescriptionLastModification,
+			&machine.VirtualizationSystemLastModification,
+			&machine.SerialNumberLastModification,
+			&machine.MachineTypeLastModification,
+			&machine.PerimeterIDLastModification,
+			&machine.LocationIDLastModification,
+			&machine.OperatingSystemIDLastModification,
+			&machine.OmnisVersionLastModification)
+
 		if err != nil {
 			return nil, fmt.Errorf("rows.Scan failed <- %v", err)
 		}
