@@ -32,7 +32,7 @@ func createConnection(dbString string) (*sql.DB, error) {
 
 // CreateOmnisConnection should have a comment.
 func CreateOmnisConnection() (*sql.DB, error) {
-	dbString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.GetConfig().OmnisDB.Username,
+	dbString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", config.GetConfig().OmnisDB.Username,
 		config.GetConfig().OmnisDB.Password,
 		config.GetConfig().OmnisDB.Host,
 		config.GetConfig().OmnisDB.Port,
@@ -42,7 +42,7 @@ func CreateOmnisConnection() (*sql.DB, error) {
 
 // CreateAdminConnection should have a comment.
 func CreateAdminConnection() (*sql.DB, error) {
-	dbString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s", config.GetConfig().AdminDB.Username,
+	dbString := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", config.GetConfig().AdminDB.Username,
 		config.GetConfig().AdminDB.Password,
 		config.GetConfig().AdminDB.Host,
 		config.GetConfig().AdminDB.Port,

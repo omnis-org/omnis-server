@@ -567,7 +567,7 @@ END //
 DROP PROCEDURE IF EXISTS get_machines//
 CREATE PROCEDURE get_machines(IN p_automatic BOOLEAN)
 BEGIN
-    SELECT id,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version FROM Machine WHERE automatic=p_automatic;
+    SELECT id,uuid,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version FROM Machine WHERE automatic=p_automatic;
 END //
 
 
@@ -575,7 +575,7 @@ END //
 DROP PROCEDURE IF EXISTS get_pending_machines//
 CREATE PROCEDURE get_pending_machines()
 BEGIN
-    SELECT id,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version FROM Machine WHERE authorized IS NULL AND automatic=0;
+    SELECT id,uuid,authorized,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version FROM Machine WHERE authorized IS NULL AND automatic=0;
 END //
 
 
@@ -583,7 +583,7 @@ END //
 DROP PROCEDURE IF EXISTS get_machine_by_id//
 CREATE PROCEDURE get_machine_by_id(IN p_id INT, IN p_automatic BOOLEAN)
 BEGIN
-    SELECT id,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version FROM Machine WHERE id=p_id AND automatic=p_automatic;
+    SELECT id,uuid,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version FROM Machine WHERE id=p_id AND automatic=p_automatic;
 END //
 
 
@@ -591,10 +591,10 @@ END //
 DROP PROCEDURE IF EXISTS get_timestamp_machines//
 CREATE PROCEDURE get_timestamp_machines(IN p_automatic BOOLEAN)
 BEGIN
-    SELECT id, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification
+    SELECT id, uuid_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,machine_type_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,omnis_version_last_modification
     FROM Machine
     WHERE automatic = p_automatic
-    AND (uuid_last_modification IS NOT NULL OR authorized_last_modification IS NOT NULL OR hostname_last_modification IS NOT NULL OR label_last_modification IS NOT NULL OR description_last_modification IS NOT NULL OR virtualization_system_last_modification IS NOT NULL OR serial_number_last_modification IS NOT NULL OR perimeter_id_last_modification IS NOT NULL OR location_id_last_modification IS NOT NULL OR operating_system_id_last_modification IS NOT NULL OR machine_type_last_modification IS NOT NULL OR omnis_version_last_modification IS NOT NULL);
+    AND (uuid_last_modification IS NOT NULL OR hostname_last_modification IS NOT NULL OR label_last_modification IS NOT NULL OR description_last_modification IS NOT NULL OR virtualization_system_last_modification IS NOT NULL OR serial_number_last_modification IS NOT NULL OR perimeter_id_last_modification IS NOT NULL OR location_id_last_modification IS NOT NULL OR operating_system_id_last_modification IS NOT NULL OR machine_type_last_modification IS NOT NULL OR omnis_version_last_modification IS NOT NULL);
 END //
 
 
@@ -602,19 +602,19 @@ END //
 DROP PROCEDURE IF EXISTS get_timestamp_machine_by_id//
 CREATE PROCEDURE get_timestamp_machine_by_id(IN p_id INT, IN p_automatic BOOLEAN)
 BEGIN
-    SELECT id, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification
+    SELECT id, uuid_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,machine_type_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,omnis_version_last_modification
     FROM Machine
     WHERE automatic = p_automatic AND id = p_id
-    AND (uuid_last_modification IS NOT NULL OR authorized_last_modification IS NOT NULL OR hostname_last_modification IS NOT NULL OR label_last_modification IS NOT NULL OR description_last_modification IS NOT NULL OR virtualization_system_last_modification IS NOT NULL OR serial_number_last_modification IS NOT NULL OR perimeter_id_last_modification IS NOT NULL OR location_id_last_modification IS NOT NULL OR operating_system_id_last_modification IS NOT NULL OR machine_type_last_modification IS NOT NULL OR omnis_version_last_modification IS NOT NULL);
+    AND (uuid_last_modification IS NOT NULL OR hostname_last_modification IS NOT NULL OR label_last_modification IS NOT NULL OR description_last_modification IS NOT NULL OR virtualization_system_last_modification IS NOT NULL OR serial_number_last_modification IS NOT NULL OR perimeter_id_last_modification IS NOT NULL OR location_id_last_modification IS NOT NULL OR operating_system_id_last_modification IS NOT NULL OR machine_type_last_modification IS NOT NULL OR omnis_version_last_modification IS NOT NULL);
 END //
 
 
 -- insert_machine
 DROP PROCEDURE IF EXISTS insert_machine//
-CREATE PROCEDURE insert_machine(IN p_uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_machine_type VARCHAR(255),IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
+CREATE PROCEDURE insert_machine(IN p_uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_machine_type VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
 BEGIN
-    INSERT INTO Machine(automatic,uuid,authorized,hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,machine_type_last_modification,omnis_version_last_modification)
-    VALUES(p_automatic, p_uuid, p_authorized, p_hostname,p_label,p_description,p_virtualization_system,p_serial_number,p_perimeter_id,p_location_id,p_operating_system_id,p_machine_type,p_omnis_version,
+    INSERT INTO Machine(automatic,uuid,authorized,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version, uuid_last_modification, authorized_last_modification, hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,machine_type_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,omnis_version_last_modification)
+    VALUES(p_automatic, p_uuid, p_authorized, p_hostname,p_label,p_description,p_virtualization_system,p_serial_number,p_machine_type,p_perimeter_id,p_location_id,p_operating_system_id,p_omnis_version,
     CASE WHEN (p_uuid IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_authorized IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_hostname IS NULL) THEN NULL ELSE NOW() END,
@@ -622,10 +622,10 @@ BEGIN
     CASE WHEN (p_description IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_virtualization_system IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_serial_number IS NULL) THEN NULL ELSE NOW() END,
+    CASE WHEN (p_machine_type IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_perimeter_id IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_location_id IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_operating_system_id IS NULL) THEN NULL ELSE NOW() END,
-    CASE WHEN (p_machine_type IS NULL) THEN NULL ELSE NOW() END,
     CASE WHEN (p_omnis_version IS NULL) THEN NULL ELSE NOW() END);
 
     INSERT INTO Machine(id, automatic, uuid, authorized, hostname,label,description,virtualization_system,serial_number,perimeter_id,location_id,operating_system_id,machine_type,omnis_version)
@@ -653,13 +653,13 @@ IF NEW.virtualization_system != OLD.virtualization_system THEN SET NEW.virtualiz
 
 IF NEW.serial_number != OLD.serial_number THEN SET NEW.serial_number_last_modification = NOW(); END IF;
 
+IF NEW.machine_type != OLD.machine_type THEN SET NEW.machine_type_last_modification = NOW(); END IF;
+
 IF NEW.perimeter_id != OLD.perimeter_id THEN SET NEW.perimeter_id_last_modification = NOW(); END IF;
 
 IF NEW.location_id != OLD.location_id THEN SET NEW.location_id_last_modification = NOW(); END IF;
 
 IF NEW.operating_system_id != OLD.operating_system_id THEN SET NEW.operating_system_id_last_modification = NOW(); END IF;
-
-IF NEW.machine_type != OLD.machine_type THEN SET NEW.machine_type_last_modification = NOW(); END IF;
 
 IF NEW.omnis_version != OLD.omnis_version THEN SET NEW.omnis_version_last_modification = NOW(); END IF;
 
@@ -668,7 +668,7 @@ END//
 
 -- update_machine
 DROP PROCEDURE IF EXISTS update_machine//
-CREATE PROCEDURE update_machine(IN p_id INT, IN p_uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_machine_type VARCHAR(255),IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
+CREATE PROCEDURE update_machine(IN p_id INT, IN p_uuid VARCHAR(36), IN p_authorized BOOLEAN, IN p_hostname VARCHAR(255),IN p_label VARCHAR(255),IN p_description TEXT,IN p_virtualization_system VARCHAR(255),IN p_serial_number VARCHAR(255),IN p_machine_type VARCHAR(255),IN p_perimeter_id INT,IN p_location_id INT,IN p_operating_system_id INT,IN p_omnis_version VARCHAR(255), IN p_automatic BOOLEAN)
 BEGIN
     if p_automatic THEN  -- auto
         UPDATE Machine SET
@@ -679,10 +679,10 @@ BEGIN
         description = COALESCE(p_description, description),
         virtualization_system = COALESCE(p_virtualization_system, virtualization_system),
         serial_number = COALESCE(p_serial_number, serial_number),
+        machine_type = COALESCE(p_machine_type, machine_type),
         perimeter_id = COALESCE(p_perimeter_id, perimeter_id),
         location_id = COALESCE(p_location_id, location_id),
         operating_system_id = COALESCE(p_operating_system_id, operating_system_id),
-        machine_type = COALESCE(p_machine_type, machine_type),
         omnis_version = COALESCE(p_omnis_version, omnis_version)
         WHERE id = p_id AND automatic = true;
 
@@ -708,6 +708,9 @@ BEGIN
         -- serial_number
         serial_number = CASE WHEN (serial_number_last_modification IS NULL) THEN p_serial_number ELSE serial_number END,
         serial_number_last_modification = CASE WHEN (serial_number_last_modification IS NULL) THEN NULL ELSE  serial_number_last_modification END,
+        -- machine_type
+        machine_type = CASE WHEN (machine_type_last_modification IS NULL) THEN p_machine_type ELSE machine_type END,
+        machine_type_last_modification = CASE WHEN (machine_type_last_modification IS NULL) THEN NULL ELSE  machine_type_last_modification END,
         -- perimeter_id
         perimeter_id = CASE WHEN (perimeter_id_last_modification IS NULL) THEN p_perimeter_id ELSE perimeter_id END,
         perimeter_id_last_modification = CASE WHEN (perimeter_id_last_modification IS NULL) THEN NULL ELSE  perimeter_id_last_modification END,
@@ -717,9 +720,6 @@ BEGIN
         -- operating_system_id
         operating_system_id = CASE WHEN (operating_system_id_last_modification IS NULL) THEN p_operating_system_id ELSE operating_system_id END,
         operating_system_id_last_modification = CASE WHEN (operating_system_id_last_modification IS NULL) THEN NULL ELSE  operating_system_id_last_modification END,
-        -- machine_type
-        machine_type = CASE WHEN (machine_type_last_modification IS NULL) THEN p_machine_type ELSE machine_type END,
-        machine_type_last_modification = CASE WHEN (machine_type_last_modification IS NULL) THEN NULL ELSE  machine_type_last_modification END,
         -- omnis_version
         omnis_version = CASE WHEN (omnis_version_last_modification IS NULL) THEN p_omnis_version ELSE omnis_version END,
         omnis_version_last_modification = CASE WHEN (omnis_version_last_modification IS NULL) THEN NULL ELSE  omnis_version_last_modification END
@@ -733,10 +733,10 @@ BEGIN
         description = COALESCE(p_description, description),
         virtualization_system = COALESCE(p_virtualization_system, virtualization_system),
         serial_number = COALESCE(p_serial_number, serial_number),
+        machine_type = COALESCE(p_machine_type, machine_type),
         perimeter_id = COALESCE(p_perimeter_id, perimeter_id),
         location_id = COALESCE(p_location_id, location_id),
         operating_system_id = COALESCE(p_operating_system_id, operating_system_id),
-        machine_type = COALESCE(p_machine_type, machine_type),
         omnis_version = COALESCE(p_omnis_version, omnis_version)
         WHERE id = p_id AND automatic = false;
     END IF;

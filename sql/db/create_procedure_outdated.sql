@@ -54,7 +54,11 @@ END //
 -- retrieve outdated machines
 CREATE OR REPLACE PROCEDURE get_outdated_machines(IN p_outdated_day INT)
 BEGIN
-    SELECT * FROM Machine WHERE automatic=false AND (
+    SELECT id,uuid,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version,
+    uuid_last_modification,hostname_last_modification,label_last_modification,description_last_modification,virtualization_system_last_modification,serial_number_last_modification,
+    machine_type_last_modification,perimeter_id_last_modification,location_id_last_modification,operating_system_id_last_modification,omnis_version_last_modification
+    FROM Machine WHERE automatic=false AND authorized=true AND (
+        uuid_last_modification < NOW() - INTERVAL p_outdated_day DAY OR
         hostname_last_modification < NOW() - INTERVAL p_outdated_day DAY OR
         label_last_modification < NOW() - INTERVAL p_outdated_day DAY OR
         description_last_modification < NOW() - INTERVAL p_outdated_day DAY OR

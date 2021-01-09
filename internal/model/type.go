@@ -45,8 +45,8 @@ type NullTime struct {
 	sql.NullTime
 }
 
-// MarshalJSON should have a comment.
-func (v NullInt32) MarshalJSON() ([]byte, error) {
+// MarshalJSON only marshal value
+func (v *NullInt32) MarshalJSON() ([]byte, error) {
 	if v.Valid {
 		return json.Marshal(v.Int32)
 	}
@@ -69,8 +69,8 @@ func (v *NullInt32) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalJSON should have a comment.
-func (v NullInt64) MarshalJSON() ([]byte, error) {
+// MarshalJSON only marshal value
+func (v *NullInt64) MarshalJSON() ([]byte, error) {
 	if v.Valid {
 		return json.Marshal(v.Int64)
 	}
@@ -93,8 +93,8 @@ func (v *NullInt64) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalJSON should have a comment.
-func (s NullString) MarshalJSON() ([]byte, error) {
+// MarshalJSON only marshal value
+func (s *NullString) MarshalJSON() ([]byte, error) {
 	if s.Valid {
 		return json.Marshal(s.String)
 	}
@@ -117,8 +117,8 @@ func (s *NullString) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// MarshalJSON should have a comment.
-func (b NullBool) MarshalJSON() ([]byte, error) {
+// MarshalJSON only marshal value
+func (b *NullBool) MarshalJSON() ([]byte, error) {
 	if b.Valid {
 		return json.Marshal(b.Bool)
 	}
@@ -141,8 +141,8 @@ func (b *NullBool) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-// WARNING : MarshalJSON doesn't return val if t is not valid
-func (t NullTime) MarshalJSON() ([]byte, error) {
+// MarshalJSON only marshal value
+func (t *NullTime) MarshalJSON() ([]byte, error) {
 	if t.Valid {
 		return json.Marshal(t.Time)
 	}
