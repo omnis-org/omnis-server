@@ -274,16 +274,6 @@ CREATE TABLE Gateway(
 
 USE OMNIS_ADMIN;
 
-
-CREATE TABLE Permission(
-    id INT NOT NULL AUTO_INCREMENT,
-    can_select BOOLEAN NOT NULL,
-    can_insert BOOLEAN NOT NULL,
-    can_update BOOLEAN NOT NULL,
-    can_delete BOOLEAN NOT NULL,
-    CONSTRAINT right_pk PRIMARY KEY (id)
-);
-
 -- PERMISSION
 -- 0000 = NO PERMSSION = 0;
 -- 0001 = SELECT = 1;
