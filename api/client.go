@@ -16,7 +16,7 @@ func (api *API) informations(w http.ResponseWriter, r *http.Request) {
 	var infos client_informations.Informations
 	err := json.NewDecoder(r.Body).Decode(&infos)
 	if err != nil {
-		api.internalError(w, err)
+		api.badRequestError(w, err)
 		return
 	}
 
@@ -50,9 +50,13 @@ func (api *API) informations(w http.ResponseWriter, r *http.Request) {
 	// Si non, mettre en attente de confirmation, api not authorised avec message uuid non confirmer
 	// Dans panel admin, mettre en queue les confirmations des UUID (vue, api qui accepte, api qui refuse, api qui liste (queue))
 	// Quand confirmer, lancer analyseClient qui mettra en BDD la machine avec l'id etc
-	client.AnalyzeClientInformations(&infos)
+	err = client.AnalyzeClientInformations(&infos)
 
-	api.success(w)
+	if err != nil {
+		api.internalError(w, err)
+	}
+
+	api.successNoContent(w)
 }
 
 func (api *API) setupClient() {
