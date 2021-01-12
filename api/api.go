@@ -23,35 +23,65 @@ type API struct {
 //////////////////			ERROR			//////////////////
 
 func (api *API) badRequestError(w http.ResponseWriter, err error) {
+	// 400
 	log.Info(err)
-	http.Error(w, http.StatusText(400), 400)
-}
-
-func (api *API) notFoundError(w http.ResponseWriter, err error) {
-	log.Info(err)
-	http.Error(w, http.StatusText(404), 404)
-}
-
-func (api *API) internalError(w http.ResponseWriter, err error) {
-	log.Error(err)
-	http.Error(w, http.StatusText(500), 500)
+	w.WriteHeader(http.StatusBadRequest)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"message": "Validation errors in your request"}`))
 }
 
 func (api *API) unauthorizedError(w http.ResponseWriter, err error) {
+	// 401
 	log.Info(err)
-	http.Error(w, http.StatusText(401), 401)
+	w.WriteHeader(http.StatusUnauthorized)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"message": "Authentication credentials were missing or incorrect"}`))
+}
+
+func (api *API) forbiddenError(w http.ResponseWriter, err error) {
+	// 404
+	log.Info(err)
+	w.WriteHeader(http.StatusForbidden)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"message": "The request is understood, but it has been refused or access is not allowed"}`))
+}
+
+func (api *API) notFoundError(w http.ResponseWriter) {
+	// 404
+	w.WriteHeader(http.StatusNotFound)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"message": "The item does not exist"}`))
+}
+
+func (api *API) internalError(w http.ResponseWriter, err error) {
+	// 500
+	log.Error(err)
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"message": "Something is broken"}`))
 }
 
 //////////////////			SUCCESS			//////////////////
 
-func (api *API) success(w http.ResponseWriter) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Success\n")
-}
+// func (api *API) success(w http.ResponseWriter) {
+// 	w.WriteHeader(http.StatusOK)
+// }
 
-func (api *API) sendJSON(w http.ResponseWriter, json []byte) {
+func (api *API) successReturnJSON(w http.ResponseWriter, json []byte) {
+	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(json)
+}
+
+func (api *API) successCreateItem(w http.ResponseWriter, location string) {
+	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Location", location)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte(`{"message": "The item was created successfully"}`))
+}
+
+func (api *API) successNoContent(w http.ResponseWriter) {
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (api *API) sendText(w http.ResponseWriter, text string) {
@@ -59,17 +89,10 @@ func (api *API) sendText(w http.ResponseWriter, text string) {
 	fmt.Fprintf(w, text)
 }
 
-func (api *API) sendNullJSON(w http.ResponseWriter) {
-	w.Header().Set("Content-Type", "application/json")
-	n := []uint8{110, 117, 108, 108}
-	w.Write(n)
-}
-
 ///// Router
 
 func (api *API) root(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "Welcome in OmnIS Server API\n")
+	api.successReturnJSON(w, []byte(`{"message":"Welcome in OmnIS Server API"`))
 }
 
 func checkAccess(permissionsToCheck int, roleID int32, method string) error {
@@ -80,7 +103,7 @@ func checkAccess(permissionsToCheck int, roleID int32, method string) error {
 
 	// GET => 0
 	// POST => 1
-	// PUT => 2
+	// PATCH => 2
 	// DELETE => 3
 	var methodToCheck int = -1
 
@@ -88,7 +111,7 @@ func checkAccess(permissionsToCheck int, roleID int32, method string) error {
 		methodToCheck = 0
 	} else if method == "POST" {
 		methodToCheck = 1
-	} else if method == "PUT" {
+	} else if method == "PATCH" {
 		methodToCheck = 2
 	} else if method == "DELETE" {
 		methodToCheck = 3
@@ -173,7 +196,7 @@ func (api *API) middleware(next http.Handler) http.Handler {
 
 			err = checkAccess(permissionsToCheck, jwtClaims.RoleID, r.Method)
 			if err != nil {
-				api.unauthorizedError(w, err)
+				api.forbiddenError(w, err)
 				return
 			}
 		}
@@ -212,7 +235,7 @@ func Run() error {
 	url := fmt.Sprintf("%s:%d", config.GetConfig().Server.IP, config.GetConfig().Server.Port)
 
 	handler := handlers.CORS(
-		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PATCH", "DELETE"}),
 		handlers.AllowedHeaders([]string{"Accept", "Accept-Language", "Content-Type", "Content-Language", "Origin"}),
 		handlers.AllowedOrigins([]string{"*"}),
 	)

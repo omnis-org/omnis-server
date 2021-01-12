@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/gorilla/mux"
+	"github.com/microcosm-cc/bluemonday"
 	"github.com/omnis-org/omnis-server/config"
 	"github.com/omnis-org/omnis-server/internal/db"
 	"github.com/omnis-org/omnis-server/internal/model"
@@ -33,7 +34,7 @@ func (api *API) getObjects(f func(bool) (model.Objects, error), automatic bool) 
 			return
 		}
 
-		api.sendJSON(w, json)
+		api.successReturnJSON(w, json)
 	}
 }
 
@@ -43,7 +44,7 @@ func (api *API) getObjectsByInt(f func(int32, bool) (model.Objects, error), s st
 		idS := mux.Vars(r)[s]
 		id, err := strconv.Atoi(idS)
 		if err != nil {
-			api.internalError(w, err)
+			api.badRequestError(w, err)
 			return
 		}
 
@@ -60,14 +61,21 @@ func (api *API) getObjectsByInt(f func(int32, bool) (model.Objects, error), s st
 			return
 		}
 
-		api.sendJSON(w, json)
+		api.successReturnJSON(w, json)
 	}
 }
 
 func (api *API) getObjectsByString(f func(string, bool) (model.Objects, error), s string, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("getObjectsByString")
-		sv := mux.Vars(r)[s]
+		p := bluemonday.UGCPolicy()
+		if p == nil {
+			api.internalError(w, errors.New("bluemonday.UGCPolicy failed"))
+			return
+		}
+
+		sv := p.Sanitize(mux.Vars(r)[s])
+
 		obj, err := f(sv, automatic)
 
 		if err != nil {
@@ -81,7 +89,7 @@ func (api *API) getObjectsByString(f func(string, bool) (model.Objects, error), 
 			return
 		}
 
-		api.sendJSON(w, json)
+		api.successReturnJSON(w, json)
 	}
 }
 
@@ -91,7 +99,7 @@ func (api *API) getObject(f func(int32, bool) (model.Object, error), automatic b
 		idS := mux.Vars(r)["id"]
 		id, err := strconv.Atoi(idS)
 		if err != nil {
-			api.internalError(w, err)
+			api.badRequestError(w, err)
 			return
 		}
 
@@ -103,7 +111,7 @@ func (api *API) getObject(f func(int32, bool) (model.Object, error), automatic b
 		}
 
 		if obj == nil {
-			api.sendNullJSON(w)
+			api.notFoundError(w)
 			return
 		}
 
@@ -113,14 +121,21 @@ func (api *API) getObject(f func(int32, bool) (model.Object, error), automatic b
 			return
 		}
 
-		api.sendJSON(w, json)
+		api.successReturnJSON(w, json)
 	}
 }
 
 func (api *API) getObjectByString(f func(string, bool) (model.Object, error), s string, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("getObjectByString")
-		sv := mux.Vars(r)[s]
+		p := bluemonday.UGCPolicy()
+		if p == nil {
+			api.internalError(w, errors.New("bluemonday.UGCPolicy failed"))
+			return
+		}
+
+		sv := p.Sanitize(mux.Vars(r)[s])
+
 		obj, err := f(sv, automatic)
 
 		if err != nil {
@@ -129,7 +144,7 @@ func (api *API) getObjectByString(f func(string, bool) (model.Object, error), s 
 		}
 
 		if obj == nil {
-			api.sendNullJSON(w)
+			api.notFoundError(w)
 			return
 		}
 
@@ -139,13 +154,13 @@ func (api *API) getObjectByString(f func(string, bool) (model.Object, error), s 
 			return
 		}
 
-		api.sendJSON(w, json)
+		api.successReturnJSON(w, json)
 	}
 }
 
-func (api *API) getOutdated(f func(int) (model.Objects, error)) http.HandlerFunc {
+func (api *API) getOutdatedObjects(f func(int) (model.Objects, error)) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		log.Debug("getOutdated")
+		log.Debug("getOutdatedObjects")
 		outdatedDayS := mux.Vars(r)["outdated_day"]
 		outdatedDay, err := strconv.Atoi(outdatedDayS)
 		if err != nil {
@@ -165,12 +180,12 @@ func (api *API) getOutdated(f func(int) (model.Objects, error)) http.HandlerFunc
 			return
 		}
 
-		api.sendJSON(w, json)
+		api.successReturnJSON(w, json)
 
 	}
 }
 
-func (api *API) insertObject(f func(*model.Object, bool) (int32, error), o *model.Object, automatic bool) http.HandlerFunc {
+func (api *API) insertObject(f func(*model.Object, bool) (int32, error), o *model.Object, apiPath string, objName string, automatic bool) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Debug("insertObject")
 
@@ -178,7 +193,7 @@ func (api *API) insertObject(f func(*model.Object, bool) (int32, error), o *mode
 
 		err := json.NewDecoder(r.Body).Decode(&obj)
 		if err != nil {
-			api.internalError(w, err)
+			api.badRequestError(w, err)
 			return
 		}
 
@@ -194,17 +209,13 @@ func (api *API) insertObject(f func(*model.Object, bool) (int32, error), o *mode
 		}
 
 		if id == 0 {
-			api.badRequestError(w, errors.New("id == 0"))
+			api.badRequestError(w, errors.New("error insert id == 0"))
 			return
 		}
 
-		idJSON, err := json.Marshal(model.IDJSON{ID: id})
-		if err != nil {
-			api.internalError(w, err)
-			return
-		}
+		location := fmt.Sprintf("/%s/%s/%d", apiPath, objName, id)
 
-		api.sendJSON(w, idJSON)
+		api.successCreateItem(w, location)
 	}
 }
 
@@ -216,14 +227,14 @@ func (api *API) updateObject(f func(int32, *model.Object, bool) (int64, error), 
 
 		err := json.NewDecoder(r.Body).Decode(&obj)
 		if err != nil {
-			api.internalError(w, err)
+			api.badRequestError(w, err)
 			return
 		}
 
 		idS := mux.Vars(r)["id"]
 		id, err := strconv.Atoi(idS)
 		if err != nil {
-			api.internalError(w, err)
+			api.badRequestError(w, err)
 			return
 		}
 
@@ -233,7 +244,7 @@ func (api *API) updateObject(f func(int32, *model.Object, bool) (int64, error), 
 			return
 		}
 
-		api.success(w)
+		api.successNoContent(w)
 	}
 }
 
@@ -243,7 +254,7 @@ func (api *API) deleteObject(f func(int32) (int64, error), automatic bool) http.
 		idS := mux.Vars(r)["id"]
 		id, err := strconv.Atoi(idS)
 		if err != nil {
-			api.internalError(w, err)
+			api.badRequestError(w, err)
 			return
 		}
 
@@ -258,7 +269,7 @@ func (api *API) deleteObject(f func(int32) (int64, error), automatic bool) http.
 			return
 		}
 
-		api.success(w)
+		api.successNoContent(w)
 	}
 }
 
@@ -288,13 +299,13 @@ func (api *API) setupBasicFunctions(apiPath string, getObjs func(bool) (model.Ob
 	}
 	// insertObject
 	if insertObj != nil && obj != nil {
-		api.router.Methods("POST").Path(fmt.Sprintf("%s/%s", apiPath, objName)).HandlerFunc(api.insertObject(insertObj, obj, false))
-		api.router.Methods("POST").Path(fmt.Sprintf("%s/%s", apiPathAuto, objName)).HandlerFunc(api.insertObject(insertObj, obj, true))
+		api.router.Methods("POST").Path(fmt.Sprintf("%s/%s", apiPath, objName)).HandlerFunc(api.insertObject(insertObj, obj, apiPath, objName, false))
+		api.router.Methods("POST").Path(fmt.Sprintf("%s/%s", apiPathAuto, objName)).HandlerFunc(api.insertObject(insertObj, obj, apiPath, objName, true))
 	}
 	// updateObject
 	if updateObj != nil && obj != nil {
-		api.router.Methods("PUT").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPath, objName)).HandlerFunc(api.updateObject(updateObj, obj, false))
-		api.router.Methods("PUT").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPathAuto, objName)).HandlerFunc(api.updateObject(updateObj, obj, true))
+		api.router.Methods("PATCH").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPath, objName)).HandlerFunc(api.updateObject(updateObj, obj, false))
+		api.router.Methods("PATCH").Path(fmt.Sprintf("%s/%s/{id:[0-9]+}", apiPathAuto, objName)).HandlerFunc(api.updateObject(updateObj, obj, true))
 	}
 	// delete
 	if deleteObj != nil {
@@ -303,7 +314,7 @@ func (api *API) setupBasicFunctions(apiPath string, getObjs func(bool) (model.Ob
 	}
 
 	if objName != "" {
-		api.router.Methods("GET").Path(fmt.Sprintf("%s/%ss/outdated/{outdated_day:[0-9]+}", apiPath, objName)).HandlerFunc(api.getOutdated(outdatedObj))
+		api.router.Methods("GET").Path(fmt.Sprintf("%s/%ss/outdated/{outdated_day:[0-9]+}", apiPath, objName)).HandlerFunc(api.getOutdatedObjects(outdatedObj))
 	}
 
 }

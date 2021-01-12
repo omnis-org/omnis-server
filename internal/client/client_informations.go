@@ -34,8 +34,7 @@ func doClientInformations(infos *client_informations.Informations, updateMachine
 	return nil
 }
 
-// TODO refactor casting
-func AnalyzeClientInformations(i interface{}) {
+func AnalyzeClientInformations(i interface{}) error {
 	infos := i.(*client_informations.Informations)
 
 	log.Info(fmt.Sprintf("get new informations from : %s", infos.SystemInformations.Hostname))
@@ -50,8 +49,7 @@ func AnalyzeClientInformations(i interface{}) {
 
 		itf2, err := db.GetInterfaceByMac(itf.MAC, true)
 		if err != nil {
-			log.Error(err)
-			return
+			return fmt.Errorf("db.GetInterfaceByMac failed <- %v", err)
 		}
 
 		if itf2.ID.Valid {
@@ -64,8 +62,8 @@ func AnalyzeClientInformations(i interface{}) {
 
 	err := doClientInformations(infos, machineID)
 	if err != nil {
-		log.Error(err)
-		return
+		return fmt.Errorf("doClientInformations failed <- %v", err)
 	}
 
+	return nil
 }

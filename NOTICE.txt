@@ -1,0 +1,7 @@
+######################
+####### NOTICE #######
+######################
+
+This product contains code from the repository
+https://github.com/cryptlex/rest-api-response-format
+under License (MIT) and Copyright (c) 2016 Adnan Kamili

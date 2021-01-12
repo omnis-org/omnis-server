@@ -42,14 +42,14 @@ func (api *API) listPendingMachine(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	api.sendJSON(w, json)
+	api.successReturnJSON(w, json)
 }
 
 func (api *API) doAuthorize(w http.ResponseWriter, r *http.Request, authorize bool) {
 	idS := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idS)
 	if err != nil {
-		api.internalError(w, err)
+		api.badRequestError(w, err)
 		return
 	}
 
@@ -59,7 +59,7 @@ func (api *API) doAuthorize(w http.ResponseWriter, r *http.Request, authorize bo
 		return
 	}
 
-	api.success(w)
+	api.successNoContent(w)
 }
 
 func (api *API) authorizeMachine(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +75,7 @@ func (api *API) login(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		api.internalError(w, err)
+		api.badRequestError(w, err)
 		return
 	}
 
@@ -91,7 +91,7 @@ func (api *API) login(w http.ResponseWriter, r *http.Request) {
 		api.internalError(w, err)
 	}
 
-	api.sendJSON(w, jsonToken)
+	api.successReturnJSON(w, jsonToken)
 }
 
 func (api *API) refresh(w http.ResponseWriter, r *http.Request) {
@@ -112,7 +112,7 @@ func (api *API) refresh(w http.ResponseWriter, r *http.Request) {
 		api.internalError(w, err)
 	}
 
-	api.sendJSON(w, jsonToken)
+	api.successReturnJSON(w, jsonToken)
 
 }
 
@@ -120,7 +120,7 @@ func (api *API) register(w http.ResponseWriter, r *http.Request) {
 	var user model.User
 	err := json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		api.internalError(w, fmt.Errorf("json.NewDecoder(r.Body).Decode failed <- %v", err))
+		api.badRequestError(w, fmt.Errorf("json.NewDecoder(r.Body).Decode failed <- %v", err))
 		return
 	}
 
@@ -140,21 +140,21 @@ func (api *API) register(w http.ResponseWriter, r *http.Request) {
 		api.internalError(w, err)
 	}
 
-	api.sendJSON(w, jsonUser)
+	api.successReturnJSON(w, jsonUser)
 }
 
 func (api *API) update(w http.ResponseWriter, r *http.Request) {
 	idS := mux.Vars(r)["id"]
 	id, err := strconv.Atoi(idS)
 	if err != nil {
-		api.internalError(w, fmt.Errorf("strconv.Atoi failed <- %v", err))
+		api.badRequestError(w, fmt.Errorf("strconv.Atoi failed <- %v", err))
 		return
 	}
 
 	var user model.User
 	err = json.NewDecoder(r.Body).Decode(&user)
 	if err != nil {
-		api.internalError(w, fmt.Errorf("json.NewDecoder(r.Body).Decode failed <- %v", err))
+		api.badRequestError(w, fmt.Errorf("json.NewDecoder(r.Body).Decode failed <- %v", err))
 		return
 	}
 
@@ -170,7 +170,7 @@ func (api *API) update(w http.ResponseWriter, r *http.Request) {
 		api.internalError(w, err)
 	}
 
-	api.sendJSON(w, jsonUser)
+	api.successReturnJSON(w, jsonUser)
 }
 
 // check if first connection
@@ -182,9 +182,9 @@ func (api *API) first(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if len(users) == 0 {
-		api.sendText(w, fmt.Sprintf("TRUE"))
+		api.successReturnJSON(w, []byte(`{"result": true}`))
 	} else {
-		api.sendText(w, fmt.Sprintf("FALSE"))
+		api.successReturnJSON(w, []byte(`{"result": false}`))
 	}
 }
 
@@ -196,9 +196,9 @@ func (api *API) setupAdmin() {
 	api.router.Methods("GET").Path(fmt.Sprintf("%s/refresh", adminPath)).HandlerFunc(api.refresh)
 	// admin users
 	api.router.Methods("POST").Path(fmt.Sprintf("%s/register", adminPath)).HandlerFunc(api.register)
-	api.router.Methods("PUT").Path(fmt.Sprintf("%s/update/{id:[0-9]+}", adminPath)).HandlerFunc(api.update)
+	api.router.Methods("PATCH").Path(fmt.Sprintf("%s/update/{id:[0-9]+}", adminPath)).HandlerFunc(api.update)
 	// pending machine
 	api.router.Methods("GET").Path(fmt.Sprintf("%s/pending_machines/", adminPath)).HandlerFunc(api.listPendingMachine)
-	api.router.Methods("PUT").Path(fmt.Sprintf("%s/pending_machine/{id:[0-9]+}/authorize", adminPath)).HandlerFunc(api.authorizeMachine)
-	api.router.Methods("PUT").Path(fmt.Sprintf("%s/pending_machine/{id:[0-9]+}/unauthorize", adminPath)).HandlerFunc(api.unauthorizeMachine)
+	api.router.Methods("PATCH").Path(fmt.Sprintf("%s/pending_machine/{id:[0-9]+}/authorize", adminPath)).HandlerFunc(api.authorizeMachine)
+	api.router.Methods("PATCH").Path(fmt.Sprintf("%s/pending_machine/{id:[0-9]+}/unauthorize", adminPath)).HandlerFunc(api.unauthorizeMachine)
 }
