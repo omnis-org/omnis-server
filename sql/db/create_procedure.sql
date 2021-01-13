@@ -567,7 +567,7 @@ END //
 DROP PROCEDURE IF EXISTS get_machines//
 CREATE PROCEDURE get_machines(IN p_automatic BOOLEAN)
 BEGIN
-    SELECT id,uuid,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version FROM Machine WHERE automatic=p_automatic;
+    SELECT id,uuid,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version FROM Machine WHERE automatic=p_automatic AND authorized=1;
 END //
 
 
