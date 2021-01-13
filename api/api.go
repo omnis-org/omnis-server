@@ -39,7 +39,7 @@ func (api *API) unauthorizedError(w http.ResponseWriter, err error) {
 }
 
 func (api *API) forbiddenError(w http.ResponseWriter, err error) {
-	// 404
+	// 403
 	log.Info(err)
 	w.WriteHeader(http.StatusForbidden)
 	w.Header().Set("Content-Type", "application/json")
