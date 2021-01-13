@@ -171,7 +171,7 @@ func Update(id int32, user *model.User) error {
 		return ErrNotExist
 	}
 
-	if user.Password.Valid && user.Password.String != "" {
+	if user.Password != nil && user.Password.Valid && user.Password.String != "" {
 		enc, err := bcrypt.GenerateFromPassword([]byte(user.Password.String), bcrypt.DefaultCost)
 		if err != nil {
 			return fmt.Errorf("bcrypt.GenerateFromPassword failed <- %v", err)

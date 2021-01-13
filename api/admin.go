@@ -164,7 +164,10 @@ func (api *API) update(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Password.String = ""
+	if user.Password != nil {
+		user.Password.String = ""
+	}
+
 	jsonUser, err := json.Marshal(user)
 	if err != nil {
 		api.internalError(w, err)
