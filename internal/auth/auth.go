@@ -129,34 +129,34 @@ func Login(user *model.User) (*UserToken, error) {
 }
 
 // Register should have a comment.
-func Register(user *model.User) error {
+func Register(user *model.User) (int32, error) {
 
 	userDB, err := db.GetUserByUsername(user.Username.String)
 	if err != nil {
-		return fmt.Errorf("net.GetUserByUsername failed <- %v", err)
+		return 0, fmt.Errorf("net.GetUserByUsername failed <- %v", err)
 	}
 
 	if userDB.Valid() {
-		return ErrAlreadyExist
+		return 0, ErrAlreadyExist
 	}
 
 	enc, err := bcrypt.GenerateFromPassword([]byte(user.Password.String), bcrypt.DefaultCost)
 	if err != nil {
-		return fmt.Errorf("bcrypt.GenerateFromPassword failed <- %v", err)
+		return 0, fmt.Errorf("bcrypt.GenerateFromPassword failed <- %v", err)
 	}
 
 	err = user.Password.Scan(enc)
 	if err != nil {
-		return fmt.Errorf("user.Password.Scan failed <- %v", err)
+		return 0, fmt.Errorf("user.Password.Scan failed <- %v", err)
 	}
 
-	_, err = db.InsertUser(user)
+	id, err := db.InsertUser(user)
 
 	if err != nil {
-		return fmt.Errorf("net.InsertUser failed <- %v", err)
+		return 0, fmt.Errorf("net.InsertUser failed <- %v", err)
 	}
 
-	return nil
+	return id, nil
 }
 
 // Update should have a comment.

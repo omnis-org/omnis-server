@@ -213,9 +213,7 @@ func (api *API) insertObject(f func(*model.Object, bool) (int32, error), o *mode
 			return
 		}
 
-		location := fmt.Sprintf("/%s/%s/%d", apiPath, objName, id)
-
-		api.successCreateItem(w, location)
+		api.successCreateItem(w, id)
 	}
 }
 
