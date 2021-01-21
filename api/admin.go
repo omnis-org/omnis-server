@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -124,7 +125,12 @@ func (api *API) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = auth.Register(&user)
+	if user.Username == nil || user.Password == nil {
+		api.badRequestError(w, errors.New("Bad username or password"))
+		return
+	}
+
+	id, err := auth.Register(&user)
 	if err != nil {
 		if err == auth.ErrAlreadyExist {
 			api.badRequestError(w, err)
@@ -134,13 +140,7 @@ func (api *API) register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user.Password.String = ""
-	jsonUser, err := json.Marshal(user)
-	if err != nil {
-		api.internalError(w, err)
-	}
-
-	api.successReturnJSON(w, jsonUser)
+	api.successCreateItem(w, id)
 }
 
 func (api *API) update(w http.ResponseWriter, r *http.Request) {

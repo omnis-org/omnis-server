@@ -73,11 +73,10 @@ func (api *API) successReturnJSON(w http.ResponseWriter, json []byte) {
 	w.Write(json)
 }
 
-func (api *API) successCreateItem(w http.ResponseWriter, location string) {
+func (api *API) successCreateItem(w http.ResponseWriter, id int32) {
 	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Location", location)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"message": "The item was created successfully"}`))
+	w.Write([]byte(fmt.Sprintf(`{"message": "The item was created successfully", "id": %d}`, id)))
 }
 
 func (api *API) successNoContent(w http.ResponseWriter) {
@@ -95,7 +94,7 @@ func (api *API) root(w http.ResponseWriter, r *http.Request) {
 	api.successReturnJSON(w, []byte(`{"message":"Welcome in OmnIS Server API"`))
 }
 
-func checkAccess(permissionsToCheck int, roleID int32, method string) error {
+func checkAccess(permissionsToCheck int, roleID int32, method string, RequestURI string) error {
 	role, err := db.GetRole(roleID)
 	if err != nil {
 		return err
@@ -131,6 +130,9 @@ func checkAccess(permissionsToCheck int, roleID int32, method string) error {
 	}
 
 	if permissions>>methodToCheck&1 == 1 {
+		return nil
+	} else if methodToCheck == 0 && strings.HasPrefix(RequestURI, fmt.Sprintf("%s/role/%d", config.GetConfig().Server.AdminAPI, roleID)) {
+		// Authorize if try access is own role
 		return nil
 	} else {
 		return fmt.Errorf("Unauthorize : %d >> %d & 1", permissions, methodToCheck)
@@ -194,7 +196,7 @@ func (api *API) middleware(next http.Handler) http.Handler {
 				return
 			}
 
-			err = checkAccess(permissionsToCheck, jwtClaims.RoleID, r.Method)
+			err = checkAccess(permissionsToCheck, jwtClaims.RoleID, r.Method, r.RequestURI)
 			if err != nil {
 				api.forbiddenError(w, err)
 				return
