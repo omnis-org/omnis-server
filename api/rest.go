@@ -348,30 +348,30 @@ func (api *API) setupGetObjectByString(apiPath string, f func(string, bool) (mod
 
 func (api *API) setupLocation(apiPath string) {
 	var location model.Object = new(model.Location)
-	api.setupBasicFunctions(apiPath, db.GetLocationsO, db.GetLocationO, db.InsertLocationO, db.UpdateLocationO, db.DeleteLocation, nil, "location", &location)
+	api.setupBasicFunctions(apiPath, db.GetLocationsO, db.GetLocationO, db.InsertLocationO, db.UpdateLocationO, db.DeleteLocation, db.GetOutdatedLocationsO, "location", &location)
 	api.setupGetObjectByString(apiPath, db.GetLocationByNameO, "location", "name")
 }
 
 func (api *API) setupPerimeter(apiPath string) {
 	var perimeter model.Object = new(model.Perimeter)
-	api.setupBasicFunctions(apiPath, db.GetPerimetersO, db.GetPerimeterO, db.InsertPerimeterO, db.UpdatePerimeterO, db.DeletePerimeter, nil, "perimeter", &perimeter)
+	api.setupBasicFunctions(apiPath, db.GetPerimetersO, db.GetPerimeterO, db.InsertPerimeterO, db.UpdatePerimeterO, db.DeletePerimeter, db.GetOutdatedPerimetersO, "perimeter", &perimeter)
 	api.setupGetObjectByString(apiPath, db.GetPerimeterByNameO, "perimeter", "name")
 }
 
 func (api *API) setupOperatingSystem(apiPath string) {
 	var operatingSystem model.Object = new(model.OperatingSystem)
-	api.setupBasicFunctions(apiPath, db.GetOperatingSystemsO, db.GetOperatingSystemO, db.InsertOperatingSystemO, db.UpdateOperatingSystemO, db.DeleteOperatingSystem, nil, "operatingSystem", &operatingSystem)
+	api.setupBasicFunctions(apiPath, db.GetOperatingSystemsO, db.GetOperatingSystemO, db.InsertOperatingSystemO, db.UpdateOperatingSystemO, db.DeleteOperatingSystem, db.GetOutdatedOperatingSystemsO, "operatingSystem", &operatingSystem)
 	api.setupGetObjectsByString(apiPath, db.GetOperatingSystemsByNameO, "operatingSystem", "name")
 }
 
 func (api *API) setupTag(apiPath string) {
 	var tag model.Object = new(model.Tag)
-	api.setupBasicFunctions(apiPath, db.GetTagsO, db.GetTagO, db.InsertTagO, db.UpdateTagO, db.DeleteTag, nil, "tag", &tag)
+	api.setupBasicFunctions(apiPath, db.GetTagsO, db.GetTagO, db.InsertTagO, db.UpdateTagO, db.DeleteTag, db.GetOutdatedTagsO, "tag", &tag)
 }
 
 func (api *API) setupSoftware(apiPath string) {
 	var software model.Object = new(model.Software)
-	api.setupBasicFunctions(apiPath, db.GetSoftwaresO, db.GetSoftwareO, db.InsertSoftwareO, db.UpdateSoftwareO, db.DeleteSoftware, nil, "software", &software)
+	api.setupBasicFunctions(apiPath, db.GetSoftwaresO, db.GetSoftwareO, db.InsertSoftwareO, db.UpdateSoftwareO, db.DeleteSoftware, db.GetOutdatedSoftwaresO, "software", &software)
 }
 
 func (api *API) setupMachine(apiPath string) {
@@ -381,30 +381,30 @@ func (api *API) setupMachine(apiPath string) {
 
 func (api *API) setupInstalledSoftware(apiPath string) {
 	var installedSoftware model.Object = new(model.InstalledSoftware)
-	api.setupBasicFunctions(apiPath, db.GetInstalledSoftwaresO, db.GetInstalledSoftwareO, db.InsertInstalledSoftwareO, db.UpdateInstalledSoftwareO, db.DeleteInstalledSoftware, nil, "installedSoftware", &installedSoftware)
+	api.setupBasicFunctions(apiPath, db.GetInstalledSoftwaresO, db.GetInstalledSoftwareO, db.InsertInstalledSoftwareO, db.UpdateInstalledSoftwareO, db.DeleteInstalledSoftware, db.GetOutdatedInstalledSoftwaresO, "installedSoftware", &installedSoftware)
 }
 
 func (api *API) setupTaggedMachine(apiPath string) {
 	var taggedMachine model.Object = new(model.TaggedMachine)
-	api.setupBasicFunctions(apiPath, db.GetTaggedMachinesO, db.GetTaggedMachineO, db.InsertTaggedMachineO, db.UpdateTaggedMachineO, db.DeleteTaggedMachine, nil, "taggedMachine", &taggedMachine)
+	api.setupBasicFunctions(apiPath, db.GetTaggedMachinesO, db.GetTaggedMachineO, db.InsertTaggedMachineO, db.UpdateTaggedMachineO, db.DeleteTaggedMachine, db.GetOutdatedTaggedMachinesO, "taggedMachine", &taggedMachine)
 }
 
 func (api *API) setupNetwork(apiPath string) {
 	var network model.Object = new(model.Network)
-	api.setupBasicFunctions(apiPath, db.GetNetworksO, db.GetNetworkO, db.InsertNetworkO, db.UpdateNetworkO, db.DeleteNetwork, nil, "network", &network)
+	api.setupBasicFunctions(apiPath, db.GetNetworksO, db.GetNetworkO, db.InsertNetworkO, db.UpdateNetworkO, db.DeleteNetwork, db.GetOutdatedNetworksO, "network", &network)
 	api.setupGetObjectsByString(apiPath, db.GetNetworksByIPO, "network", "ip")
 }
 
 func (api *API) setupInterface(apiPath string) {
 	var interfaceO model.Object = new(model.InterfaceO)
-	api.setupBasicFunctions(apiPath, db.GetInterfacesO, db.GetInterfaceO, db.InsertInterfaceO, db.UpdateInterfaceO, db.DeleteInterface, nil, "interface", &interfaceO)
+	api.setupBasicFunctions(apiPath, db.GetInterfacesO, db.GetInterfaceO, db.InsertInterfaceO, db.UpdateInterfaceO, db.DeleteInterface, db.GetOutdatedInterfacesO, "interface", &interfaceO)
 	api.setupGetObjectByString(apiPath, db.GetInterfaceByMacO, "interface", "mac")
 	api.setupGetObjectsByInt(apiPath, db.GetInterfacesByMachineIDO, "interface", "machineId")
 }
 
 func (api *API) setupGateway(apiPath string) {
 	var gateway model.Object = new(model.Gateway)
-	api.setupBasicFunctions(apiPath, db.GetGatewaysO, db.GetGatewayO, db.InsertGatewayO, db.UpdateGatewayO, db.DeleteGateway, nil, "gateway", &gateway)
+	api.setupBasicFunctions(apiPath, db.GetGatewaysO, db.GetGatewayO, db.InsertGatewayO, db.UpdateGatewayO, db.DeleteGateway, db.GetOutdatedGatewaysO, "gateway", &gateway)
 	api.setupGetObjectsByInt(apiPath, db.GetGatewaysByInterfaceIDO, "gateway", "interfaceId")
 }
 
