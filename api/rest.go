@@ -415,6 +415,7 @@ func (api *API) setupOmnisAPI() {
 	api.setupPerimeter(apiPath)
 	api.setupOperatingSystem(apiPath)
 	api.setupTag(apiPath)
+	api.setupSoftware(apiPath)
 	api.setupMachine(apiPath)
 	api.setupInstalledSoftware(apiPath)
 	api.setupTaggedMachine(apiPath)
