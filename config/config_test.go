@@ -49,19 +49,23 @@ func TestLoadConfig(t *testing.T) {
 		t.Errorf("loadedConfig.Server.IP should be 4200")
 	}
 
-	if loadedConfig.Server.OmnisAPI != "/api/omnis" {
-		t.Errorf("loadedConfig.Server.IP should be '/api/omnis'")
+	if loadedConfig.Server.APIPath != "/api" {
+		t.Errorf("loadedConfig.Server.IP should be '/api'")
 	}
 
-	if loadedConfig.Server.AdminAPI != "/api/admin" {
-		t.Errorf("loadedConfig.Server.IP should be '/api/admin'")
+	if loadedConfig.Server.OmnisRestPath != "/rest/omnis" {
+		t.Errorf("loadedConfig.Server.IP should be '/rest/omnis'")
 	}
 
-	if loadedConfig.Server.Admin != "/admin" {
+	if loadedConfig.Server.AdminRestPath != "/rest/admin" {
+		t.Errorf("loadedConfig.Server.IP should be '/rest/admin'")
+	}
+
+	if loadedConfig.Server.AdminPath != "/admin" {
 		t.Errorf("loadedConfig.Server.IP should be '/admin'")
 	}
 
-	if loadedConfig.Server.Client != "/client" {
+	if loadedConfig.Server.ClientPath != "/client" {
 		t.Errorf("loadedConfig.Server.IP should be '/client'")
 	}
 

@@ -60,6 +60,7 @@ func (api *API) informations(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) setupClient() {
-	clientPath := config.GetConfig().Server.Client
+	conf := config.GetConfig()
+	clientPath := conf.Server.APIPath + conf.Server.ClientPath
 	api.router.Methods("POST").Path(fmt.Sprintf("%s/informations", clientPath)).HandlerFunc(api.informations)
 }
