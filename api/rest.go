@@ -409,7 +409,8 @@ func (api *API) setupGateway(apiPath string) {
 }
 
 func (api *API) setupOmnisAPI() {
-	apiPath := config.GetConfig().Server.OmnisAPI
+	conf := config.GetConfig()
+	apiPath := conf.Server.APIPath + conf.Server.OmnisRestPath
 	api.router.Methods("GET").Path(apiPath).HandlerFunc(api.root)
 	api.setupLocation(apiPath)
 	api.setupPerimeter(apiPath)
@@ -438,7 +439,8 @@ func (api *API) setupRole(apiPath string) {
 }
 
 func (api *API) setupAdminAPI() {
-	apiPath := config.GetConfig().Server.AdminAPI
+	conf := config.GetConfig()
+	apiPath := conf.Server.APIPath + conf.Server.AdminRestPath
 	api.setupUser(apiPath)
 	api.setupRole(apiPath)
 }

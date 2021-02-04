@@ -129,9 +129,11 @@ func checkAccess(permissionsToCheck int, roleID int32, method string, RequestURI
 		permissions = role.PendingMachinesPermissions.Int32
 	}
 
+	config := config.GetConfig()
+
 	if permissions>>methodToCheck&1 == 1 {
 		return nil
-	} else if methodToCheck == 0 && strings.HasPrefix(RequestURI, fmt.Sprintf("%s/role/%d", config.GetConfig().Server.AdminAPI, roleID)) {
+	} else if methodToCheck == 0 && strings.HasPrefix(RequestURI, fmt.Sprintf("%s/role/%d", config.Server.APIPath+config.Server.AdminRestPath, roleID)) {
 		// Authorize if try access is own role
 		return nil
 	} else {
@@ -150,23 +152,25 @@ func (api *API) middleware(next http.Handler) http.Handler {
 
 		var permissionsToCheck int = 0
 
-		if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.Client) {
+		config := config.GetConfig()
+
+		if strings.HasPrefix(r.RequestURI, config.Server.APIPath+config.Server.ClientPath) {
 			log.Info("No security check")
-		} else if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.OmnisAPI) {
+		} else if strings.HasPrefix(r.RequestURI, config.Server.APIPath+config.Server.OmnisRestPath) {
 			permissionsToCheck = 1
-		} else if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.AdminAPI) {
-			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/user", config.GetConfig().Server.AdminAPI)) {
+		} else if strings.HasPrefix(r.RequestURI, config.Server.APIPath+config.Server.AdminRestPath) {
+			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/user", config.Server.APIPath+config.Server.AdminRestPath)) {
 				permissionsToCheck = 3
 			}
-			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/role", config.GetConfig().Server.AdminAPI)) {
+			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/role", config.Server.APIPath+config.Server.AdminRestPath)) {
 				permissionsToCheck = 2
 			}
-		} else if strings.HasPrefix(r.RequestURI, config.GetConfig().Server.Admin) {
-			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/pending_machine", config.GetConfig().Server.Admin)) {
+		} else if strings.HasPrefix(r.RequestURI, config.Server.APIPath+config.Server.AdminPath) {
+			if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/pending_machine", config.Server.APIPath+config.Server.AdminPath)) {
 				permissionsToCheck = 4
-			} else if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/update", config.GetConfig().Server.Admin)) {
+			} else if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/update", config.Server.APIPath+config.Server.AdminPath)) {
 				permissionsToCheck = 3
-			} else if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/register", config.GetConfig().Server.Admin)) {
+			} else if strings.HasPrefix(r.RequestURI, fmt.Sprintf("%s/register", config.Server.APIPath+config.Server.AdminPath)) {
 
 				users, err := db.GetUsers()
 				if err != nil {

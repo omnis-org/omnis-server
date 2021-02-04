@@ -192,7 +192,8 @@ func (api *API) first(w http.ResponseWriter, r *http.Request) {
 }
 
 func (api *API) setupAdmin() {
-	adminPath := config.GetConfig().Server.Admin
+	config := config.GetConfig()
+	adminPath := config.Server.APIPath + config.Server.AdminPath
 	// connection & token
 	api.router.Methods("GET").Path(fmt.Sprintf("%s/first", adminPath)).HandlerFunc(api.first)
 	api.router.Methods("POST").Path(fmt.Sprintf("%s/login", adminPath)).HandlerFunc(api.login)
