@@ -11,7 +11,7 @@ CALL insert_machine("58c9df97-1bd8-4270-8ace-3177fff1b28e",1,"AD01","AD01","Acti
 CALL insert_machine("2f0096ea-2f02-4882-ad7a-e24ad8c13b5d",1,"FILE-SHARE01","FILE-SHARE01","File sharing server",NULL,"012445","client",1,2,3, "1.0", 1);
 CALL insert_machine("ce9de293-2dd2-4e92-a18b-50c0868148f6",1,"AD01-PCA","AD01-PCA","ActiveDirectory domain controller redondant",NULL,"012346","client",1,1,3, "1.0", 1);
 CALL insert_machine("558f79e5-3ccb-42f7-964d-16244e550505",1,"FILE-SHARE01-PCA","FILE-SHARE-PCA01","File sharing server","Docker","012347","client",1,1,3, "1.0", 1);
-CALL insert_machine("781b0cca-b347-4505-a7d3-af1888cf4fa6",1,"BACKUP01-DOMAIN","BACKUP01-DOMAIN","machine de backup décorélée des autres SI","Podman","29931","client",2,2,3,NULL, 1);
+CALL insert_machine("781b0cca-b347-4505-a7d3-af1888cf4fa6",1,"BACKUP01-DOMAIN","BACKUP01-DOMAIN","machine de backup décorélée des autres SI","Podman","29931","client",2,2,1,NULL, 1);
 CALL insert_machine("e73ea760-0ab8-48de-a868-6a98bb7f4fae",1,"BACKUP01-DOMAIN-PCA","BACKUP02-DOMAIN-PCA","machine de backup dédiée au site de PCA et décorélée des autres SI","Virtualbox","29431","client",2,1,3,NULL, 1);
 CALL insert_machine("5e4f8b41-59c3-407a-aacc-6a7ee8582fcb",NULL,"user01","user01","Domain user computer",NULL,"012315","client",1,3,2, "1.0", 1);
 CALL insert_machine("bc4b0aac-7fdb-49c8-918c-12917a031790",NULL,"user02","user02","Domain user computer",NULL,"012325","client",1,3,2, "1.0", 1);
