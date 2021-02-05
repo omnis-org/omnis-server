@@ -57,8 +57,11 @@ You have examples of configuration file in build/testdata/example.json :
     "server" : {
         "ip" : "0.0.0.0",                           # The listening IP address of the server
         "port" : 4320,                              # The port of the omnis server service
-        "omnis_api" : "/api/omnis",                 # The path of omnis api
-        "admin_api" : "/api/admin"                  # The path of admin api
+        "apiPath": "/api",                          # The api path
+        "omnisRestPath" : "/rest/omnis",            # The omnis rest api endpoint path
+        "adminRestPath" : "/rest/admin",            # The admin rest api endpoint path
+        "adminPath" : "/admin",                     # The admin api endpoint path
+        "clientPath" : "/client"                    # The client api endpoint path
     },
     "admin":{
         "expiration_token_time" : 10,               # Token validity time (minute)
