@@ -15,8 +15,11 @@
 # vendor/
 
 .vscode
-build/omnis-server
-build/omnis-server.exe
+
+build/omnis-server*
+internal/version/version.go
+
+
 __debug_bin
 
 **.crt

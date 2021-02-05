@@ -1,6 +1,6 @@
 
 
-VERSION="0.2"
+VERSION="1.0"
 TIME=$(shell date +"%d-%m-%y")
 
 
@@ -22,15 +22,15 @@ hello:
 	@echo " # Welcome in omnis-server project !\n"
 
 build: hello version
-	go build ../cmd/omnis-server
+	go build -o ./omnis-server_$(VERSION) ../cmd/omnis-server
 
 all: compile 
 
 
 compile: hello version
 	@echo "Compiling for every OS"
-	GOOS=linux go build ../cmd/omnis-server
-	GOOS=windows go build ../cmd/omnis-server
+	GOOS=linux go build -o ./omnis-server_$(VERSION) ../cmd/omnis-server
+	GOOS=windows go build -o ./omnis-server_$(VERSION).exe ../cmd/omnis-server
 
 run: hello
 	go run ../cmd/omnis-server testdata/example.json
