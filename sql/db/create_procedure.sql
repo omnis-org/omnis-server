@@ -586,6 +586,14 @@ BEGIN
     SELECT id,uuid,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version FROM Machine WHERE id=p_id AND automatic=p_automatic;
 END //
 
+-- get_machine_by_uuid
+DROP PROCEDURE IF EXISTS get_machine_by_uuid//
+CREATE PROCEDURE get_machine_by_uuid(IN p_uuid VARCHAR(36), IN p_automatic BOOLEAN)
+BEGIN
+    SELECT id,uuid,hostname,label,description,virtualization_system,serial_number,machine_type,perimeter_id,location_id,operating_system_id,omnis_version FROM Machine WHERE uuid=p_uuid AND automatic=p_automatic;
+END //
+
+
 
 -- get_timestamp_machines
 DROP PROCEDURE IF EXISTS get_timestamp_machines//

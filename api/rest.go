@@ -377,6 +377,7 @@ func (api *API) setupSoftware(apiPath string) {
 func (api *API) setupMachine(apiPath string) {
 	var machine model.Object = new(model.Machine)
 	api.setupBasicFunctions(apiPath, db.GetMachinesO, db.GetMachineO, db.InsertMachineO, db.UpdateMachineO, db.DeleteMachine, db.GetOutdatedMachinesO, "machine", &machine)
+	api.setupGetObjectByString(apiPath, db.GetMachineByUUIDO, "machine", "uuid")
 }
 
 func (api *API) setupInstalledSoftware(apiPath string) {

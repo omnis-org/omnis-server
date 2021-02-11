@@ -40,27 +40,19 @@ func AnalyzeClientInformations(i interface{}) error {
 	log.Info(fmt.Sprintf("get new informations from : %s", infos.SystemInformations.Hostname))
 	log.Info(infos)
 	var machineID int32 = 0
-	for _, itf := range infos.NetworkInformations.Interfaces {
-		if itf.MAC == "" {
-			continue
-		}
 
-		log.Debug(fmt.Sprintf("machine as interface with mac : %s", itf.MAC))
+	machine, err := db.GetMachineByUUID(infos.SystemInformations.UUID, true)
+	if err != nil {
+		return fmt.Errorf("db.GetMachineByUUID failed <- %v", err)
+	}
 
-		itf2, err := db.GetInterfaceByMac(itf.MAC, true)
-		if err != nil {
-			return fmt.Errorf("db.GetInterfaceByMac failed <- %v", err)
-		}
-
-		if itf2.ID.Valid {
-			machineID = itf2.MachineID.Int32
-			break
-		}
+	if machine != nil {
+		machineID = machine.ID.Int32
 	}
 
 	log.Debug(fmt.Sprintf("machine id : %d", machineID))
 
-	err := doClientInformations(infos, machineID)
+	err = doClientInformations(infos, machineID)
 	if err != nil {
 		return fmt.Errorf("doClientInformations failed <- %v", err)
 	}

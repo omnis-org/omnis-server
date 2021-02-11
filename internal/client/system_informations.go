@@ -91,11 +91,18 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 	var location model.NullInt32
 	var operatingSystem model.NullInt32
 	var omnisVersion model.NullString
+	var uuid model.NullString
 
 	err := hostname.Scan(systemInformations.Hostname)
 	if err != nil {
 		return 0, fmt.Errorf("hostname.Scan failed <- %v", err)
 	}
+
+	err = uuid.Scan(systemInformations.UUID)
+	if err != nil {
+		return 0, fmt.Errorf("uuid.Scan failed <- %v", err)
+	}
+
 	err = label.Scan(systemInformations.Hostname)
 	if err != nil {
 		return 0, fmt.Errorf("label.Scan failed <- %v", err)
@@ -143,6 +150,7 @@ func doMachine(systemInformations *client_informations.SystemInformations, locat
 	}
 
 	machine := model.Machine{Hostname: &hostname,
+		UUID:                 &uuid,
 		Label:                &label,
 		VirtualizationSystem: &virtualizationSystem,
 		SerialNumber:         &serialNumber,

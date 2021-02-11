@@ -89,6 +89,40 @@ func GetMachine(id int32, automatic bool) (*model.Machine, error) {
 	return &machine, nil
 }
 
+// GetMachineByUUID should have a comment.
+func GetMachineByUUID(uuid string, automatic bool) (*model.Machine, error) {
+	log.Debug(fmt.Sprintf("GetMachineByUUID(%s,%t)", uuid, automatic))
+
+	db, err := GetOmnisConnection()
+	if err != nil {
+		return nil, fmt.Errorf("GetOmnisConnection failed <- %v", err)
+	}
+
+	var machine model.Machine
+	err = db.QueryRow("CALL get_machine_by_uuid(?,?);", uuid, automatic).Scan(&machine.ID,
+		&machine.UUID,
+		&machine.Hostname,
+		&machine.Label,
+		&machine.Description,
+		&machine.VirtualizationSystem,
+		&machine.SerialNumber,
+		&machine.MachineType,
+		&machine.PerimeterID,
+		&machine.LocationID,
+		&machine.OperatingSystemID,
+		&machine.OmnisVersion)
+
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+
+	if err != nil {
+		return nil, fmt.Errorf("db.QueryRow failed <- %v", err)
+	}
+
+	return &machine, nil
+}
+
 // GetPendingMachines should have a comment.
 func GetPendingMachines() (model.Machines, error) {
 	log.Debug("GetPendingMachines()")
@@ -146,7 +180,7 @@ func InsertMachine(machine *model.Machine, automatic bool) (int32, error) {
 	}
 
 	var id int32 = 0
-	sqlStr := "CALL insert_machine(?,?,NULL,?,?,?,?,?,?,?,?,?,?);"
+	sqlStr := "CALL insert_machine(?,NULL,?,?,?,?,?,?,?,?,?,?,?);"
 
 	err = db.QueryRow(sqlStr,
 		machine.UUID,
@@ -320,6 +354,11 @@ func GetMachinesO(automatic bool) (model.Objects, error) {
 // GetMachineO should have a comment.
 func GetMachineO(id int32, automatic bool) (model.Object, error) {
 	return GetMachine(id, automatic)
+}
+
+// GetMachineByUUIDO should have a comment.
+func GetMachineByUUIDO(uuid string, automatic bool) (model.Object, error) {
+	return GetMachineByUUID(uuid, automatic)
 }
 
 // InsertMachineO should have a comment.

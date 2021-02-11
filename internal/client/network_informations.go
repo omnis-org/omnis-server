@@ -249,7 +249,12 @@ func doInterfaces(interfaces []client_informations.InterfaceInformations, machin
 			}
 		}
 
-		err = doInterface(&itf, machineID, perimeterID, updateInterface.ID.Int32)
+		var updateInterfaceID int32 = 0
+		if updateInterface.ID != nil {
+			updateInterfaceID = updateInterface.ID.Int32
+		}
+
+		err = doInterface(&itf, machineID, perimeterID, updateInterfaceID)
 		if err != nil {
 			return fmt.Errorf("doInterface failed <- %v", err)
 		}
